@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chasing Golden Age Golf | The Caddie Chat</title>
+  <meta name="description" content="Nine days, ten courses — a journey through the greatest golden age golf architecture in the American Northeast.">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛳</text></svg>">
+  <style>
+    .course-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .course-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--color-border);
+      transition: background 0.3s ease;
+      text-decoration: none;
+    }
+    .course-item:first-child {
+      border-top: 1px solid var(--color-border);
+    }
+    .course-item:hover {
+      background: var(--color-bg-elevated);
+      padding-left: var(--space-sm);
+      padding-right: var(--space-sm);
+    }
+    .course-num {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 400;
+      color: var(--color-text-muted);
+      line-height: 1;
+      font-style: italic;
+    }
+    .course-item:hover .course-num {
+      color: var(--color-accent);
+    }
+    .course-info h3 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: 0.25rem;
+    }
+    .course-info p {
+      color: var(--color-text-secondary);
+      font-size: 0.88rem;
+    }
+    .course-arrow {
+      font-size: 1.2rem;
+      color: var(--color-text-muted);
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+    .course-item:hover .course-arrow {
+      color: var(--color-accent);
+      transform: translateX(4px);
+    }
+    .trip-intro {
+      max-width: 720px;
+      margin-bottom: var(--space-xl);
+    }
+    .trip-intro p {
+      color: var(--color-text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.85;
+      margin-bottom: var(--space-sm);
+    }
+
+    @media (max-width: 600px) {
+      .course-item {
+        grid-template-columns: 50px 1fr auto;
+      }
+      .course-num {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="nav">
+    <div class="container">
+      <a href="/" class="nav-logo">The Caddie <span>Chat</span></a>
+      <ul class="nav-links">
+        <li><a href="/caddie-chronicles/">Chronicles</a></li>
+        <li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li>
+        <li><a href="/through-the-lens/">Through the Lens</a></li>
+        <li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== PAGE HEADER ===== -->
+  <header class="page-header">
+    <div class="container">
+      <span class="section-label">Architecture & History</span>
+      <h1>Chasing<br>Golden Age<br><em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">Golf</em></h1>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- ===== TRIP INTRO ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="trip-intro reveal">
+        <p>Nine days, ten courses, and a search for the heart of Golden Age golf in the Northeast. This trip wasn't just mine — it was a journey shared with two fellow Evans Scholars and Old Barnwell caddies, chasing the designs that shaped the game we love.</p>
+        <p>From Tillinghast to Raynor, from the public gems to the most exclusive private clubs, these are the courses and the stories from the road.</p>
+      </div>
+
+      <!-- ===== COURSE LIST ===== -->
+      <div class="course-list">
+
+        <a href="#stonewall" class="course-item reveal">
+          <span class="course-num">01</span>
+          <div class="course-info">
+            <h3>Stonewall</h3>
+            <p>Old North Course — Tom Doak's vision of strategic restraint</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#byrne" class="course-item reveal">
+          <span class="course-num">02</span>
+          <div class="course-info">
+            <h3>Francis A. Byrne Golf Course</h3>
+            <p>A public Tillinghast hidden in plain sight</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#mountain-ridge" class="course-item reveal">
+          <span class="course-num">03</span>
+          <div class="course-info">
+            <h3>Mountain Ridge CC</h3>
+            <p>Tillinghast's rolling masterpiece in northern New Jersey</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#essex-county" class="course-item reveal">
+          <span class="course-num">04</span>
+          <div class="course-info">
+            <h3>Essex County CC</h3>
+            <p>Golden Age elegance with views that stop you mid-swing</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#north-jersey" class="course-item reveal">
+          <span class="course-num">05</span>
+          <div class="course-info">
+            <h3>North Jersey CC</h3>
+            <p>A Raynor template course with serious teeth</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#hollywood" class="course-item reveal">
+          <span class="course-num">06</span>
+          <div class="course-info">
+            <h3>Hollywood GC</h3>
+            <p>Raynor in the hills — dramatic, demanding, unforgettable</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#winged-foot" class="course-item reveal">
+          <span class="course-num">07</span>
+          <div class="course-info">
+            <h3>Winged Foot GC</h3>
+            <p>Tillinghast's crown jewel — as intimidating as its reputation</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+        <a href="#friars-head" class="course-item reveal">
+          <span class="course-num">08</span>
+          <div class="course-info">
+            <h3>Friar's Head</h3>
+            <p>Coore & Crenshaw's links on Long Island's North Shore</p>
+          </div>
+          <span class="course-arrow">→</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="section-pad" style="background: var(--color-bg-elevated);">
+    <div class="container">
+      <div class="cta-banner reveal">
+        <h2>The chase <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">continues.</em></h2>
+        <p>More courses, more architecture, more stories from the golden age are on the way.</p>
+        <a href="/" class="btn btn-arrow">Back to Home</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">The Caddie <span>Chat</span></div>
+        <ul class="footer-links">
+          <li><a href="/caddie-chronicles/">Chronicles</a></li>
+          <li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li>
+          <li><a href="/through-the-lens/">Through the Lens</a></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">© 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span>
+        <div class="footer-social">
+          <a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>
