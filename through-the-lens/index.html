@@ -4,150 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Through the Lens | The Caddie Chat</title>
-  <meta name="description" content="Photography galleries — film rolls from abroad, tournament moments, and city streets through a caddie's lens.">
+  <meta name="description" content="Photography galleries — film rolls from abroad, tournament moments, and city streets.">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛳</text></svg>">
-  <style>
-    .gallery-section {
-      margin-bottom: var(--space-xl);
-    }
-    .gallery-section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: var(--space-md);
-      padding-bottom: var(--space-sm);
-      border-bottom: 1px solid var(--color-border);
-    }
-    .gallery-section-header h2 {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      font-weight: 500;
-    }
-    .gallery-section-header span {
-      font-size: 0.78rem;
-      color: var(--color-text-muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .gallery-masonry {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
-    .gallery-masonry-item {
-      overflow: hidden;
-      position: relative;
-      cursor: pointer;
-      background: var(--color-bg-card);
-    }
-    .gallery-masonry-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.6s ease, filter 0.4s ease;
-    }
-    .gallery-masonry-item:hover img {
-      transform: scale(1.06);
-    }
-    .gallery-masonry-item.tall {
-      grid-row: span 2;
-    }
-    .gallery-masonry-item.wide {
-      grid-column: span 2;
-    }
-    .gallery-masonry-item .overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(11,11,11,0.7) 0%, transparent 50%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      display: flex;
-      align-items: flex-end;
-      padding: var(--space-sm);
-    }
-    .gallery-masonry-item:hover .overlay {
-      opacity: 1;
-    }
-    .overlay-text {
-      font-family: var(--font-display);
-      font-size: 0.95rem;
-      font-style: italic;
-      color: var(--color-text-primary);
-    }
-
-    /* Gallery collection cards for the sub-pages */
-    .collection-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: var(--space-md);
-    }
-    .collection-card {
-      position: relative;
-      overflow: hidden;
-      aspect-ratio: 4/3;
-      display: flex;
-      align-items: flex-end;
-      border: 1px solid var(--color-border);
-      transition: border-color 0.4s ease, transform 0.4s ease;
-    }
-    .collection-card:hover {
-      border-color: rgba(201, 169, 110, 0.3);
-      transform: translateY(-3px);
-    }
-    .collection-card img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.7s ease;
-    }
-    .collection-card:hover img {
-      transform: scale(1.05);
-    }
-    .collection-card-overlay {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      padding: var(--space-md);
-      background: linear-gradient(to top, rgba(11,11,11,0.85) 0%, transparent 100%);
-    }
-    .collection-card h3 {
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      font-weight: 500;
-      margin-bottom: 0.25rem;
-    }
-    .collection-card p {
-      font-size: 0.82rem;
-      color: var(--color-text-secondary);
-    }
-
-    @media (max-width: 768px) {
-      .gallery-masonry {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .collection-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    @media (max-width: 480px) {
-      .gallery-masonry {
-        grid-template-columns: 1fr;
-      }
-      .gallery-masonry-item.tall,
-      .gallery-masonry-item.wide {
-        grid-row: span 1;
-        grid-column: span 1;
-      }
-    }
-  </style>
 </head>
 <body>
-
-  <!-- ===== NAVIGATION ===== -->
   <nav class="nav">
     <div class="container">
       <a href="/" class="nav-logo">The Caddie <span>Chat</span></a>
@@ -157,143 +18,49 @@
         <li><a href="/through-the-lens/">Through the Lens</a></li>
         <li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li>
       </ul>
-      <button class="nav-toggle" aria-label="Menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
-  <!-- ===== PAGE HEADER ===== -->
-  <header class="page-header">
-    <div class="container">
-      <span class="section-label">Photography</span>
-      <h1>Through<br>the <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">Lens</em></h1>
-      <p>A visual journal — film rolls from abroad, tournament moments, and the cities and courses that shape the journey.</p>
-    </div>
-  </header>
-
+  <header class="page-header"><div class="container">
+    <span class="section-label">Photography</span>
+    <h1>Through<br>the <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">Lens</em></h1>
+    <p>A visual journal — film rolls from abroad, tournament moments, and city streets through a caddie's lens.</p>
+  </div></header>
   <div class="divider"></div>
-
-  <!-- ===== GALLERY COLLECTIONS ===== -->
-  <section class="section-pad-lg">
-    <div class="container">
-
-      <!-- Film Rolls -->
-      <div class="gallery-section reveal">
-        <div class="gallery-section-header">
-          <h2>Film Rolls from Abroad</h2>
-          <span>3 Collections</span>
-        </div>
-        <div class="collection-grid">
-
-          <a href="#abroad-1" class="collection-card">
-            <!-- REPLACE with your actual film roll images -->
-            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=700&q=80" alt="Abroad Film Roll #1">
-            <div class="collection-card-overlay">
-              <h3>Abroad Film Roll #1</h3>
-              <p>First roll — early days overseas</p>
-            </div>
-          </a>
-
-          <a href="#abroad-2" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=700&q=80" alt="Abroad Film Roll #2">
-            <div class="collection-card-overlay">
-              <h3>Abroad Film Roll #2</h3>
-              <p>Deeper into the continent</p>
-            </div>
-          </a>
-
-          <a href="#abroad-3" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=700&q=80" alt="Abroad Film Roll #3">
-            <div class="collection-card-overlay">
-              <h3>Abroad Film Roll #3</h3>
-              <p>Final frames abroad</p>
-            </div>
-          </a>
-
-        </div>
-      </div>
-
-      <!-- Cities -->
-      <div class="gallery-section reveal">
-        <div class="gallery-section-header">
-          <h2>Cities</h2>
-          <span>4 Collections</span>
-        </div>
-        <div class="collection-grid">
-
-          <a href="#key-west" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1580740
-613439-6a0fdf58c695?w=700&q=80" alt="Key West">
-            <div class="collection-card-overlay">
-              <h3>Key West</h3>
-              <p>Sun, salt, and slow mornings</p>
-            </div>
-          </a>
-
-          <a href="#philadelphia" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1569761316261-9a8696fa2ca3?w=700&q=80" alt="Philadelphia">
-            <div class="collection-card-overlay">
-              <h3>Philadelphia</h3>
-              <p>Grit and history on every block</p>
-            </div>
-          </a>
-
-          <a href="#minneapolis" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=700&q=80" alt="Minneapolis">
-            <div class="collection-card-overlay">
-              <h3>Minneapolis</h3>
-              <p>Lakes, bridges, and Midwest light</p>
-            </div>
-          </a>
-
-          <a href="#saint-louis" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1603118913037-3d4b0e1e8b6e?w=700&q=80" alt="Saint Louis">
-            <div class="collection-card-overlay">
-              <h3>Saint Louis</h3>
-              <p>The Gateway and beyond</p>
-            </div>
-          </a>
-
-        </div>
-      </div>
-
-      <!-- Tournament -->
-      <div class="gallery-section reveal">
-        <div class="gallery-section-header">
-          <h2>Tournaments</h2>
-          <span>1 Collection</span>
-        </div>
-        <div class="collection-grid">
-
-          <a href="#bmw" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=700&q=80" alt="BMW Championship 2024">
-            <div class="collection-card-overlay">
-              <h3>BMW Championship 2024</h3>
-              <p>Inside the ropes at a FedEx Cup playoff</p>
-            </div>
-          </a>
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ===== CTA ===== -->
-  <section class="section-pad" style="background: var(--color-bg-elevated);">
-    <div class="container">
-      <div class="cta-banner reveal">
-        <h2>See more on <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">Instagram.</em></h2>
-        <p>Daily shots, behind-the-scenes, and work in progress — the feed is always alive.</p>
-        <a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" class="btn btn-primary btn-arrow">@thecaddiechat</a>
+  <section class="section-pad-lg"><div class="container">
+    <div class="gallery-section reveal">
+      <div class="gallery-section-header"><h2>Film Rolls</h2><span>3 Collections</span></div>
+      <div class="collection-grid">
+        <a href="#ireland" class="collection-card"><img src="https://images.unsplash.com/photo-1590089415225-401ed6f9db8e?w=700&q=80" alt="Ireland"><div class="collection-card-overlay"><h3>Ireland</h3><p>Emerald greens and ancient stone</p></div></a>
+        <a href="#scotland" class="collection-card"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="Scotland"><div class="collection-card-overlay"><h3>Scotland</h3><p>Links land and highland skies</p></div></a>
+        <a href="#italy" class="collection-card"><img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=700&q=80" alt="Italy"><div class="collection-card-overlay"><h3>Italy</h3><p>Light, color, and la dolce vita</p></div></a>
       </div>
     </div>
-  </section>
+    <div class="gallery-section reveal">
+      <div class="gallery-section-header"><h2>Cities</h2><span>4 Collections</span></div>
+      <div class="collection-grid">
+        <a href="#chicago" class="collection-card"><img src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=700&q=80" alt="Chicago"><div class="collection-card-overlay"><h3>Chicago</h3><p>The city that raised me</p></div></a>
+        <a href="#new-york" class="collection-card"><img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=700&q=80" alt="New York"><div class="collection-card-overlay"><h3>New York</h3><p>Concrete canyons and quiet corners</p></div></a>
+        <a href="#nashville" class="collection-card"><img src="https://images.unsplash.com/photo-1545419913-775e3e1643c1?w=700&q=80" alt="Nashville"><div class="collection-card-overlay"><h3>Nashville</h3><p>Music, murals, and southern light</p></div></a>
+        <a href="#stlouis" class="collection-card"><img src="https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?w=700&q=80" alt="Saint Louis"><div class="collection-card-overlay"><h3>Saint Louis</h3><p>The Gateway and beyond</p></div></a>
+      </div>
+    </div>
+    <div class="gallery-section reveal">
+      <div class="gallery-section-header"><h2>Tournaments</h2><span>1 Collection</span></div>
+      <div class="collection-grid">
+        <a href="#bmw" class="collection-card"><img src="https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=700&q=80" alt="BMW Championship"><div class="collection-card-overlay"><h3>BMW Championship 2024</h3><p>Inside the ropes at a FedEx Cup playoff</p></div></a>
+      </div>
+    </div>
+  </div></section>
+  <section class="section-pad section-elevated"><div class="container">
+    <div class="cta-banner reveal">
+      <h2>See more on <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">Instagram.</em></h2>
+      <p>Daily shots, behind-the-scenes, and work in progress — the feed is always alive.</p>
+      <a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" class="btn btn-primary btn-arrow">@thecaddiechat</a>
+    </div>
+  </div></section>
 
-  <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -305,7 +72,7 @@
         </ul>
       </div>
       <div class="footer-bottom">
-        <span class="footer-copy">© 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span>
+        <span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span>
         <div class="footer-social">
           <a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
@@ -314,7 +81,6 @@
       </div>
     </div>
   </footer>
-
   <script src="../assets/js/main.js"></script>
 </body>
 </html>

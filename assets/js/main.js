@@ -1,18 +1,11 @@
-/* ============================================
-   THE CADDIE CHAT — Main Scripts
-   ============================================ */
-
 document.addEventListener('DOMContentLoaded', () => {
-
-  // --- Scroll-based nav background ---
   const nav = document.querySelector('.nav');
   if (nav) {
     window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 40);
-    });
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
   }
 
-  // --- Mobile nav toggle ---
   const toggle = document.querySelector('.nav-toggle');
   const links = document.querySelector('.nav-links');
   if (toggle && links) {
@@ -21,8 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
       links.classList.toggle('open');
       document.body.style.overflow = links.classList.contains('open') ? 'hidden' : '';
     });
-
-    // Close mobile nav on link click
     links.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', () => {
         toggle.classList.remove('active');
@@ -32,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Scroll reveal ---
   const reveals = document.querySelectorAll('.reveal');
   if (reveals.length) {
     const observer = new IntersectionObserver((entries) => {
@@ -43,11 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
     reveals.forEach(el => observer.observe(el));
   }
 
-  // --- Animated stat counters ---
   const counters = document.querySelectorAll('[data-count]');
   if (counters.length) {
     const countObserver = new IntersectionObserver((entries) => {
@@ -58,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }, { threshold: 0.5 });
-
     counters.forEach(el => countObserver.observe(el));
   }
 
@@ -68,24 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const prefix = el.getAttribute('data-prefix') || '';
     const duration = 1800;
     const startTime = performance.now();
-
     function update(now) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.round(eased * target);
       el.textContent = prefix + current.toLocaleString() + suffix;
       if (progress < 1) requestAnimationFrame(update);
     }
-
     requestAnimationFrame(update);
   }
 
-  // --- Stagger animation for card grids ---
-  const cards = document.querySelectorAll('.content-card, .post-card, .gallery-item');
-  cards.forEach((card, i) => {
-    card.style.transitionDelay = `${i * 0.1}s`;
-  });
-
+  const cards = document.querySelectorAll('.content-card, .post-card, .collection-card, .course-item');
+  cards.forEach((card, i) => { card.style.transitionDelay = `${i * 0.08}s`; });
 });
