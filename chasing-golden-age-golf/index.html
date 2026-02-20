@@ -3,12 +3,113 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chasing Golden Age Golf | The Caddie Chat</title>
-  <meta name="description" content="Nine days, eight courses — golden age golf architecture in the American Northeast.">
+  <title>Stonewall — Old Course | The Caddie Chat</title>
+  <meta name="description" content="Day one of the Northeast trip — walking Tom Doak's minimalist masterpiece in the Pennsylvania countryside.">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛳</text></svg>">
+  <style>
+    .course-hero {
+      padding: calc(var(--nav-height) + var(--space-xl)) 0 var(--space-lg);
+    }
+    .course-meta {
+      display: flex;
+      gap: var(--space-lg);
+      flex-wrap: wrap;
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--color-border);
+    }
+    .course-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .course-meta-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+    .course-meta-value {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--color-text-primary);
+    }
+    .course-body {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .course-body p {
+      color: var(--color-text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+    .course-body p:first-of-type::first-letter {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      float: left;
+      line-height: 1;
+      margin-right: 0.5rem;
+      margin-top: 0.1rem;
+      color: var(--color-accent);
+    }
+    .course-body h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin: 2.5rem 0 1rem;
+    }
+    .pull-quote {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-style: italic;
+      color: var(--color-accent);
+      line-height: 1.5;
+      padding: var(--space-md) 0;
+      margin: var(--space-md) 0;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .course-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-lg) 0;
+      margin-top: var(--space-lg);
+      border-top: 1px solid var(--color-border);
+    }
+    .course-nav a {
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      transition: color 0.3s ease;
+    }
+    .course-nav a:hover {
+      color: var(--color-accent);
+    }
+    .course-number {
+      font-family: var(--font-display);
+      font-size: 8rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--color-text-muted);
+      line-height: 1;
+      opacity: 0.3;
+    }
+    @media (max-width: 768px) {
+      .course-number { font-size: 5rem; }
+      .course-body p:first-of-type::first-letter { font-size: 2.8rem; }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- ===== NAVIGATION ===== -->
   <nav class="nav">
     <div class="container">
       <a href="/" class="nav-logo">The Caddie <span>Chat</span></a>
@@ -18,40 +119,95 @@
         <li><a href="/through-the-lens/">Through the Lens</a></li>
         <li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li>
       </ul>
-      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </nav>
 
-  <header class="page-header"><div class="container">
-    <span class="section-label">Architecture &amp; History</span>
-    <h1>Chasing<br>Golden Age<br><em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">Golf</em></h1>
-  </div></header>
-  <div class="divider"></div>
-  <section class="section-pad-lg"><div class="container">
-    <div class="trip-intro reveal">
-      <p>Nine days, eight courses, and a search for the heart of Golden Age golf in the Northeast.</p>
-      <p>This trip wasn't just mine — it was a journey shared with two fellow Evans Scholars and Old Barnwell caddies, chasing the designs that shaped the game we love.</p>
-      <p>From Tillinghast to Travis, from the public gems to the most exclusive private clubs, these are the courses and the stories from the road.</p>
+  <!-- ===== COURSE HERO ===== -->
+  <section class="course-hero">
+    <div class="container">
+      <span class="section-label"><a href="/chasing-golden-age-golf/" style="color: inherit;">Chasing Golden Age Golf</a> — Course 01</span>
+      <div class="course-number">01</div>
+      <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 500; line-height: 1.1; margin-top: -1rem;">
+        Stonewall<br><em style="font-style: italic; color: var(--color-accent);">Old Course</em>
+      </h1>
+      <div class="course-meta">
+        <div class="course-meta-item">
+          <span class="course-meta-label">Architect</span>
+          <span class="course-meta-value">Tom Doak</span>
+        </div>
+        <div class="course-meta-item">
+          <span class="course-meta-label">Opened</span>
+          <span class="course-meta-value">1993</span>
+        </div>
+        <div class="course-meta-item">
+          <span class="course-meta-label">Location</span>
+          <span class="course-meta-value">Elverson, PA</span>
+        </div>
+        <div class="course-meta-item">
+          <span class="course-meta-label">Style</span>
+          <span class="course-meta-value">Walking Only</span>
+        </div>
+      </div>
     </div>
-    <div class="course-list">
-      <a href="/chasing-golden-age-golf/stonewall/" class="course-item reveal"><span class="course-num">01</span><div class="course-info"><h3>Stonewall</h3><p>Tom Doak's first solo design — strategic restraint on rolling Pennsylvania terrain</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/byrne/" class="course-item reveal"><span class="course-num">02</span><div class="course-info"><h3>Francis A. Byrne Golf Course</h3><p>Charles Banks completing Seth Raynor's plans — a public gem hidden in plain sight</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/mountain-ridge/" class="course-item reveal"><span class="course-num">03</span><div class="course-info"><h3>Mountain Ridge CC</h3><p>Donald Ross's rolling masterpiece in northern New Jersey</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/essex-county/" class="course-item reveal"><span class="course-num">04</span><div class="course-info"><h3>Essex County CC</h3><p>A collaboration of Tillinghast, Raynor, and Banks — New Jersey's oldest club</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/north-jersey/" class="course-item reveal"><span class="course-num">05</span><div class="course-info"><h3>North Jersey CC</h3><p>Walter Travis design with serious strategic teeth</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/hollywood/" class="course-item reveal"><span class="course-num">06</span><div class="course-info"><h3>Hollywood GC</h3><p>Walter Travis in the hills — dramatic, demanding, unforgettable</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/winged-foot/" class="course-item reveal"><span class="course-num">07</span><div class="course-info"><h3>Winged Foot GC</h3><p>Tillinghast's crown jewel — as intimidating as its reputation</p></div><span class="course-arrow">→</span></a>
-      <a href="/chasing-golden-age-golf/friars-head/" class="course-item reveal"><span class="course-num">08</span><div class="course-info"><h3>Friar's Head</h3><p>Coore &amp; Crenshaw's links on Long Island's North Shore</p></div><span class="course-arrow">→</span></a>
-    </div>
-  </div></section>
-  <section class="section-pad section-elevated"><div class="container">
-    <div class="cta-banner reveal">
-      <h2>The chase <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">continues.</em></h2>
-      <p>More courses, more architecture, more stories from the golden age are on the way.</p>
-      <a href="/" class="btn btn-arrow">Back to Home</a>
-    </div>
-  </div></section>
+  </section>
 
+  <div class="divider"></div>
+
+  <!-- ===== COURSE CONTENT ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="course-body reveal">
+
+        <p>We pulled off the highway somewhere west of Philadelphia into a stretch of Pennsylvania countryside that felt like it had not changed in a hundred years. Rolling dairy land. Stone walls lining the road. No signage, no fanfare, no indication that one of the most important golf courses of the modern era was tucked behind these fields. That was the first thing Stonewall taught us — great golf does not need to announce itself.</p>
+
+        <p>This was day one. Three Evans Scholars and Old Barnwell caddies, a rental car loaded with golf bags and not nearly enough clean clothes for nine days on the road, chasing the architecture we had spent years reading about and talking about over beers after long loops. We had driven from the airport with that kind of energy you only get at the start of something — when the whole trip is still ahead of you and every course on the list feels like a promise waiting to be kept.</p>
+
+        <p>Stonewall was the right place to start. Not because it is the oldest course on our list or the most famous, but because it captures something pure about what golf can be when the ego is stripped away. The club was founded in the early 1990s by Jack May, a Philadelphia attorney who wanted a place where golf was the only agenda. No tennis courts. No swimming pool. No cart paths. Just golf, walking, and the Pennsylvania countryside.</p>
+
+        <h2>Doak's Laboratory</h2>
+
+        <p>The story of how Tom Doak ended up here is one of those beautiful accidents in golf architecture. The project was originally a Tom Fazio commission, but when Fazio got pulled away by Shadow Creek, the relatively unknown Doak was given the opportunity to step in. He kept much of the original routing to avoid refiling permits, but made it unmistakably his own — most notably reversing the direction of what became the 18th hole, sweeping it down the hillside toward the old stone barn that serves as the clubhouse.</p>
+
+        <p>When Doak was building Stonewall, they wanted to tear down that barn behind the 18th green. Doak made everyone march up the hill and stand on the fairway and look at it. He convinced them that the building was part of the architecture, that you could not separate the golf from the land it sat on. That instinct — to let the property speak rather than impose your will on it — is what makes the Old Course at Stonewall feel like it has been there forever.</p>
+
+        <div class="pull-quote">
+          "Great golf does not need to announce itself. The land speaks, and the architect's job is to listen."
+        </div>
+
+        <p>Walking it, you feel the restraint in every hole. The greens are small and tilted, and they make the course play far harder than the yardage suggests. A contour on the 2nd green was inspired by the 7th green at Merion, and if you pay attention, you can catch other subtle tributes to the Philadelphia-area courses that Doak studied and admired. This is not a course that screams at you. It asks questions, and the best answers come from golfers who are willing to think.</p>
+
+        <h2>Walking the Ground</h2>
+
+        <p>The front nine weaves through ponds and a nasty ravine, testing your nerve off the tee more than once. But it is the back nine where the property really opens up. The natural rise and fall of the land creates dramatic driving visuals and side-hill approach shots that demand creativity. You find yourself inventing shots out here — bump and runs into greens, little cuts against the slope, the kind of golf that gets lost when everything is played through the air to a number on a sprinkler head.</p>
+
+        <p>The par threes are a highlight. Five of them, each one memorable. The downhill 5th, where the green is guarded by wetlands and a creek, offers panoramic views of the surrounding farmland that made all three of us stop and just look for a minute before teeing off. Those moments — when the golf pauses long enough for the place to sink in — are what separate great courses from merely difficult ones.</p>
+
+        <p>And then the 18th. That sweeping approach downhill, the stone barn waiting at the bottom, the wall running alongside the green. It is one of the great finishing holes in American golf, not because of its difficulty, but because of its sense of arrival. You feel like you have been somewhere by the time you walk off that green.</p>
+
+        <h2>What Stonewall Taught Us</h2>
+
+        <p>We played the Old Course in the late afternoon, the autumn light falling low across the fields, and by the time we finished, the three of us were quiet in the way you get when something has exceeded what you expected. This was not just a good golf course. It was a statement about what the game could be. Minimalist design. Walking only. Caddies encouraged. No pretension, just substance.</p>
+
+        <p>Stonewall set the tone for the entire trip. It reminded us why we were out here — not to check boxes on a ranking list, but to walk courses that were built with conviction, by architects who believed that golf was better when it respected the ground it was played on. Tom Doak built his reputation on that belief, and the Old Course at Stonewall is where it all started to come together for him.</p>
+
+        <p>As we drove away through those stone-lined roads toward New Jersey and whatever came next, I kept thinking about that barn behind 18. How close it came to being torn down. How one person standing on a hillside and saying "you cannot take that piece out" preserved something that now feels essential. That is architecture. That is what we came to find.</p>
+
+      </div>
+
+      <!-- ===== COURSE NAV ===== -->
+      <div class="course-nav">
+        <a href="/chasing-golden-age-golf/">← All Courses</a>
+        <a href="/chasing-golden-age-golf/francis-a-byrne/">Next: Francis A. Byrne →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -72,6 +228,7 @@
       </div>
     </div>
   </footer>
+
   <script src="../assets/js/main.js"></script>
 </body>
 </html>
