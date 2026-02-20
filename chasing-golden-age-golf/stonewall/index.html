@@ -36,6 +36,27 @@
       font-size: 1.1rem;
       color: var(--color-text-primary);
     }
+
+    /* ===== HERO IMAGE ===== */
+    .course-hero-image {
+      width: 100%;
+      margin: 0 0 var(--space-lg);
+      overflow: hidden;
+    }
+    .course-hero-image img {
+      width: 100%;
+      height: 60vh;
+      object-fit: cover;
+      object-position: center 40%;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .course-hero-image img {
+        height: 40vh;
+      }
+    }
+
+    /* ===== COURSE BODY ===== */
     .course-body {
       max-width: 720px;
       margin: 0 auto;
@@ -73,6 +94,154 @@
       border-top: 1px solid var(--color-border);
       border-bottom: 1px solid var(--color-border);
     }
+
+    /* ===== INLINE IMAGES ===== */
+    .inline-image {
+      margin: 2.5rem -4rem;
+      position: relative;
+    }
+    .inline-image img {
+      width: 100%;
+      border-radius: 2px;
+      display: block;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+    .inline-image img:hover {
+      opacity: 0.92;
+    }
+    .inline-image figcaption {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-top: 0.75rem;
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+    @media (max-width: 868px) {
+      .inline-image {
+        margin: 2rem -1rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .inline-image {
+        margin: 2rem 0;
+      }
+    }
+
+    /* ===== PHOTO GALLERY ===== */
+    .photo-gallery {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-lg) 0;
+    }
+    .photo-gallery h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-md);
+      text-align: center;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    .gallery-grid .gallery-item {
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      cursor: pointer;
+      position: relative;
+    }
+    .gallery-grid .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease, opacity 0.3s ease;
+    }
+    .gallery-grid .gallery-item:hover img {
+      transform: scale(1.03);
+      opacity: 0.9;
+    }
+    .gallery-grid .gallery-item.wide {
+      grid-column: span 2;
+    }
+    @media (max-width: 600px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .gallery-grid .gallery-item.wide {
+        grid-column: span 2;
+      }
+    }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.95);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+    .lightbox.active {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 2px;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 2rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.3s ease;
+    }
+    .lightbox-close:hover {
+      color: #fff;
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 2.5rem;
+      cursor: pointer;
+      padding: 1rem;
+      transition: color 0.3s ease;
+    }
+    .lightbox-nav:hover {
+      color: #fff;
+    }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      font-style: italic;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    /* ===== COURSE NAV ===== */
     .course-nav {
       display: flex;
       justify-content: space-between;
@@ -156,7 +325,10 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/stonewall/hero-walking-bunkers.jpg" alt="Walking the fairway at Stonewall, looking out toward Doak's bunker complexes and the Pennsylvania hills beyond" loading="eager">
+  </div>
 
   <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
@@ -167,11 +339,21 @@
 
         <p>This was day one. Three Evans Scholars and Old Barnwell caddies, a rental car loaded with golf bags and not nearly enough clean clothes for nine days on the road, chasing the architecture we had spent years reading about and talking about over beers after long loops. We had driven from the airport with that kind of energy you only get at the start of something. When the whole trip is still ahead of you and every course on the list feels like a promise waiting to be kept.</p>
 
+        <figure class="inline-image">
+          <img src="../../assets/images/courses/stonewall/clubhouse-approach.jpg" alt="The approach to the Stonewall clubhouse, with the old stone buildings framing the fairway and bunkers in the foreground" onclick="openLightbox(0)" loading="lazy">
+          <figcaption>The approach toward the clubhouse. Doak insisted on keeping the old stone barn, arguing that you could not separate the golf from the land it sat on.</figcaption>
+        </figure>
+
         <p>Stonewall was the right place to start. Not because it is the oldest course on our list or the most famous, but because it captures something pure about what golf can be when the ego is stripped away. The club was founded in the early 1990s by Jack May, a Philadelphia attorney who wanted a place where golf was the only agenda. No tennis courts. No swimming pool. No cart paths. Just golf, walking, and the Pennsylvania countryside.</p>
 
         <h2>Doak's Laboratory</h2>
 
         <p>The story of how Tom Doak ended up here is one of those beautiful accidents in golf architecture. The project was originally a Tom Fazio commission, but when Fazio got pulled away by Shadow Creek, the relatively unknown Doak was given the opportunity to step in. He kept much of the original routing to avoid refiling permits, but made it unmistakably his own, most notably reversing the direction of what became the 18th hole, sweeping it down the hillside toward the old stone barn that serves as the clubhouse.</p>
+
+        <figure class="inline-image">
+          <img src="../../assets/images/courses/stonewall/fairway-bunker-clusters.jpg" alt="Fairway view at Stonewall showing Tom Doak's distinctive bunker clusters set against the tree line" onclick="openLightbox(1)" loading="lazy">
+          <figcaption>Doak's bunkering at Stonewall is surgical. Clusters placed not to punish, but to frame decisions and reward the golfer who picks the right line.</figcaption>
+        </figure>
 
         <p>When Doak was building Stonewall, they wanted to tear down that barn behind the 18th green. Doak made everyone march up the hill and stand on the fairway and look at it. He convinced them that the building was part of the architecture, that you could not separate the golf from the land it sat on. That instinct, to let the property speak rather than impose your will on it, is what makes the Old Course at Stonewall feel like it has been there forever.</p>
 
@@ -184,6 +366,11 @@
         <h2>Walking the Ground</h2>
 
         <p>The front nine weaves through ponds and a nasty ravine, testing your nerve off the tee more than once. But it is the back nine where the property really opens up. The natural rise and fall of the land creates dramatic driving visuals and side-hill approach shots that demand creativity. You find yourself inventing shots out here. Bump and runs into greens, little cuts against the slope, the kind of golf that gets lost when everything is played through the air to a number on a sprinkler head.</p>
+
+        <figure class="inline-image">
+          <img src="../../assets/images/courses/stonewall/uphill-tee-shot.jpg" alt="View from an elevated tee at Stonewall, showing the dramatic uphill approach to a green guarded by bunkers" onclick="openLightbox(2)" loading="lazy">
+          <figcaption>The elevation changes at Stonewall create tee shots where you feel the full scale of the property opening up in front of you.</figcaption>
+        </figure>
 
         <p>The par threes are a highlight. Five of them, each one memorable. The downhill 5th, where the green is guarded by wetlands and a creek, offers panoramic views of the surrounding farmland that made all three of us stop and just look for a minute before teeing off. Those moments, when the golf pauses long enough for the place to sink in, are what separate great courses from merely difficult ones.</p>
 
@@ -198,11 +385,58 @@
         <p>As we drove away through those stone-lined roads toward New Jersey and whatever came next, I kept thinking about that barn behind 18. How close it came to being torn down. How one person standing on a hillside and saying "you cannot take that piece out" preserved something that now feels essential. That is architecture. That is what we came to find.</p>
 
       </div>
+    </div>
+  </section>
 
-      <!-- ===== COURSE NAV ===== -->
+  <div class="divider"></div>
+
+  <!-- ===== PHOTO GALLERY ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="photo-gallery">
+        <h2>From the Round</h2>
+        <div class="gallery-grid">
+          <div class="gallery-item wide" onclick="openLightbox(3)">
+            <img src="../../assets/images/courses/stonewall/fairway-rolling-hills.jpg" alt="Wide fairway with players at Stonewall, rolling Pennsylvania hills in the background" loading="lazy">
+          </div>
+          <div class="gallery-item" onclick="openLightbox(4)">
+            <img src="../../assets/images/courses/stonewall/tee-stone-wall.jpg" alt="Tee box at Stonewall with the signature stone wall running alongside" loading="lazy">
+          </div>
+          <div class="gallery-item" onclick="openLightbox(5)">
+            <img src="../../assets/images/courses/stonewall/elevated-tee-par3.jpg" alt="Elevated tee on a par three at Stonewall, looking down toward bunkers and a tucked green" loading="lazy">
+          </div>
+          <div class="gallery-item" onclick="openLightbox(6)">
+            <img src="../../assets/images/courses/stonewall/fairway-oak-tree.jpg" alt="A lone oak frames the tee shot, with the stone wall running the right edge of the fairway" loading="lazy">
+          </div>
+          <div class="gallery-item wide" onclick="openLightbox(7)">
+            <img src="../../assets/images/courses/stonewall/green-approach-players.jpg" alt="Players approaching a green at Stonewall with a bunker right and the wooded hills beyond" loading="lazy">
+          </div>
+          <div class="gallery-item" onclick="openLightbox(8)">
+            <img src="../../assets/images/courses/stonewall/fairway-bag-view.jpg" alt="A stand bag alone in the fairway, looking toward bunkers and the tree line at Stonewall" loading="lazy">
+          </div>
+          <div class="gallery-item" onclick="openLightbox(9)">
+            <img src="../../assets/images/courses/stonewall/finishing-hole-clubhouse.jpg" alt="The finishing hole at Stonewall, the fairway sweeping down toward the stone clubhouse" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/">← All Courses</a>
-        <a href="/chasing-golden-age-golf/francis-a-byrne/">Next: Francis A. Byrne →</a>
+        <a href="/chasing-golden-age-golf/">&#8592; All Courses</a>
+        <a href="/chasing-golden-age-golf/francis-a-byrne/">Next: Francis A. Byrne &#8594;</a>
       </div>
     </div>
   </section>
@@ -230,5 +464,58 @@
   </footer>
 
   <script src="../../assets/js/main.js"></script>
+  <script>
+    // Lightbox functionality
+    const lightboxImages = [
+      { src: '../../assets/images/courses/stonewall/clubhouse-approach.jpg', caption: 'The approach toward the clubhouse, with the old stone buildings framing the fairway.' },
+      { src: '../../assets/images/courses/stonewall/fairway-bunker-clusters.jpg', caption: 'Doak\'s bunker clusters, placed to frame decisions rather than simply punish.' },
+      { src: '../../assets/images/courses/stonewall/uphill-tee-shot.jpg', caption: 'An elevated tee revealing the full scale of the property.' },
+      { src: '../../assets/images/courses/stonewall/fairway-rolling-hills.jpg', caption: 'The wide fairways and rolling Pennsylvania hills of Stonewall.' },
+      { src: '../../assets/images/courses/stonewall/tee-stone-wall.jpg', caption: 'A tee box framed by the stone walls that give the club its name.' },
+      { src: '../../assets/images/courses/stonewall/elevated-tee-par3.jpg', caption: 'Looking down from an elevated tee toward a tucked green.' },
+      { src: '../../assets/images/courses/stonewall/fairway-oak-tree.jpg', caption: 'A lone oak and the stone wall defining the edge of play.' },
+      { src: '../../assets/images/courses/stonewall/green-approach-players.jpg', caption: 'Approaching the green with the wooded hills beyond.' },
+      { src: '../../assets/images/courses/stonewall/fairway-bag-view.jpg', caption: 'A stand bag in the fairway. Walking only at Stonewall.' },
+      { src: '../../assets/images/courses/stonewall/finishing-hole-clubhouse.jpg', caption: 'The finishing hole sweeping down toward the stone clubhouse.' }
+    ];
+
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentIndex = index;
+      const lightbox = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+      img.src = lightboxImages[index].src;
+      img.alt = lightboxImages[index].caption;
+      caption.textContent = lightboxImages[index].caption;
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function navigateLightbox(e, direction) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + direction + lightboxImages.length) % lightboxImages.length;
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+      img.src = lightboxImages[currentIndex].src;
+      img.alt = lightboxImages[currentIndex].caption;
+      caption.textContent = lightboxImages[currentIndex].caption;
+    }
+
+    document.addEventListener('keydown', function(e) {
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
