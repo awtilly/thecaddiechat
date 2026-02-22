@@ -13,19 +13,52 @@
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    .course-hero-image { width: 100%; overflow: hidden; position: relative; }
+    .course-hero-image img { width: 100%; height: 60vh; object-fit: cover; object-position: center 45%; display: block; }
+    .course-hero-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent); pointer-events: none; }
+
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    .inline-image { margin: 2.5rem -4rem; position: relative; }
+    .inline-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .inline-image img:hover { opacity: 0.92; }
+    .inline-image figcaption { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; font-style: italic; letter-spacing: 0.02em; }
+
+    .featured-image { margin: 3rem -4rem; position: relative; }
+    .featured-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+    .featured-caption .caption-line { width: 40px; min-width: 40px; height: 1px; background: var(--color-accent); margin-top: 0.6rem; }
+    .featured-caption p { font-size: 0.82rem; color: var(--color-text-muted); font-style: italic; letter-spacing: 0.02em; line-height: 1.6; margin: 0; }
+
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2.5rem; cursor: pointer; padding: 1rem; transition: color 0.3s ease; }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+
+    @media (max-width: 868px) { .inline-image, .featured-image { margin: 2rem -1rem; } }
+    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } .course-hero-image img { height: 45vh; } }
+    @media (max-width: 480px) { .inline-image, .featured-image { margin: 2rem 0; } }
   </style>
 </head>
 <body>
+
   <nav class="nav"><div class="container"><a href="/" class="nav-logo">The Caddie <span>Chat</span></a><ul class="nav-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li><li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li></ul><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
 
   <section class="course-hero">
@@ -42,8 +75,12 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/essex-county/hero-bag-panoramic.jpg" alt="A stand bag with tiger headcovers resting on an elevated tee at Essex County, the entire course spreading out below with ponds, bunkers, fescue edges, and the clubhouse in the distance under a wide New Jersey sky" loading="eager">
+  </div>
 
+  <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
     <div class="container">
       <div class="course-body reveal">
@@ -51,6 +88,15 @@
         <p>Some courses carry their history lightly, wearing it like a comfortable old jacket you barely notice anymore. Essex County Country Club wears its history like a crown. Founded in 1887, it is the oldest golf club in New Jersey and the sixth oldest in the entire United States, and it carries that weight with a quiet dignity that hits you the moment you turn into the property. The original clubhouse, once the Orange Springs Hotel, a health resort built around the area's mineral springs, still anchors the grounds, and you can feel the layers of time in every corner of the place.</p>
 
         <p>We arrived at Essex County in the middle of the trip, deep enough into our nine days that we had started to develop a shared vocabulary for what we were seeing. We could talk about routing without sounding like we were reading from a textbook. We could feel the difference between a green that was designed and one that was merely shaped. That fluency made Essex County even more rewarding, because this is a course that rewards close attention. A collaboration between three of the Golden Age's most important architects that somehow coheres into a single, unified experience.</p>
+
+        <!-- GROUP PHOTO: Featured treatment -->
+        <figure class="featured-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/essex-county/group-photo-tee.jpg" alt="The foursome standing on an elevated tee at Essex County, the entire course laid out behind them with the clubhouse, ponds, and rolling fairways under dramatic clouds" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>Day four. The foursome on the tee at Essex County with the entire property spread out behind us. Tillinghast holes on the left, Raynor-Banks on the right, and somehow it all works together.</p>
+          </div>
+        </figure>
 
         <h2>Three Architects, One Course</h2>
 
@@ -66,6 +112,12 @@
 
         <p>The setting itself is part of the story. Essex County sits on the slopes of the Orange Mountains, and the views from several elevated tees stretch out across the New Jersey landscape in a way that makes you forget you are twenty minutes from Manhattan. There is a grandeur to this place that is not manufactured. It comes from the terrain, from the old-growth trees, from the sense that people have been playing golf on this ground for nearly a century and a half.</p>
 
+        <!-- COUNTY FLAG: Inline image -->
+        <figure class="inline-image" onclick="openLightbox(1)">
+          <img src="../../assets/images/courses/essex-county/county-flag-bench.jpg" alt="The white Essex County flag flying above a wooden bench on the hilltop, the open links-style layout stretching below with golden fescue, scattered bunkers, and the clubhouse in the distance" loading="lazy">
+          <figcaption>The County flag on the hill. From up here, you can see how Hanse unified the Tillinghast and Raynor-Banks holes into one continuous landscape. The fescue, the open sight lines, the bunkers scattered like punctuation across the property.</figcaption>
+        </figure>
+
         <p>What struck all three of us was the variety. The Tillinghast holes tend to be more internally dramatic. Bold green contours, strategic bunkering that forces decisions, that unmistakable Tillinghast intensity where every shot matters. The Raynor-Banks holes bring the template tradition into play, with recognizable strategic concepts adapted to the specific slopes and angles of this property. Together, they create a round that never repeats itself, where every hole asks something new.</p>
 
         <h2>A Living Museum</h2>
@@ -75,14 +127,64 @@
         <p>Among the three of us, this was one of the most discussed courses of the entire trip. Not because it was the hardest or the most famous, but because it raised the most interesting questions. How do you blend three different architectural voices into one experience? What does it mean for a course to evolve over more than a century? Can renovation honor the past without being a slave to it? Essex County answers all of those questions, and the answer, in each case, is yes.</p>
 
       </div>
+    </div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/mountain-ridge/">← Prev: Mountain Ridge</a>
-        <a href="/chasing-golden-age-golf/north-jersey/">Next: North Jersey CC →</a>
+        <a href="/chasing-golden-age-golf/mountain-ridge/">&#8592; Prev: Mountain Ridge</a>
+        <a href="/chasing-golden-age-golf/north-jersey/">Next: North Jersey CC &#8594;</a>
       </div>
     </div>
   </section>
 
   <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">The Caddie <span>Chat</span></div><ul class="footer-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li></ul></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span><div class="footer-social"><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a></div></div></div></footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    const lightboxImages = [
+      { src: '../../assets/images/courses/essex-county/group-photo-tee.jpg', caption: 'The foursome on the tee at Essex County, the entire property behind us.' },
+      { src: '../../assets/images/courses/essex-county/county-flag-bench.jpg', caption: 'The County flag on the hill. The whole course visible from here.' },
+      { src: '../../assets/images/courses/essex-county/hero-bag-panoramic.jpg', caption: 'A stand bag on the tee. The course spreads out below like a painting.' }
+    ];
+    let currentIndex = 0;
+    function openLightbox(index) {
+      currentIndex = index;
+      document.getElementById('lightbox-img').src = lightboxImages[index].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[index].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[index].caption;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function navigateLightbox(e, dir) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + dir + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentIndex].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[currentIndex].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[currentIndex].caption;
+    }
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
