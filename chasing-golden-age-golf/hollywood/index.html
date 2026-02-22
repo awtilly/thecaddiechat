@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hollywood Golf Club | The Caddie Chat</title>
-  <meta name="description" content="Walter Travis in the hills of Deal, New Jersey. Dramatic, demanding, and utterly unforgettable.">
+  <meta name="description" content="Walter Travis on the Jersey Shore. Dramatic, demanding, and utterly unforgettable.">
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛳</text></svg>">
   <style>
@@ -13,19 +13,70 @@
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    .course-hero-image { width: 100%; overflow: hidden; position: relative; }
+    .course-hero-image img { width: 100%; height: 70vh; object-fit: cover; object-position: center 45%; display: block; }
+    .course-hero-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent); pointer-events: none; }
+
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    .inline-image { margin: 2.5rem -4rem; position: relative; }
+    .inline-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .inline-image img:hover { opacity: 0.92; }
+    .inline-image figcaption { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; font-style: italic; letter-spacing: 0.02em; }
+
+    .full-bleed-image { width: 100vw; margin-left: calc(-50vw + 50%); position: relative; overflow: hidden; margin-top: 3rem; margin-bottom: 3rem; }
+    .full-bleed-image img { width: 100%; height: 55vh; object-fit: cover; object-position: center 60%; display: block; cursor: pointer; transition: transform 0.8s ease; }
+    .full-bleed-image:hover img { transform: scale(1.015); }
+    .full-bleed-image figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2rem 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); font-size: 0.82rem; color: rgba(255,255,255,0.8); font-style: italic; letter-spacing: 0.02em; }
+
+    .featured-image { margin: 3rem -4rem; position: relative; }
+    .featured-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+    .featured-caption .caption-line { width: 40px; min-width: 40px; height: 1px; background: var(--color-accent); margin-top: 0.6rem; }
+    .featured-caption p { font-size: 0.82rem; color: var(--color-text-muted); font-style: italic; letter-spacing: 0.02em; line-height: 1.6; margin: 0; }
+
+    .image-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 3rem -4rem; align-items: end; }
+    .image-pair .pair-item { overflow: hidden; position: relative; cursor: pointer; }
+    .image-pair .pair-item:first-child { margin-top: -2rem; }
+    .image-pair .pair-item img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s ease; }
+    .image-pair .pair-item:hover img { transform: scale(1.03); opacity: 0.92; }
+    .image-pair figcaption { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.5rem; font-style: italic; }
+
+    .memorabilia { max-width: 360px; margin: 0 auto; padding: var(--space-md) 0; text-align: center; }
+    .memorabilia-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+    .memorabilia img { max-height: 380px; width: auto; max-width: 100%; display: inline-block; cursor: pointer; transition: transform 0.4s ease, opacity 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.08); border-radius: 2px; }
+    .memorabilia img:hover { transform: translateY(-4px); opacity: 0.92; }
+    .memorabilia figcaption { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; font-style: italic; }
+
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2.5rem; cursor: pointer; padding: 1rem; transition: color 0.3s ease; }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+
+    @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; } }
+    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } .course-hero-image img { height: 50vh; } .full-bleed-image img { height: 45vh; } .image-pair { grid-template-columns: 1fr; gap: 1.5rem; } .image-pair .pair-item:first-child { margin-top: 0; } }
+    @media (max-width: 480px) { .inline-image, .featured-image { margin: 2rem 0; } }
   </style>
 </head>
 <body>
+
   <nav class="nav"><div class="container"><a href="/" class="nav-logo">The Caddie <span>Chat</span></a><ul class="nav-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li><li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li></ul><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
 
   <section class="course-hero">
@@ -42,8 +93,12 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE: Tunnel shot on film ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/hollywood/hero-tunnel-flag.jpg" alt="A gravel path leading through a wooden tunnel carved into a grass-covered mound at Hollywood Golf Club, the flag and green visible through the far end, shot on 35mm film with soft warm tones" loading="eager">
+  </div>
 
+  <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
     <div class="container">
       <div class="course-body reveal">
@@ -52,9 +107,24 @@
 
         <p>The club sits in Deal, New Jersey, on the Jersey Shore, in a stretch of coastline that holds an extraordinary concentration of elite private golf. Hollywood is part of that corridor, but it stands apart because of the way Travis used the hilly terrain to create a course that is simultaneously intimate and expansive. You move through corridors framed by mature trees, climb to elevated tees with sweeping views, and then drop back down into valleys where the outside world disappears. The rhythm of the course is almost musical. Crescendo, decrescendo, crescendo again.</p>
 
+        <!-- GROUP PHOTO AT TUNNEL: Featured treatment -->
+        <figure class="featured-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/hollywood/group-tunnel.jpg" alt="The foursome standing at the entrance to the iconic wooden tunnel at Hollywood Golf Club, native grasses framing the passage with the green and flag visible through the opening behind them" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>The foursome at Hollywood's iconic tunnel. You walk through a grass-covered mound to reach the green on the other side. You do not see this at many golf courses.</p>
+          </div>
+        </figure>
+
         <h2>Travis Unleashed</h2>
 
         <p>The thing that separates Hollywood from North Jersey, beyond the obvious difference in terrain, is the boldness of the design decisions. Travis takes bigger swings here. The bunkering is more dramatic, carved into hillsides and set at angles that demand real commitment from the tee. The green complexes are more adventurous, with contours that create genuine do-or-die moments on approach shots. Where North Jersey whispers its challenges, Hollywood states them plainly, and then punishes you if you do not listen.</p>
+
+        <!-- BUNKER COMPLEX: Inline image -->
+        <figure class="inline-image" onclick="openLightbox(1)">
+          <img src="../../assets/images/courses/hollywood/bunker-complex-green.jpg" alt="A cluster of deep bunkers guarding a green at Hollywood Golf Club, white sand contrasting with the dark green turf and mature trees behind, the restored bunkering showing Schneider's handiwork" loading="lazy">
+          <figcaption>The restored bunkering at Hollywood. Deep, irregular, and placed with surgical precision. Another Schneider restoration that brought Travis's original vision back to life.</figcaption>
+        </figure>
 
         <p>The elevation changes make the course play much longer than the yardage suggests. Uphill par fours that look manageable on the scorecard become grinding tests of ball-striking when you account for the climb. Downhill holes offer the thrill of seeing the entire hole laid out below you, every bunker and contour visible, every strategic option clear. Those moments, standing on an elevated tee with the course spread out at your feet, are some of the most dramatic visuals we encountered on the entire trip.</p>
 
@@ -62,23 +132,110 @@
           "If North Jersey was Travis the chess player, Hollywood was Travis the artist, painting with bolder strokes on a bigger canvas."
         </div>
 
+        <!-- FULL BLEED: Foursome walking fairway -->
+        <figure class="full-bleed-image" onclick="openLightbox(2)">
+          <img src="../../assets/images/courses/hollywood/foursome-walking-fairway.jpg" alt="Four golfers carrying bags walking down the fairway at Hollywood Golf Club, heading toward a green guarded by deep bunkers and fescue edges, the clubhouse visible through the trees in the distance" loading="lazy">
+          <figcaption>Four bags, one fairway. Walking Hollywood is the only way to experience how Travis moves you through this property.</figcaption>
+        </figure>
+
         <h2>The Back Nine</h2>
 
         <p>The back nine at Hollywood is where the course reaches its peak. The terrain becomes more aggressive, the holes more demanding, and the views more rewarding. Travis routes you through the highest points on the property and then brings you back down through corridors that feel almost private, sheltered from the wind and the world. It is a master class in pacing. Alternating between exhilarating openness and quiet concentration, keeping you engaged and slightly off-balance all the way to the clubhouse.</p>
+
+        <!-- IMAGE PAIR: Film green shot + Walkers with fescue -->
+        <div class="image-pair">
+          <figure class="pair-item" onclick="openLightbox(3)">
+            <img src="../../assets/images/courses/hollywood/green-flag-bunkers-film.jpg" alt="Two golfers reading a putt on a green at Hollywood Golf Club with restored bunkers stretching across the background, shot on 35mm film with muted tones" loading="lazy">
+            <figcaption>On the green, reading the line. The restored bunkers stretch across the horizon behind. Shot on 35mm film.</figcaption>
+          </figure>
+          <figure class="pair-item" onclick="openLightbox(4)">
+            <img src="../../assets/images/courses/hollywood/walkers-fescue-bunkers.jpg" alt="Three golfers walking toward a green framed by deep fescue-edged bunkers at Hollywood Golf Club under dramatic afternoon clouds" loading="lazy">
+            <figcaption>Walking into the fescue. Hollywood's bunkers frame every approach with golden edges.</figcaption>
+          </figure>
+        </div>
 
         <p>What made Hollywood stick with us was the way it challenged our assumptions about Travis as an architect. Before this trip, we knew him primarily as a player-turned-designer who built strategic, cerebral courses. Hollywood confirmed the cerebral part, but it also showed us a side of Travis that does not get enough credit: his ability to match the scale of his design to the scale of the land. Given a dramatic property, he did not shrink from it. He rose to it. The result is a course that feels as bold and confident as the man who built it.</p>
 
         <p>We played Hollywood in the afternoon, the shadows lengthening across the hillsides as we worked our way through the closing holes, and by the end all three of us agreed on something: this was one of the best courses on the trip, and it was not one we had expected to say that about. Walter Travis, the quiet name in the Golden Age conversation, had built something here that stands toe to toe with the work of his more famous contemporaries. Sometimes the best discoveries on a trip like this are the ones you did not see coming.</p>
 
       </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== MEMORABILIA: Gate Plaque ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="memorabilia">
+        <div class="memorabilia-label">At the Gate</div>
+        <figure onclick="openLightbox(5)">
+          <img src="../../assets/images/courses/hollywood/gate-plaque-1898.jpg" alt="Bronze plaque on the stone gate pillar at Hollywood Golf Club showing the club crest with crossed clubs and holly berries, Est. 1898, with a PRIVATE sign below" loading="lazy">
+          <figcaption>Hollywood Golf Club. Est. 1898. Private.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/north-jersey/">← Prev: North Jersey CC</a>
-        <a href="/chasing-golden-age-golf/winged-foot/">Next: Winged Foot GC →</a>
+        <a href="/chasing-golden-age-golf/north-jersey/">&#8592; Prev: North Jersey CC</a>
+        <a href="/chasing-golden-age-golf/winged-foot/">Next: Winged Foot GC &#8594;</a>
       </div>
     </div>
   </section>
 
   <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">The Caddie <span>Chat</span></div><ul class="footer-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li></ul></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span><div class="footer-social"><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a></div></div></div></footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    const lightboxImages = [
+      { src: '../../assets/images/courses/hollywood/group-tunnel.jpg', caption: 'The foursome at Hollywood\'s iconic tunnel.' },
+      { src: '../../assets/images/courses/hollywood/bunker-complex-green.jpg', caption: 'Restored bunkering at Hollywood. Deep, irregular, surgical.' },
+      { src: '../../assets/images/courses/hollywood/foursome-walking-fairway.jpg', caption: 'Four bags, one fairway. Walking Hollywood.' },
+      { src: '../../assets/images/courses/hollywood/green-flag-bunkers-film.jpg', caption: 'On the green, reading the line. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/hollywood/walkers-fescue-bunkers.jpg', caption: 'Walking into the fescue. Hollywood\'s bunkers frame every approach.' },
+      { src: '../../assets/images/courses/hollywood/gate-plaque-1898.jpg', caption: 'Hollywood Golf Club. Est. 1898. Private.' },
+      { src: '../../assets/images/courses/hollywood/hero-tunnel-flag.jpg', caption: 'The tunnel at Hollywood. Shot on 35mm film.' }
+    ];
+    let currentIndex = 0;
+    function openLightbox(index) {
+      currentIndex = index;
+      document.getElementById('lightbox-img').src = lightboxImages[index].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[index].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[index].caption;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function navigateLightbox(e, dir) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + dir + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentIndex].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[currentIndex].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[currentIndex].caption;
+    }
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
