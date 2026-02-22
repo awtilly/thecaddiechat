@@ -8,25 +8,267 @@
   <link rel="stylesheet" href="../../assets/css/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⛳</text></svg>">
   <style>
+    /* ===== HERO ===== */
     .course-hero { padding: calc(var(--nav-height) + var(--space-xl)) 0 var(--space-lg); }
     .course-meta { display: flex; gap: var(--space-lg); flex-wrap: wrap; margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid var(--color-border); }
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    /* ===== HERO IMAGE ===== */
+    .course-hero-image {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .course-hero-image img {
+      width: 100%;
+      height: 60vh;
+      object-fit: cover;
+      object-position: center 45%;
+      display: block;
+    }
+    .course-hero-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30%;
+      background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent);
+      pointer-events: none;
+    }
+
+    /* ===== COURSE BODY ===== */
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    /* ===== INLINE IMAGE ===== */
+    .inline-image {
+      margin: 2.5rem -4rem;
+      position: relative;
+    }
+    .inline-image img {
+      width: 100%;
+      border-radius: 2px;
+      display: block;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+    .inline-image img:hover { opacity: 0.92; }
+    .inline-image figcaption {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+      margin-top: 0.75rem;
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== FULL BLEED IMAGE ===== */
+    .full-bleed-image {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      position: relative;
+      overflow: hidden;
+      margin-top: 3rem;
+      margin-bottom: 3rem;
+    }
+    .full-bleed-image img {
+      width: 100%;
+      height: 70vh;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+      cursor: pointer;
+      transition: transform 0.8s ease;
+    }
+    .full-bleed-image:hover img { transform: scale(1.015); }
+    .full-bleed-image figcaption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 3rem 2rem 1.5rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.8);
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== IMAGE PAIR: Offset ===== */
+    .image-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 3rem -4rem;
+      align-items: end;
+    }
+    .image-pair .pair-item {
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+    .image-pair .pair-item:first-child { margin-top: -2rem; }
+    .image-pair .pair-item img {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease, opacity 0.3s ease;
+    }
+    .image-pair .pair-item:hover img { transform: scale(1.03); opacity: 0.92; }
+    .image-pair figcaption {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    /* ===== FEATURED IMAGE ===== */
+    .featured-image {
+      margin: 3rem -4rem;
+      position: relative;
+    }
+    .featured-image img {
+      width: 100%;
+      border-radius: 2px;
+      display: block;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .featured-caption .caption-line {
+      width: 40px;
+      min-width: 40px;
+      height: 1px;
+      background: var(--color-accent);
+      margin-top: 0.6rem;
+    }
+    .featured-caption p {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      font-style: italic;
+      letter-spacing: 0.02em;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ===== GALLERY ===== */
+    .photo-gallery {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: var(--space-lg) 0;
+    }
+    .gallery-header {
+      text-align: center;
+      margin-bottom: var(--space-lg);
+    }
+    .gallery-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+    .gallery-header p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-top: 0.5rem;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    .gallery-grid .gallery-item {
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      cursor: pointer;
+      position: relative;
+    }
+    .gallery-grid .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease, opacity 0.3s ease;
+    }
+    .gallery-grid .gallery-item:hover img { transform: scale(1.03); opacity: 0.9; }
+    .gallery-grid .gallery-item.wide { grid-column: span 2; }
+    @media (max-width: 600px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-grid .gallery-item.wide { grid-column: span 2; }
+    }
+
+    /* ===== FILM STRIP LABEL ===== */
+    .film-label {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      opacity: 0.6;
+      margin-top: 0.25rem;
+    }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.95);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2.5rem; cursor: pointer; padding: 1rem; transition: color 0.3s ease; }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
+    /* ===== COURSE NAV ===== */
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 868px) {
+      .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; }
+    }
+    @media (max-width: 768px) {
+      .course-number { font-size: 5rem; }
+      .course-body p:first-of-type::first-letter { font-size: 2.8rem; }
+      .course-hero-image img { height: 45vh; }
+      .full-bleed-image img { height: 45vh; }
+      .image-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+      .image-pair .pair-item:first-child { margin-top: 0; }
+    }
+    @media (max-width: 480px) {
+      .inline-image, .featured-image { margin: 2rem 0; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- ===== NAVIGATION ===== -->
   <nav class="nav">
     <div class="container">
       <a href="/" class="nav-logo">The Caddie <span>Chat</span></a>
@@ -40,6 +282,7 @@
     </div>
   </nav>
 
+  <!-- ===== COURSE HERO ===== -->
   <section class="course-hero">
     <div class="container">
       <span class="section-label"><a href="/chasing-golden-age-golf/" style="color: inherit;">Chasing Golden Age Golf</a>, Course 02</span>
@@ -56,8 +299,12 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg" alt="A player watches his tee shot at Francis A. Byrne while a caddie in an Evans Scholar bib stands alongside the bag, the green complex and New Jersey hills beyond" loading="eager">
+  </div>
 
+  <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
     <div class="container">
       <div class="course-body reveal">
@@ -70,15 +317,36 @@
 
         <p>The story behind this course is one of those layered histories that golf architecture nerds live for. Francis Byrne was born in 1926 as the West Course for Essex County Country Club, designed by Charles Banks, the protege who completed the unfinished work of Seth Raynor after Raynor's untimely death. Raynor had learned directly from Charles Blair Macdonald, the grandfather of American golf architecture. So when you walk this course, you are walking in a direct line from the very origins of American course design.</p>
 
+        <!-- GREEN COMPLEX: Inline with accent caption -->
+        <figure class="inline-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/francis-a-byrne/green-bunker-pin.jpg" alt="A green complex at Francis A. Byrne with a deep fronting bunker and the pin tucked behind, mature trees framing the background" loading="lazy">
+          <figcaption>Banks' green complexes at Byrne have survived nearly a century of public play. The bold bunkering still asks questions, still demands answers.</figcaption>
+        </figure>
+
         <p>The club eventually ran into financial trouble and sold the West Course to Essex County in the 1970s. It was renamed after Francis Byrne, a former town commissioner and father of New Jersey Governor Brendan Byrne. Decades of public play softened some of the original Banks features, as often happens when maintenance budgets tighten and the bunkers get a little smaller each year. But recent renovation work by Stephen Kay has brought many of those classic elements roaring back to life.</p>
 
         <div class="pull-quote">
           "If you know what you are looking for, you can spot Banks' fingerprints everywhere. The bold bunkering, the broad greens, the template holes woven right into the fabric of the course."
         </div>
 
+        <!-- PANORAMIC VIEW: Full bleed -->
+        <figure class="full-bleed-image" onclick="openLightbox(1)">
+          <img src="../../assets/images/courses/francis-a-byrne/panoramic-holes-fescue.jpg" alt="An elevated view across multiple holes at Francis A. Byrne, greens and bunkers cascading through the hillside with native fescue in the foreground" loading="lazy">
+          <figcaption>From above, you can see how Banks routed the holes through the natural contours of the hillside. Greens, bunkers, and fairways layered across the terrain like they grew there.</figcaption>
+        </figure>
+
         <h2>Template Holes for the People</h2>
 
         <p>Here is what makes Francis Byrne special: this is one of the few places in the country where you can play authentic Macdonald-Raynor-Banks template holes on a public course for a municipal green fee. The Road Hole on number one. A pure Biarritz on number two, with that deep swale bisecting the green, one of those rare holes where you stop on the tee and genuinely have to think about strategy on a par three. The Short on five. The Eden on fourteen. These are designs that trace their lineage all the way back to the great links of Scotland, filtered through the American template tradition, and they are available to anyone who books a tee time.</p>
+
+        <!-- BUNKER CLOSE-UP: Featured treatment -->
+        <figure class="featured-image" onclick="openLightbox(2)">
+          <img src="../../assets/images/courses/francis-a-byrne/bunker-edge-green.jpg" alt="From the lip of a deep greenside bunker at Francis A. Byrne, looking across raked sand toward the pin and the green surface beyond" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>From the lip of a Banks bunker. The raked sand, the clean edge, the pin waiting on the other side. These are the details that separate architecture from landscaping.</p>
+          </div>
+        </figure>
 
         <p>The Biarritz on two is the standout. It can play up to 265 yards from the back tees, which is borderline absurd for a par three. That deep swale in the middle of the green creates three distinct zones: front plateau, valley, and back tier. Watching your ball land on the front shelf, trickle down into the valley, and if you have judged the distance right, climb up the back tier toward a tucked pin is one of the great pleasures in public golf. It is a hole that rewards intelligence over brute force, and that is quintessential Banks.</p>
 
@@ -86,19 +354,69 @@
 
         <p>The property itself is built into the side of a mountain, essentially, with dramatic elevation changes that make the walk a genuine workout. This is not a criticism. It adds to the drama. The front nine climbs and drops through the hillside, with bold bunkering framing the holes and demanding commitment from the tee. There is no filler here. Every bunker means something, every contour in the green asks a question.</p>
 
+        <!-- IMAGE PAIR: Two elevated tee shots -->
+        <div class="image-pair">
+          <figure class="pair-item" onclick="openLightbox(3)">
+            <img src="../../assets/images/courses/francis-a-byrne/elevated-tee-town.jpg" alt="From an elevated tee at Francis A. Byrne, looking down a long fairway lined with bunkers, the town of West Orange climbing the hillside beyond" loading="lazy">
+            <figcaption>The town climbs the hillside behind the fairway. Public golf, woven into the community.</figcaption>
+          </figure>
+          <figure class="pair-item" onclick="openLightbox(4)">
+            <img src="../../assets/images/courses/francis-a-byrne/tee-valley-bunkering.jpg" alt="An elevated tee shot looking down into a valley, dramatic bunkering shaping the fairway with dense tree cover framing both sides" loading="lazy">
+            <figcaption>The elevation drops are relentless. Banks used every foot of it.</figcaption>
+          </figure>
+        </div>
+
         <p>The ninth hole is a gorgeous finisher to the front side, with trees framing the fairway and a green complex that sits so naturally in the landscape that you want to stand there a little longer and take it in. That feeling, of not wanting to leave a green because the setting is too good, is not something you expect from a municipal course. But Francis Byrne keeps surprising you like that.</p>
 
         <p>Finishing up the round, you are reminded that golf does not have to be exclusive to be memorable. The bones of Charles Banks' design have survived nearly a century of heavy play, a change in ownership, and the slow erosion that comes with public stewardship. And now, with the restoration work bringing back the classic features, Francis Byrne is playing closer to its original intent than it has in decades. If you are making a golf trip through northern New Jersey, this should be on your list. Not as an afterthought. As a destination.</p>
 
       </div>
+    </div>
+  </section>
 
-      <div class="course-nav">
-        <a href="/chasing-golden-age-golf/stonewall/">← Prev: Stonewall</a>
-        <a href="/chasing-golden-age-golf/mountain-ridge/">Next: Mountain Ridge →</a>
+  <div class="divider"></div>
+
+  <!-- ===== PHOTO GALLERY ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="photo-gallery">
+        <div class="gallery-header">
+          <h2>From the Round</h2>
+          <p>Francis A. Byrne Golf Course, West Orange, New Jersey</p>
+          <span class="film-label">Shot on 35mm film</span>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-item wide" onclick="openLightbox(5)">
+            <img src="../../assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg" alt="Player and caddie at Francis A. Byrne" loading="lazy">
+          </div>
+          <div class="gallery-item" onclick="openLightbox(6)">
+            <img src="../../assets/images/courses/francis-a-byrne/uphill-approach-bunkers.jpg" alt="Uphill approach to a green guarded by bunkers at Francis A. Byrne" loading="lazy">
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
+      <div class="course-nav">
+        <a href="/chasing-golden-age-golf/stonewall/">&#8592; Prev: Stonewall</a>
+        <a href="/chasing-golden-age-golf/mountain-ridge/">Next: Mountain Ridge &#8594;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -119,6 +437,56 @@
       </div>
     </div>
   </footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    const lightboxImages = [
+      { src: '../../assets/images/courses/francis-a-byrne/green-bunker-pin.jpg', caption: 'Banks\' green complex. Nearly a century old and still asking the right questions.' },
+      { src: '../../assets/images/courses/francis-a-byrne/panoramic-holes-fescue.jpg', caption: 'Multiple holes visible from above, routed through the natural hillside.' },
+      { src: '../../assets/images/courses/francis-a-byrne/bunker-edge-green.jpg', caption: 'From the lip of a Banks bunker, looking toward the pin.' },
+      { src: '../../assets/images/courses/francis-a-byrne/elevated-tee-town.jpg', caption: 'An elevated tee with the town of West Orange climbing the hillside.' },
+      { src: '../../assets/images/courses/francis-a-byrne/tee-valley-bunkering.jpg', caption: 'The elevation drops are relentless. Banks used every foot of it.' },
+      { src: '../../assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg', caption: 'Player and Evans Scholar caddie on the tee at Francis A. Byrne.' },
+      { src: '../../assets/images/courses/francis-a-byrne/uphill-approach-bunkers.jpg', caption: 'Uphill approach to a green guarded by Banks\' bold bunkering.' }
+    ];
+
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentIndex = index;
+      const lightbox = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+      img.src = lightboxImages[index].src;
+      img.alt = lightboxImages[index].caption;
+      caption.textContent = lightboxImages[index].caption;
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function navigateLightbox(e, direction) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + direction + lightboxImages.length) % lightboxImages.length;
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-caption');
+      img.src = lightboxImages[currentIndex].src;
+      img.alt = lightboxImages[currentIndex].caption;
+      caption.textContent = lightboxImages[currentIndex].caption;
+    }
+
+    document.addEventListener('keydown', function(e) {
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
