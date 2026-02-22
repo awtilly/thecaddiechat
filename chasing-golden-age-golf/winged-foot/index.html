@@ -13,19 +13,39 @@
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    .featured-image { margin: 3rem -4rem; position: relative; }
+    .featured-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+    .featured-caption .caption-line { width: 40px; min-width: 40px; height: 1px; background: var(--color-accent); margin-top: 0.6rem; }
+    .featured-caption p { font-size: 0.82rem; color: var(--color-text-muted); font-style: italic; letter-spacing: 0.02em; line-height: 1.6; margin: 0; }
+
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    @media (max-width: 868px) { .featured-image { margin: 2rem -1rem; } }
     @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+    @media (max-width: 480px) { .featured-image { margin: 2rem 0; } }
   </style>
 </head>
 <body>
+
   <nav class="nav"><div class="container"><a href="/" class="nav-logo">The Caddie <span>Chat</span></a><ul class="nav-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li><li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li></ul><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
 
   <section class="course-hero">
@@ -51,6 +71,15 @@
         <p>There are courses you play, and then there are courses that play you. Winged Foot is the latter, both of them. For the entire trip leading up to this day, we had been talking about Tillinghast. His creativity, his craftsmanship, his insistence on building what he called "man-sized courses." At Francis Byrne, we saw the influence of his contemporaries. At Essex County, we walked holes he designed. But Winged Foot is Tillinghast at his peak, the place where everything he believed about the game is executed across 36 intertwined holes with an intensity that borders on intimidating. And we were not leaving until we had walked every one of them.</p>
 
         <p>We drove into Mamaroneck knowing that we were about to play one of the most significant properties in American golf. Six U.S. Opens on the West. Two U.S. Women's Opens. Countless championships. The reputation precedes every step you take here, and the weight of that history is palpable the moment you walk through the clubhouse door and see the memorabilia on the walls. The photos, the flags, the scorecards from rounds that changed careers and altered the history of the game. Winged Foot runs on a first-come, first-served system. No tee times, just roll up and put your name on the board. We got there early. We had to. Thirty-six holes of Tillinghast was going to be a long day, and we did not want to miss a minute of it.</p>
+
+        <!-- THE ARRIVAL: Featured image -->
+        <figure class="featured-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/winged-foot/arrival-gps-clubhouse.jpg" alt="View through the windshield arriving at Winged Foot Golf Club, the stone Tudor clubhouse visible through the glass with the GPS reading Arrive at Winged Foot Golf Club on the dashboard" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>0.4 miles. Arrive at Winged Foot Golf Club. The GPS knew where we were going. We had known for months. The stone clubhouse through the windshield, 8:52 in the morning. Thirty-six holes ahead.</p>
+          </div>
+        </figure>
 
         <h2>The West Course</h2>
 
@@ -81,14 +110,39 @@
         <p>Winged Foot was, in many ways, the climax of our trip. We had been building toward this. Studying the architects, developing our eye, learning to see the design decisions that most golfers walk right past. And here, across 36 holes of Tillinghast's finest work, everything came together. Not just the West, which the world already knows. But the East, the course the members keep for themselves, which might be the more complete expression of what Tillinghast believed golf could be. The education was not complete. It never is. But standing in that clubhouse with aching legs and full hearts, we understood something we had not before: that great golf architecture is not about making the game easier or harder. It is about making every single shot matter. And for 36 holes, every single one of them did.</p>
 
       </div>
+
+      <!-- ===== LIGHTBOX ===== -->
+      <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+        <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+        <img id="lightbox-img" src="" alt="">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+      </div>
+
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/hollywood/">← Prev: Hollywood GC</a>
-        <a href="/chasing-golden-age-golf/friars-head/">Next: Friar's Head →</a>
+        <a href="/chasing-golden-age-golf/hollywood/">&#8592; Prev: Hollywood GC</a>
+        <a href="/chasing-golden-age-golf/friars-head/">Next: Friar's Head &#8594;</a>
       </div>
     </div>
   </section>
 
   <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">The Caddie <span>Chat</span></div><ul class="footer-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li></ul></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span><div class="footer-social"><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a></div></div></div></footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    function openLightbox(index) {
+      document.getElementById('lightbox-img').src = '../../assets/images/courses/winged-foot/arrival-gps-clubhouse.jpg';
+      document.getElementById('lightbox-img').alt = 'Arriving at Winged Foot Golf Club. 8:52 AM. Thirty-six holes ahead.';
+      document.getElementById('lightbox-caption').textContent = 'Arriving at Winged Foot Golf Club. 8:52 AM. Thirty-six holes ahead.';
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(e) {
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && document.getElementById('lightbox').classList.contains('active')) closeLightbox(e);
+    });
+  </script>
 </body>
 </html>
