@@ -13,19 +13,70 @@
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    .course-hero-image { width: 100%; overflow: hidden; position: relative; }
+    .course-hero-image img { width: 100%; height: 60vh; object-fit: cover; object-position: center 55%; display: block; }
+    .course-hero-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent); pointer-events: none; }
+
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    .inline-image { margin: 2.5rem -4rem; position: relative; }
+    .inline-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .inline-image img:hover { opacity: 0.92; }
+    .inline-image figcaption { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; font-style: italic; letter-spacing: 0.02em; }
+
+    .full-bleed-image { width: 100vw; margin-left: calc(-50vw + 50%); position: relative; overflow: hidden; margin-top: 3rem; margin-bottom: 3rem; }
+    .full-bleed-image img { width: 100%; height: 65vh; object-fit: cover; object-position: center 50%; display: block; cursor: pointer; transition: transform 0.8s ease; }
+    .full-bleed-image:hover img { transform: scale(1.015); }
+    .full-bleed-image figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2rem 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); font-size: 0.82rem; color: rgba(255,255,255,0.8); font-style: italic; letter-spacing: 0.02em; }
+
+    .featured-image { margin: 3rem -4rem; position: relative; }
+    .featured-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+    .featured-caption .caption-line { width: 40px; min-width: 40px; height: 1px; background: var(--color-accent); margin-top: 0.6rem; }
+    .featured-caption p { font-size: 0.82rem; color: var(--color-text-muted); font-style: italic; letter-spacing: 0.02em; line-height: 1.6; margin: 0; }
+
+    .image-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 3rem -4rem; align-items: end; }
+    .image-pair .pair-item { overflow: hidden; position: relative; cursor: pointer; }
+    .image-pair .pair-item:first-child { margin-top: -2rem; }
+    .image-pair .pair-item img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s ease; }
+    .image-pair .pair-item:hover img { transform: scale(1.03); opacity: 0.92; }
+    .image-pair figcaption { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.5rem; font-style: italic; }
+
+    .memorabilia { max-width: 400px; margin: 0 auto; padding: var(--space-md) 0; text-align: center; }
+    .memorabilia-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+    .memorabilia img { max-height: 420px; width: auto; max-width: 100%; display: inline-block; cursor: pointer; transition: transform 0.4s ease, opacity 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.08); border-radius: 2px; }
+    .memorabilia img:hover { transform: translateY(-4px); opacity: 0.92; }
+    .memorabilia figcaption { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; font-style: italic; }
+
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2.5rem; cursor: pointer; padding: 1rem; transition: color 0.3s ease; }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+
+    @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; } }
+    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } .course-hero-image img { height: 45vh; } .full-bleed-image img { height: 45vh; } .image-pair { grid-template-columns: 1fr; gap: 1.5rem; } .image-pair .pair-item:first-child { margin-top: 0; } }
+    @media (max-width: 480px) { .inline-image, .featured-image { margin: 2rem 0; } }
   </style>
 </head>
 <body>
+
   <nav class="nav"><div class="container"><a href="/" class="nav-logo">The Caddie <span>Chat</span></a><ul class="nav-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li><li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li></ul><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
 
   <section class="course-hero">
@@ -42,8 +93,12 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/north-jersey/hero-clubhouse-bunkers.jpg" alt="The Tudor clubhouse at North Jersey Country Club framed by restored Schneider bunkers in the foreground, undulating green contours flowing toward the building under dramatic clouds" loading="eager">
+  </div>
 
+  <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
     <div class="container">
       <div class="course-body reveal">
@@ -56,21 +111,54 @@
 
         <p>You can feel the player's mind at work on every hole at North Jersey. The course does not overpower you with length or visual intimidation. Instead, it asks you questions that seem simple on the surface but grow more complex the more you think about them. Where exactly do I want to be on this fairway? What is the penalty for missing the green on this side versus that side? Am I being rewarded for taking on risk, or punished for ignoring it?</p>
 
+        <!-- ROLLING TERRAIN: Inline image -->
+        <figure class="inline-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/north-jersey/rolling-terrain-tee.jpg" alt="View from an elevated tee at North Jersey showing dramatic terrain movement, exposed earth, and native grasses with greens perched on hillsides under storm clouds" loading="lazy">
+          <figcaption>The terrain at North Jersey is serious. From the elevated tees, you can see just how much Travis used the natural land movement to create his strategic questions.</figcaption>
+        </figure>
+
         <p>Travis had a gift for building holes where the obvious play was not necessarily the smart play. At North Jersey, you will find tee shots where the widest part of the fairway sets up the worst angle into the green, and the tight side that makes you nervous off the tee opens up the entire putting surface for your approach. It is the kind of design that rewards the golfer who slows down and thinks, which is exactly how Travis played the game himself.</p>
 
         <div class="pull-quote">
           "Travis designed courses the way he played. Strategically, precisely, with an emphasis on positioning over power."
         </div>
 
+        <!-- FULL BLEED: Walkers on path -->
+        <figure class="full-bleed-image" onclick="openLightbox(1)">
+          <img src="../../assets/images/courses/north-jersey/walkers-path-green.jpg" alt="Two golfers walking the path between holes at North Jersey, bags on their shoulders, heading toward a green perched on a hillside with native grasses and dramatic storm clouds overhead" loading="lazy">
+          <figcaption>The walk between holes. This is what it looks like when a course has been genuinely restored, not just maintained. You can feel the land breathing again.</figcaption>
+        </figure>
+
         <h2>The Schneider Restoration</h2>
 
         <p>What makes North Jersey feel so alive right now is the restoration work by Brian Schneider of Renaissance Golf Design. For decades, the course had been slowly buried. Dense tree canopies choked sunlight from the fairways, diminished turf quality, and swallowed the natural terrain that Travis had used so intentionally. Many of the original green contours had been softened over the years, and the course had drifted far from Travis's intent. Schneider, who has made a career out of resurrecting Golden Age designs at places like Hollywood, Garden City, and the Lido, took on the project with the same careful philosophy he brings to all his restoration work. He pulled back the tree canopy, exposed the dramatic natural terrain movements that Travis had routed the course across, and restored the bunkers to their original positions and character.</p>
+
+        <!-- CASCADING HOLES: Featured image showing Schneider's work -->
+        <figure class="featured-image" onclick="openLightbox(2)">
+          <img src="../../assets/images/courses/north-jersey/cascading-holes-creek.jpg" alt="Multiple greens and tees cascading down a hillside at North Jersey, with a creek winding through exposed rock outcroppings and restored native areas, the forest backdrop showing the scale of the terrain" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>Schneider's restoration in one frame. The cleared canopy reveals cascading greens, exposed rock, and the creek that Travis routed the course around. For three caddies from Old Barnwell who know Schneider's work firsthand, this was a highlight of the entire trip.</p>
+          </div>
+        </figure>
 
         <p>The result is a course that feels like it did in the 1920s, only now you can actually see it. Walking up the 8th fairway, where the trees have been cleared to reveal the rolling landforms beneath your feet, you can feel the difference between a course that has been merely maintained and one that has been genuinely understood. Schneider did not redesign North Jersey. He uncovered it. And for three caddies from Old Barnwell who know Schneider's work firsthand, seeing what he accomplished here was a highlight of the entire trip.</p>
 
         <h2>The Green Complexes</h2>
 
         <p>The greens are where North Jersey reveals its teeth. They are not the largest greens you will encounter, but they are among the most internally demanding. Travis uses subtle slopes and shelves to create distinct pin positions that change the character of a hole entirely depending on where the flag is. A hole that plays as a comfortable par one day becomes a fight for bogey the next, simply because the pin has moved fifteen feet. That kind of design longevity, where the challenge refreshes itself without any change to the physical layout, is the mark of an architect who understood the game at its deepest level.</p>
+
+        <!-- IMAGE PAIR: Clubhouse approach + Finishing green -->
+        <div class="image-pair">
+          <figure class="pair-item" onclick="openLightbox(3)">
+            <img src="../../assets/images/courses/north-jersey/clubhouse-fairway-approach.jpg" alt="Looking up the fairway toward the Tudor clubhouse at North Jersey, bunkers guarding the green with a lone golfer on the putting surface" loading="lazy">
+            <figcaption>The approach toward the clubhouse. Those bunkers are not decorative.</figcaption>
+          </figure>
+          <figure class="pair-item" onclick="openLightbox(4)">
+            <img src="../../assets/images/courses/north-jersey/finishing-green-clubhouse.jpg" alt="The finishing green at North Jersey with a red pin, bunker on the right, and the stone clubhouse rising behind under overcast skies" loading="lazy">
+            <figcaption>The finishing green. Pin tucked, bunker right, clubhouse watching. A proper ending.</figcaption>
+          </figure>
+        </div>
 
         <p>The bunkering supports the green complexes perfectly. Travis was not a flashy bunker designer. You will not find the towering, eyebrow-shaped bunkers that make you gasp from the tee. His bunkers are functional, placed with surgical precision at the exact spots where they create the most strategic tension. Miss the green in the wrong spot and you face a recovery that demands real skill. Miss it in the right spot and you have a straightforward up and down. The difference between those two outcomes is usually about three yards, and knowing where that line is takes rounds, not minutes, to learn.</p>
 
@@ -81,14 +169,83 @@
         <p>Among the three of us, this was one of those courses that kept coming up in conversation for the rest of the trip. Not because it was the most dramatic or the most beautiful, but because it was the most intellectually stimulating. Walter Travis built something here that grows on you with every hole, every round, every revisited memory. And Brian Schneider made sure the world could see it again. It is the kind of course that makes you want to be a better thinker on the golf course, not just a better swinger. That is a rare and valuable quality, and it is why Travis deserves to be mentioned in the same breath as the more famous names of his era.</p>
 
       </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== MEMORABILIA: Clock Tower ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="memorabilia">
+        <div class="memorabilia-label">On the Ground</div>
+        <figure onclick="openLightbox(5)">
+          <img src="../../assets/images/courses/north-jersey/clock-tower-1895.jpg" alt="The ornate North Jersey Country Club clock tower with Est. 1895 inscribed on its face, boxwood hedges at its base, and the restored rolling green contours visible behind" loading="lazy">
+          <figcaption>Est. 1895. The clock at North Jersey with Schneider's restored contours rolling behind it.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/essex-county/">← Prev: Essex County CC</a>
-        <a href="/chasing-golden-age-golf/hollywood/">Next: Hollywood GC →</a>
+        <a href="/chasing-golden-age-golf/essex-county/">&#8592; Prev: Essex County CC</a>
+        <a href="/chasing-golden-age-golf/hollywood/">Next: Hollywood GC &#8594;</a>
       </div>
     </div>
   </section>
 
   <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">The Caddie <span>Chat</span></div><ul class="footer-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li></ul></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span><div class="footer-social"><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a></div></div></div></footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    const lightboxImages = [
+      { src: '../../assets/images/courses/north-jersey/rolling-terrain-tee.jpg', caption: 'The terrain at North Jersey. Travis used every foot of elevation.' },
+      { src: '../../assets/images/courses/north-jersey/walkers-path-green.jpg', caption: 'The walk between holes. A course genuinely restored, not just maintained.' },
+      { src: '../../assets/images/courses/north-jersey/cascading-holes-creek.jpg', caption: 'Schneider\'s restoration in one frame. Cascading greens, exposed rock, the creek Travis routed around.' },
+      { src: '../../assets/images/courses/north-jersey/clubhouse-fairway-approach.jpg', caption: 'The approach toward the Tudor clubhouse.' },
+      { src: '../../assets/images/courses/north-jersey/finishing-green-clubhouse.jpg', caption: 'The finishing green. Pin tucked, bunker right, clubhouse watching.' },
+      { src: '../../assets/images/courses/north-jersey/clock-tower-1895.jpg', caption: 'Est. 1895. The clock at North Jersey with restored contours behind.' },
+      { src: '../../assets/images/courses/north-jersey/hero-clubhouse-bunkers.jpg', caption: 'The clubhouse framed by Schneider\'s restored bunkers.' }
+    ];
+    let currentIndex = 0;
+    function openLightbox(index) {
+      currentIndex = index;
+      document.getElementById('lightbox-img').src = lightboxImages[index].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[index].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[index].caption;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function navigateLightbox(e, dir) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + dir + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentIndex].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[currentIndex].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[currentIndex].caption;
+    }
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
