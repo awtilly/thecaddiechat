@@ -13,19 +13,82 @@
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    .course-hero-image { width: 100%; overflow: hidden; position: relative; }
+    .course-hero-image img { width: 100%; height: 60vh; object-fit: cover; object-position: center 55%; display: block; }
+    .course-hero-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent); pointer-events: none; }
+
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    .inline-image { margin: 2.5rem -4rem; position: relative; }
+    .inline-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .inline-image img:hover { opacity: 0.92; }
+    .inline-image figcaption { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; font-style: italic; letter-spacing: 0.02em; }
+
+    .full-bleed-image { width: 100vw; margin-left: calc(-50vw + 50%); position: relative; overflow: hidden; margin-top: 3rem; margin-bottom: 3rem; }
+    .full-bleed-image img { width: 100%; height: 65vh; object-fit: cover; object-position: center 40%; display: block; cursor: pointer; transition: transform 0.8s ease; }
+    .full-bleed-image:hover img { transform: scale(1.015); }
+    .full-bleed-image figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2rem 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); font-size: 0.82rem; color: rgba(255,255,255,0.8); font-style: italic; letter-spacing: 0.02em; }
+
+    .image-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 3rem -4rem; align-items: end; }
+    .image-pair .pair-item { overflow: hidden; position: relative; cursor: pointer; }
+    .image-pair .pair-item:first-child { margin-top: -2rem; }
+    .image-pair .pair-item img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s ease; }
+    .image-pair .pair-item:hover img { transform: scale(1.03); opacity: 0.92; }
+    .image-pair figcaption { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.5rem; font-style: italic; }
+
+    .featured-image { margin: 3rem -4rem; position: relative; }
+    .featured-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+    .featured-caption .caption-line { width: 40px; min-width: 40px; height: 1px; background: var(--color-accent); margin-top: 0.6rem; }
+    .featured-caption p { font-size: 0.82rem; color: var(--color-text-muted); font-style: italic; letter-spacing: 0.02em; line-height: 1.6; margin: 0; }
+
+    .photo-gallery { max-width: 960px; margin: 0 auto; padding: var(--space-lg) 0; }
+    .gallery-header { text-align: center; margin-bottom: var(--space-lg); }
+    .gallery-header h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); }
+    .gallery-header p { font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.5rem; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    .gallery-grid .gallery-item { overflow: hidden; aspect-ratio: 4 / 3; cursor: pointer; position: relative; }
+    .gallery-grid .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease, opacity 0.3s ease; }
+    .gallery-grid .gallery-item:hover img { transform: scale(1.03); opacity: 0.9; }
+    .gallery-grid .gallery-item.wide { grid-column: span 2; }
+    .gallery-grid .gallery-item.tall { aspect-ratio: 3 / 4; }
+    @media (max-width: 600px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } .gallery-grid .gallery-item.wide { grid-column: span 2; } }
+
+    .memorabilia { max-width: 400px; margin: 0 auto; padding: var(--space-md) 0; text-align: center; }
+    .memorabilia-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+    .memorabilia img { max-height: 320px; width: auto; max-width: 100%; border-radius: 50%; display: inline-block; cursor: pointer; transition: transform 0.4s ease, opacity 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+    .memorabilia img:hover { transform: translateY(-4px); opacity: 0.92; }
+    .memorabilia figcaption { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; font-style: italic; }
+
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2.5rem; cursor: pointer; padding: 1rem; transition: color 0.3s ease; }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+
+    @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; } }
+    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } .course-hero-image img { height: 45vh; } .full-bleed-image img { height: 45vh; } .image-pair { grid-template-columns: 1fr; gap: 1.5rem; } .image-pair .pair-item:first-child { margin-top: 0; } }
+    @media (max-width: 480px) { .inline-image, .featured-image { margin: 2rem 0; } }
   </style>
 </head>
 <body>
+
   <nav class="nav"><div class="container"><a href="/" class="nav-logo">The Caddie <span>Chat</span></a><ul class="nav-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li><li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li></ul><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
 
   <section class="course-hero">
@@ -42,8 +105,12 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/mountain-ridge/hero-clubhouse-bunker.jpg" alt="The stone Tudor clubhouse at Mountain Ridge rising above a deep greenside bunker, shot on 35mm film with warm golden tones" loading="eager">
+  </div>
 
+  <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
     <div class="container">
       <div class="course-body reveal">
@@ -52,9 +119,24 @@
 
         <p>We came to Mountain Ridge on day three, still buzzing from Stonewall and Francis Byrne, still finding our rhythm as a group on the road. Northern New Jersey in late July has a quality of light that makes everything feel alive. The trees full and green, the fairways glowing in the late morning, the ridgelines rolling out in every direction. Mountain Ridge earns its name honestly. This is a course built into serious terrain, and Ross used every foot of elevation to his advantage.</p>
 
+        <!-- GROUP PHOTO: Featured treatment -->
+        <figure class="featured-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/mountain-ridge/group-photo-flag.jpg" alt="Three friends standing on the green at Mountain Ridge, the red flag with the club's wheat sheaf logo flying beside them and the Tudor clubhouse on the ridge behind" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>Three Evans Scholars on the green at Mountain Ridge. The clubhouse sits on the ridge behind us like a castle watching over the course.</p>
+          </div>
+        </figure>
+
         <h2>Ross in the Hills</h2>
 
         <p>Donald Ross designed hundreds of courses, and the knock on him from people who have not studied his work closely is that they all feel the same. Mountain Ridge puts that lazy critique to rest immediately. The property gives Ross something he did not always have to work with: dramatic elevation changes, long views across the New Jersey hills, and enough acreage to let holes breathe. He responded with one of his most athletic designs, a course that asks you to move the ball both directions off the tee and demands precision on approaches that play uphill, downhill, and sidehill in rapid succession.</p>
+
+        <!-- DRAMATIC CLOUDS: Inline image -->
+        <figure class="inline-image" onclick="openLightbox(1)">
+          <img src="../../assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg" alt="Storm clouds building over the fairway at Mountain Ridge, bunkers scattered among mature oaks, the course stretching into the distance" loading="lazy">
+          <figcaption>The clouds rolled in and the light shifted. The course took on a different character entirely, the bunkers glowing against the darkening sky.</figcaption>
+        </figure>
 
         <p>The green complexes are where Ross shows his genius. They are not the most dramatically contoured greens you will ever see, but they are among the most intelligently designed. Nearly every one has a preferred angle of approach, and the penalty for missing that angle is not a lost ball or a forced carry. It is a chip or putt that runs away from you in ways you did not anticipate. Ross greens punish laziness, not aggression. If you have done the work off the tee to set up the right angle, the green opens up to you. If you have not, even a well-struck approach can leave you with a bogey putt.</p>
 
@@ -62,23 +144,135 @@
           "Ross greens punish laziness, not aggression. Do the work off the tee, and the green opens up. Cut corners, and even a good swing leaves you scrambling."
         </div>
 
+        <!-- FULL BLEED: Fairway toward clubhouse on the ridge -->
+        <figure class="full-bleed-image" onclick="openLightbox(2)">
+          <img src="../../assets/images/courses/mountain-ridge/fairway-ridge-clubhouse.jpg" alt="A wide fairway stretching toward the Mountain Ridge clubhouse perched on the hilltop, fescue lining the edges and a lone walker in the distance" loading="lazy">
+          <figcaption>The clubhouse on the ridge. You see it from everywhere on the course, watching over the holes like a stone cathedral set against the New Jersey sky.</figcaption>
+        </figure>
+
         <h2>The Routing</h2>
 
         <p>What impressed us most about Mountain Ridge was the routing. Ross moves you through the property in a way that never feels repetitive. You play along ridgelines with sweeping views, then drop down into tree-lined corridors where the world shrinks to just you and the hole in front of you. The transitions between these moments feel effortless, as if the course is telling a story with a rhythm, open then intimate then open again, that keeps you engaged all the way through.</p>
 
+        <!-- IMAGE PAIR: Flag + green with clubhouse -->
+        <div class="image-pair">
+          <figure class="pair-item" onclick="openLightbox(3)">
+            <img src="../../assets/images/courses/mountain-ridge/flag-clubhouse-fescue.jpg" alt="The red Mountain Ridge flag on the green with the clubhouse visible through golden fescue on the distant ridge" loading="lazy">
+            <figcaption>The red flag and the ridge. Fescue edges frame every green complex.</figcaption>
+          </figure>
+          <figure class="pair-item" onclick="openLightbox(4)">
+            <img src="../../assets/images/courses/mountain-ridge/green-pin-clubhouse.jpg" alt="Looking from the green toward the Mountain Ridge clubhouse perched above, the pin and American flag framing the view" loading="lazy">
+            <figcaption>From the green, the clubhouse looms. The scale of this place never stops surprising you.</figcaption>
+          </figure>
+        </div>
+
         <p>The par threes are strong, each one asking for a different shape and a different level of commitment. The par fours are the backbone, several of them stretching past 400 yards on a rolling property that adds yardage with its elevation changes. And the par fives offer genuine risk-reward decisions, the kind where the three of us would stand on the tee debating strategy and then all choose differently. Those conversations are what road trips like this are made of.</p>
+
+        <!-- TEE SHOT: Film action shot -->
+        <figure class="inline-image" onclick="openLightbox(5)">
+          <img src="../../assets/images/courses/mountain-ridge/tee-shot-clubhouse.jpg" alt="A player in mid-swing on the tee at Mountain Ridge, the ball just leaving the clubface, the stone clubhouse and fescue-lined fairway stretching out ahead, shot on 35mm film" loading="lazy">
+          <figcaption>Teeing off toward the clubhouse. The ball is still in the air in this one. On film, the moment feels even more permanent.</figcaption>
+        </figure>
 
         <p>Mountain Ridge is not a household name in the way that some of the courses later on our trip would be. But among the people who study this era of architecture, it is deeply respected. Ross gave this club something special. A course that rewards repeat play, that reveals new dimensions every time you walk it, that feels like it belongs so completely to its setting that you cannot imagine the land without it. We left wanting to come back, which is the highest compliment you can pay any course.</p>
 
       </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== GALLERY + MEMORABILIA ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="photo-gallery">
+        <div class="gallery-header">
+          <h2>From the Round</h2>
+          <p>Mountain Ridge Country Club, West Caldwell, New Jersey</p>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-item wide" onclick="openLightbox(6)">
+            <img src="../../assets/images/courses/mountain-ridge/water-hazard-tee.jpg" alt="Tee shot over water at Mountain Ridge, the pond reflecting the sky with bunkers and fairway beyond" loading="lazy">
+          </div>
+          <div class="gallery-item tall" onclick="openLightbox(7)">
+            <img src="../../assets/images/courses/mountain-ridge/hero-clubhouse-bunker.jpg" alt="The Tudor clubhouse rising behind a greenside bunker at Mountain Ridge" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMORABILIA: 1912 Tee Marker -->
+      <div class="memorabilia">
+        <div class="memorabilia-label">On the Ground</div>
+        <figure onclick="openLightbox(8)">
+          <img src="../../assets/images/courses/mountain-ridge/tee-marker-1912.jpg" alt="Bronze tee marker embedded in the turf at Mountain Ridge showing the club crest and 1912 founding date" loading="lazy">
+          <figcaption>1912. Over a century of golf on this ridge.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/francis-a-byrne/">← Prev: Francis A. Byrne</a>
-        <a href="/chasing-golden-age-golf/essex-county/">Next: Essex County CC →</a>
+        <a href="/chasing-golden-age-golf/francis-a-byrne/">&#8592; Prev: Francis A. Byrne</a>
+        <a href="/chasing-golden-age-golf/essex-county/">Next: Essex County CC &#8594;</a>
       </div>
     </div>
   </section>
 
   <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">The Caddie <span>Chat</span></div><ul class="footer-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li></ul></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span><div class="footer-social"><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a></div></div></div></footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    const lightboxImages = [
+      { src: '../../assets/images/courses/mountain-ridge/group-photo-flag.jpg', caption: 'Three Evans Scholars on the green at Mountain Ridge.' },
+      { src: '../../assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg', caption: 'Storm clouds building over the fairway. The course took on a different character entirely.' },
+      { src: '../../assets/images/courses/mountain-ridge/fairway-ridge-clubhouse.jpg', caption: 'The clubhouse on the ridge, watching over the course.' },
+      { src: '../../assets/images/courses/mountain-ridge/flag-clubhouse-fescue.jpg', caption: 'The red flag and the ridge. Fescue edges frame every green.' },
+      { src: '../../assets/images/courses/mountain-ridge/green-pin-clubhouse.jpg', caption: 'From the green, the clubhouse looms above.' },
+      { src: '../../assets/images/courses/mountain-ridge/tee-shot-clubhouse.jpg', caption: 'Teeing off toward the clubhouse. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/mountain-ridge/water-hazard-tee.jpg', caption: 'Tee shot over water, the pond reflecting the afternoon sky.' },
+      { src: '../../assets/images/courses/mountain-ridge/hero-clubhouse-bunker.jpg', caption: 'The Tudor clubhouse rising behind a greenside bunker. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/mountain-ridge/tee-marker-1912.jpg', caption: '1912. Over a century of golf on this ridge.' }
+    ];
+    let currentIndex = 0;
+    function openLightbox(index) {
+      currentIndex = index;
+      const lb = document.getElementById('lightbox');
+      document.getElementById('lightbox-img').src = lightboxImages[index].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[index].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[index].caption;
+      lb.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function navigateLightbox(e, dir) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + dir + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentIndex].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[currentIndex].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[currentIndex].caption;
+    }
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
