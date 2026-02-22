@@ -13,19 +13,70 @@
     .course-meta-item { display: flex; flex-direction: column; gap: 0.25rem; }
     .course-meta-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-muted); }
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
+    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
+
+    .course-hero-image { width: 100%; overflow: hidden; position: relative; }
+    .course-hero-image img { width: 100%; height: 60vh; object-fit: cover; object-position: center 65%; display: block; }
+    .course-hero-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent); pointer-events: none; }
+
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
     .course-body p:first-of-type::first-letter { font-family: var(--font-display); font-size: 3.5rem; float: left; line-height: 1; margin-right: 0.5rem; margin-top: 0.1rem; color: var(--color-accent); }
     .course-body h2 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--color-text-primary); margin: 2.5rem 0 1rem; }
     .pull-quote { font-family: var(--font-display); font-size: 1.5rem; font-style: italic; color: var(--color-accent); line-height: 1.5; padding: var(--space-md) 0; margin: var(--space-md) 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+
+    .inline-image { margin: 2.5rem -4rem; position: relative; }
+    .inline-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .inline-image img:hover { opacity: 0.92; }
+    .inline-image figcaption { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; font-style: italic; letter-spacing: 0.02em; }
+
+    .full-bleed-image { width: 100vw; margin-left: calc(-50vw + 50%); position: relative; overflow: hidden; margin-top: 3rem; margin-bottom: 3rem; }
+    .full-bleed-image img { width: 100%; height: 55vh; object-fit: cover; object-position: center 50%; display: block; cursor: pointer; transition: transform 0.8s ease; }
+    .full-bleed-image:hover img { transform: scale(1.015); }
+    .full-bleed-image figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2rem 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); font-size: 0.82rem; color: rgba(255,255,255,0.8); font-style: italic; letter-spacing: 0.02em; }
+
+    .featured-image { margin: 3rem -4rem; position: relative; }
+    .featured-image img { width: 100%; border-radius: 2px; display: block; cursor: pointer; transition: opacity 0.3s ease; }
+    .featured-image:hover img { opacity: 0.92; }
+    .featured-image .featured-caption { display: flex; align-items: flex-start; gap: 1rem; margin-top: 1rem; }
+    .featured-caption .caption-line { width: 40px; min-width: 40px; height: 1px; background: var(--color-accent); margin-top: 0.6rem; }
+    .featured-caption p { font-size: 0.82rem; color: var(--color-text-muted); font-style: italic; letter-spacing: 0.02em; line-height: 1.6; margin: 0; }
+
+    .image-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 3rem -4rem; align-items: end; }
+    .image-pair .pair-item { overflow: hidden; position: relative; cursor: pointer; }
+    .image-pair .pair-item:first-child { margin-top: -2rem; }
+    .image-pair .pair-item img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s ease; }
+    .image-pair .pair-item:hover img { transform: scale(1.03); opacity: 0.92; }
+    .image-pair figcaption { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.5rem; font-style: italic; }
+
+    .memorabilia { max-width: 360px; margin: 0 auto; padding: var(--space-md) 0; text-align: center; }
+    .memorabilia-label { font-size: 0.65rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+    .memorabilia img { max-height: 380px; width: auto; max-width: 100%; display: inline-block; cursor: pointer; transition: transform 0.4s ease, opacity 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.08); border-radius: 2px; }
+    .memorabilia img:hover { transform: translateY(-4px); opacity: 0.92; }
+    .memorabilia figcaption { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 1rem; font-style: italic; }
+
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; cursor: zoom-out; }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 2px; }
+    .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: rgba(255,255,255,0.7); font-size: 2rem; cursor: pointer; line-height: 1; transition: color 0.3s ease; }
+    .lightbox-close:hover { color: #fff; }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.6); font-size: 2.5rem; cursor: pointer; padding: 1rem; transition: color 0.3s ease; }
+    .lightbox-nav:hover { color: #fff; }
+    .lightbox-prev { left: 1rem; }
+    .lightbox-next { right: 1rem; }
+    .lightbox-caption { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.85rem; font-style: italic; text-align: center; max-width: 600px; }
+
     .course-nav { display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg) 0; margin-top: var(--space-lg); border-top: 1px solid var(--color-border); }
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
-    .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
+
+    @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; } }
+    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } .course-hero-image img { height: 45vh; } .full-bleed-image img { height: 45vh; } .image-pair { grid-template-columns: 1fr; gap: 1.5rem; } .image-pair .pair-item:first-child { margin-top: 0; } }
+    @media (max-width: 480px) { .inline-image, .featured-image { margin: 2rem 0; } }
   </style>
 </head>
 <body>
+
   <nav class="nav"><div class="container"><a href="/" class="nav-logo">The Caddie <span>Chat</span></a><ul class="nav-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li><li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li></ul><button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button></div></nav>
 
   <section class="course-hero">
@@ -42,8 +93,12 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ===== HERO IMAGE: Film clubhouse from fairway ===== -->
+  <div class="course-hero-image">
+    <img src="../../assets/images/courses/friars-head/hero-clubhouse-bluff.jpg" alt="The stone clubhouse at Friar's Head rising above the fairway and bunkers on the bluff, Long Island Sound visible beyond, shot on 35mm film with warm saturated tones under clear summer skies" loading="eager">
+  </div>
 
+  <!-- ===== COURSE CONTENT ===== -->
   <section class="section-pad-lg">
     <div class="container">
       <div class="course-body reveal">
@@ -52,9 +107,24 @@
 
         <p>Coore and Crenshaw are the modern heirs to the Golden Age philosophy. Bill Coore and Ben Crenshaw build courses the way the old masters did. They walk the land first. They let the terrain dictate the routing. They trust that the best holes are found, not manufactured. Their work at Friar's Head, which opened in 2002, is widely considered one of their finest achievements, and after playing it, I understand why. This is a course that feels ancient on a property that could be in Scotland, designed by architects who studied the Golden Age so deeply that their work sits comfortably alongside it.</p>
 
+        <!-- GROUP ON THE BLUFF: Featured image -->
+        <figure class="featured-image" onclick="openLightbox(0)">
+          <img src="../../assets/images/courses/friars-head/group-bluff-sound.jpg" alt="The foursome standing on the sandy bluff at Friar's Head with Long Island Sound stretching out behind them, dune grasses at their feet and the coastline curving into the distance under brilliant summer skies" loading="lazy">
+          <div class="featured-caption">
+            <span class="caption-line"></span>
+            <p>The foursome on the bluff. Long Island Sound behind us, the final course of the trip ahead. This is why you chase it.</p>
+          </div>
+        </figure>
+
         <h2>Links on Long Island</h2>
 
         <p>The property at Friar's Head is unlike anything else we played on this trip. Perched on the bluffs above Long Island Sound, it moves through three distinct landscapes: coastal links along the water, inland meadows with rolling terrain, and wooded uplands with views that stretch for miles. Coore and Crenshaw exploited each of these environments fully, routing holes that feel native to their specific piece of ground. The links holes play firm and fast, with the wind off the Sound adding a dimension of difficulty that changes by the hour. The inland holes have a more pastoral quality, with wider fairways and more forgiving angles. And the wooded holes demand precision, threading shots through corridors of trees to reach greens that sit perfectly in their clearings.</p>
+
+        <!-- FLAG WITH OCEAN: Inline film image -->
+        <figure class="inline-image" onclick="openLightbox(1)">
+          <img src="../../assets/images/courses/friars-head/flag-dunes-ocean-film.jpg" alt="The red and white checkered flag at Friar's Head standing on a green with sand dunes and the blue waters of Long Island Sound behind it, shot on 35mm film" loading="lazy">
+          <figcaption>The flag, the dunes, the Sound. Shot on film. This is what links golf on Long Island looks like.</figcaption>
+        </figure>
 
         <p>The variety is extraordinary. On most courses, you settle into a rhythm. You figure out what the architect is asking and you deliver it, hole after hole. At Friar's Head, the ask keeps changing. Just when you think you understand the course, it shifts terrain, shifts character, shifts the relationship between wind and shot. It demands adaptability in a way that few courses do, and that adaptability is what separates a truly great round from a merely good one.</p>
 
@@ -62,15 +132,39 @@
           "This is a course that feels ancient on a property that could be in Scotland, designed by architects who studied the Golden Age so deeply that their work sits comfortably alongside it."
         </div>
 
+        <!-- FULL BLEED: Tee into dune corridor toward ocean -->
+        <figure class="full-bleed-image" onclick="openLightbox(2)">
+          <img src="../../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg" alt="A group of golfers on the tee at Friar's Head looking down a fairway corridor framed by sand dunes and trees, the blue waters of Long Island Sound visible through the gap at the end, shot on 35mm film" loading="lazy">
+          <figcaption>The tee shot through the dunes. The Sound at the end of the corridor. Shot on 35mm film. There is no more dramatic setup in American golf.</figcaption>
+        </figure>
+
         <h2>The Coore & Crenshaw Philosophy</h2>
 
         <p>Walking Friar's Head, you see the direct line between the Golden Age architects we had been studying all week and the modern practitioners who carry their torch. Coore and Crenshaw share Doak's minimalism, Tillinghast's insistence on variety, Travis's strategic intelligence. But they add something uniquely their own, a reverence for the natural landscape that borders on spiritual. Nothing at Friar's Head looks forced. The bunkers appear to have been carved by wind and time, not by bulldozers. The greens roll and pitch with the terrain, their contours dictated by the land beneath them. Even the fescue that frames the fairways feels like it grew there on its own, an ecosystem rather than a design feature.</p>
+
+        <!-- TEE SHOT INTO DUNES: Inline image -->
+        <figure class="inline-image" onclick="openLightbox(3)">
+          <img src="../../assets/images/courses/friars-head/tee-shot-dunes.jpg" alt="A golfer completing their follow-through on an elevated tee at Friar's Head, the fairway bending through sand dunes and wind-bent trees with the ocean visible on the left" loading="lazy">
+          <figcaption>The follow-through says it all. Dunes left, ocean behind the trees, sand everywhere. Coore and Crenshaw did not build this. They found it.</figcaption>
+        </figure>
 
         <p>The green complexes are among the best we encountered on the entire trip. They are expansive, often multi-tiered, with internal contours that create wildly different putting challenges depending on the pin position. On one hole, you might face a 30-foot putt with three feet of break. On the next, a 15-footer that looks straight but runs away from you at the end because of a subtle ridge you did not see from the fairway. Reading these greens requires patience and humility, two qualities that nine days on the road had drilled into us by this point.</p>
 
         <h2>Old Barnwell on the Sound</h2>
 
         <p>For three caddies who spend their days at Old Barnwell in Aiken, South Carolina, walking Friar's Head felt strangely familiar. Both courses share a commitment to the ground game that you do not find at most modern designs. At Old Barnwell, Brian Schneider and Blake Conant built a course on sandy South Carolina soil that rewards creativity and encourages you to use every club in the bag, to bump and run, to shape shots along the contours of the land. Friar's Head does the same thing on a completely different canvas. The sandy soil, the firm and fast conditions, the greens that accept a well played running approach as warmly as an aerial one. Standing on the links holes at Friar's Head with the Sound stretching out behind you, one of us said it out loud: this feels like Old Barnwell if you dropped it on the coast and turned the volume up. Different property, different architects, different era. Same philosophy. Same love for what the ground game can be.</p>
+
+        <!-- IMAGE PAIR: Film putting toward clubhouse + Bluff coastline -->
+        <div class="image-pair">
+          <figure class="pair-item" onclick="openLightbox(4)">
+            <img src="../../assets/images/courses/friars-head/putting-clubhouse-film.jpg" alt="A golfer reading a putt on a green at Friar's Head with the stone clubhouse perched on the bluff above and a deep bunker in the foreground, shot on 35mm film" loading="lazy">
+            <figcaption>Putting toward the clubhouse. The bunker lip, the bluff, the stone above. Shot on film.</figcaption>
+          </figure>
+          <figure class="pair-item" onclick="openLightbox(5)">
+            <img src="../../assets/images/courses/friars-head/bluff-coastline-film.jpg" alt="The bluff at Friar's Head dropping down to the beach and Long Island Sound, a wooden boardwalk descending through the dune grass, the coastline stretching into the distance, shot on 35mm film" loading="lazy">
+            <figcaption>The bluff. The boardwalk down to the Sound. This is the walk between holes at Friar's Head.</figcaption>
+          </figure>
+        </div>
 
         <h2>The End of the Chase</h2>
 
@@ -83,14 +177,84 @@
         <p>The chase continues. But this is where it truly began.</p>
 
       </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== MEMORABILIA: Mailbox 3000 ===== -->
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="memorabilia">
+        <div class="memorabilia-label">Finding the Place</div>
+        <figure onclick="openLightbox(6)">
+          <img src="../../assets/images/courses/friars-head/mailbox-3000.jpg" alt="A plain black mailbox numbered 3000 on a quiet country road in Baiting Hollow, Long Island, the unmarked entrance to Friar's Head Golf Links" loading="lazy">
+          <figcaption>Mailbox 3000. No sign. No gate. Just a number on a country road. If you know, you know.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(event, -1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(event, 1)">&#8250;</button>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- ===== COURSE NAV ===== -->
+  <section>
+    <div class="container">
       <div class="course-nav">
-        <a href="/chasing-golden-age-golf/winged-foot/">← Prev: Winged Foot GC</a>
-        <a href="/chasing-golden-age-golf/">All Courses →</a>
+        <a href="/chasing-golden-age-golf/winged-foot/">&#8592; Prev: Winged Foot GC</a>
+        <a href="/chasing-golden-age-golf/">All Courses &#8594;</a>
       </div>
     </div>
   </section>
 
   <footer class="footer"><div class="container"><div class="footer-grid"><div class="footer-brand">The Caddie <span>Chat</span></div><ul class="footer-links"><li><a href="/caddie-chronicles/">Chronicles</a></li><li><a href="/chasing-golden-age-golf/">Golden Age Golf</a></li><li><a href="/through-the-lens/">Through the Lens</a></li></ul></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 The Caddie Chat. All Rights Reserved. Created by Joe Stoehner.</span><div class="footer-social"><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg></a></div></div></div></footer>
+
   <script src="../../assets/js/main.js"></script>
+  <script>
+    const lightboxImages = [
+      { src: '../../assets/images/courses/friars-head/group-bluff-sound.jpg', caption: 'The foursome on the bluff. Long Island Sound behind us, the final course ahead.' },
+      { src: '../../assets/images/courses/friars-head/flag-dunes-ocean-film.jpg', caption: 'The flag, the dunes, the Sound. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg', caption: 'The tee shot through the dunes toward the Sound. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/friars-head/tee-shot-dunes.jpg', caption: 'The follow-through. Dunes left, ocean behind the trees.' },
+      { src: '../../assets/images/courses/friars-head/putting-clubhouse-film.jpg', caption: 'Putting toward the clubhouse on the bluff. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/friars-head/bluff-coastline-film.jpg', caption: 'The bluff and the boardwalk down to the Sound. Shot on 35mm film.' },
+      { src: '../../assets/images/courses/friars-head/mailbox-3000.jpg', caption: 'Mailbox 3000. No sign. No gate. If you know, you know.' },
+      { src: '../../assets/images/courses/friars-head/hero-clubhouse-bluff.jpg', caption: 'The clubhouse at Friar\'s Head. Shot on 35mm film.' }
+    ];
+    let currentIndex = 0;
+    function openLightbox(index) {
+      currentIndex = index;
+      document.getElementById('lightbox-img').src = lightboxImages[index].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[index].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[index].caption;
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(e) {
+      if (e.target.classList.contains('lightbox-nav') || e.target.classList.contains('lightbox-prev') || e.target.classList.contains('lightbox-next')) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function navigateLightbox(e, dir) {
+      e.stopPropagation();
+      currentIndex = (currentIndex + dir + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentIndex].src;
+      document.getElementById('lightbox-img').alt = lightboxImages[currentIndex].caption;
+      document.getElementById('lightbox-caption').textContent = lightboxImages[currentIndex].caption;
+    }
+    document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox(e);
+      if (e.key === 'ArrowLeft') navigateLightbox(e, -1);
+      if (e.key === 'ArrowRight') navigateLightbox(e, 1);
+    });
+  </script>
 </body>
 </html>
