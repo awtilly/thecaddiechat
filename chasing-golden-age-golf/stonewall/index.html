@@ -48,25 +48,21 @@
     }
 
     /* ===== HERO IMAGE ===== */
-    .course-hero-image {
-      width: 100%;
-      overflow: hidden;
-      position: relative;
-    }
+    /* Hero image: responsive aspect ratio, no bad cropping */
+    .course-hero-image { width: 100%; overflow: hidden; position: relative; }
     .course-hero-image img {
       width: 100%;
-      height: 65vh;
+      aspect-ratio: 21 / 9;
+      max-height: 65vh;
+      min-height: 280px;
       object-fit: cover;
-      object-position: center 40%;
       display: block;
     }
     .course-hero-image::after {
       content: '';
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 30%;
+      bottom: 0; left: 0; right: 0;
+      height: 25%;
       background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent);
       pointer-events: none;
     }
@@ -142,7 +138,7 @@
     }
     .full-bleed-image img {
       width: 100%;
-      height: 55vh;
+      
       object-fit: cover;
       display: block;
       cursor: pointer;
@@ -177,7 +173,6 @@
       position: relative;
       cursor: pointer;
     }
-    .image-pair .pair-item:first-child {
       margin-top: -2rem;
     }
     .image-pair .pair-item img {
@@ -407,19 +402,10 @@
     .course-nav a:hover { color: var(--color-accent); }
 
     /* ===== RESPONSIVE ===== */
-    @media (max-width: 868px) {
-      .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; }
+    @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; }
     }
-    @media (max-width: 768px) {
-      .course-number { font-size: 5rem; }
-      .course-body p:first-of-type::first-letter { font-size: 2.8rem; }
-      .course-hero-image img { height: 45vh; }
-      .full-bleed-image img { height: 40vh; }
-      .image-pair {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+    
       }
-      .image-pair .pair-item:first-child { margin-top: 0; }
       .gallery-masonry {
         grid-template-columns: repeat(6, 1fr);
       }
@@ -429,14 +415,56 @@
       .g-square { grid-column: span 3; }
       .g-small  { grid-column: span 3; }
     }
-    @media (max-width: 480px) {
-      .inline-image, .featured-image { margin: 2rem 0; }
+    
       .memorabilia-row {
         grid-template-columns: 1fr;
         gap: 2rem;
       }
     }
+
+    /* Reveal fix: content visible immediately, gentle CSS animation */
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: revealFade 0.8s ease-out;
+    }
+    @keyframes revealFade {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Mobile & cross-browser fixes */
+    @media (max-width: 768px) {
+      .course-number { font-size: 5rem; }
+      .course-hero-image img { aspect-ratio: 16 / 9; max-height: 50vh; min-height: 220px; }
+      .full-bleed-image img { max- min-height: 220px; }
+      .image-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+      .pull-quote { font-size: 1.25rem; }
+      .lightbox-nav { font-size: 2rem; padding: 0.5rem; }
+      .lightbox img { max-width: 95vw; max-height: 85vh; }
+      .lightbox-caption { font-size: 0.75rem; max-width: 90vw; bottom: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .inline-image, .featured-image { margin: 2rem 0; }
+      .course-meta { gap: var(--space-sm); }
+      .course-meta-item { min-width: 45%; }
+      .course-hero-image img { aspect-ratio: 4 / 3; max-height: 45vh; }
+      .lightbox-prev { left: 0.25rem; }
+      .lightbox-next { right: 0.25rem; }
+    }
+    /* Safari fixes */
+    @supports (-webkit-touch-callout: none) {
+      .course-hero-image img { -webkit-aspect-ratio: 21 / 9; }
+      .lightbox { -webkit-backdrop-filter: blur(2px); }
+    }
+    /* Touch device lightbox improvements */
+    @media (hover: none) and (pointer: coarse) {
+      .lightbox-close { font-size: 2.5rem; top: 1rem; right: 1rem; padding: 0.5rem; }
+      .lightbox-nav { font-size: 3rem; }
+    }
   </style>
+
+  <noscript><style>.reveal{opacity:1!important;transform:none!important;animation:none!important}</style></noscript>
 </head>
 <body>
 
@@ -489,7 +517,7 @@
 
   <!-- ===== HERO IMAGE with gradient fade ===== -->
   <div class="course-hero-image">
-    <img src="../../assets/images/courses/stonewall/hero-walking-bunkers.jpg" alt="Walking the fairway at Stonewall, looking out toward Doak's bunker complexes and the Pennsylvania hills beyond" loading="eager">
+    <img src="../../assets/images/courses/stonewall/hero-walking-bunkers.jpg" alt="Walking the fairway at Stonewall, looking out toward Doak's bunker complexes and the Pennsylvania hills beyond" loading="eager" loading="eager">
   </div>
 
   <!-- ===== COURSE CONTENT ===== -->

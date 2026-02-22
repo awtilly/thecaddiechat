@@ -39,10 +39,52 @@
     .course-nav a { font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: var(--color-text-secondary); transition: color 0.3s ease; }
     .course-nav a:hover { color: var(--color-accent); }
 
-    @media (max-width: 868px) { .featured-image { margin: 2rem -1rem; } }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } }
-    @media (max-width: 480px) { .featured-image { margin: 2rem 0; } }
+    @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; } }
+     }
+
+    /* Reveal fix: content visible immediately, gentle CSS animation */
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: revealFade 0.8s ease-out;
+    }
+    @keyframes revealFade {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Mobile & cross-browser fixes */
+    @media (max-width: 768px) {
+      .course-number { font-size: 5rem; }
+      .course-hero-image img { aspect-ratio: 16 / 9; max-height: 50vh; min-height: 220px; }
+      .full-bleed-image img { max- min-height: 220px; }
+      .image-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+      .pull-quote { font-size: 1.25rem; }
+      .lightbox-nav { font-size: 2rem; padding: 0.5rem; }
+      .lightbox img { max-width: 95vw; max-height: 85vh; }
+      .lightbox-caption { font-size: 0.75rem; max-width: 90vw; bottom: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .inline-image, .featured-image { margin: 2rem 0; }
+      .course-meta { gap: var(--space-sm); }
+      .course-meta-item { min-width: 45%; }
+      .course-hero-image img { aspect-ratio: 4 / 3; max-height: 45vh; }
+      .lightbox-prev { left: 0.25rem; }
+      .lightbox-next { right: 0.25rem; }
+    }
+    /* Safari fixes */
+    @supports (-webkit-touch-callout: none) {
+      .course-hero-image img { -webkit-aspect-ratio: 21 / 9; }
+      .lightbox { -webkit-backdrop-filter: blur(2px); }
+    }
+    /* Touch device lightbox improvements */
+    @media (hover: none) and (pointer: coarse) {
+      .lightbox-close { font-size: 2.5rem; top: 1rem; right: 1rem; padding: 0.5rem; }
+      .lightbox-nav { font-size: 3rem; }
+    }
   </style>
+
+  <noscript><style>.reveal{opacity:1!important;transform:none!important;animation:none!important}</style></noscript>
 </head>
 <body>
 

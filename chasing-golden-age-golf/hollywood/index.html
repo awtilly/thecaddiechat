@@ -15,9 +15,24 @@
     .course-meta-value { font-family: var(--font-display); font-size: 1.1rem; color: var(--color-text-primary); }
     .course-number { font-family: var(--font-display); font-size: 8rem; font-weight: 400; font-style: italic; color: var(--color-text-muted); line-height: 1; opacity: 0.3; }
 
+    /* Hero image: responsive aspect ratio, no bad cropping */
     .course-hero-image { width: 100%; overflow: hidden; position: relative; }
-    .course-hero-image img { width: 100%; height: 70vh; object-fit: cover; object-position: center 45%; display: block; }
-    .course-hero-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30%; background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent); pointer-events: none; }
+    .course-hero-image img {
+      width: 100%;
+      aspect-ratio: 21 / 9;
+      max-height: 65vh;
+      min-height: 280px;
+      object-fit: cover;
+      display: block;
+    }
+    .course-hero-image::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 25%;
+      background: linear-gradient(to top, var(--color-bg, #f5f2eb), transparent);
+      pointer-events: none;
+    }
 
     .course-body { max-width: 720px; margin: 0 auto; }
     .course-body p { color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 1.5rem; }
@@ -31,7 +46,7 @@
     .inline-image figcaption { font-size: 0.78rem; color: var(--color-text-muted); margin-top: 0.75rem; font-style: italic; letter-spacing: 0.02em; }
 
     .full-bleed-image { width: 100vw; margin-left: calc(-50vw + 50%); position: relative; overflow: hidden; margin-top: 3rem; margin-bottom: 3rem; }
-    .full-bleed-image img { width: 100%; height: 55vh; object-fit: cover; object-position: center 60%; display: block; cursor: pointer; transition: transform 0.8s ease; }
+    .full-bleed-image img { width: 100%;  object-fit: cover; object-position: center 60%; display: block; cursor: pointer; transition: transform 0.8s ease; }
     .full-bleed-image:hover img { transform: scale(1.015); }
     .full-bleed-image figcaption { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 2rem 1.5rem; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); font-size: 0.82rem; color: rgba(255,255,255,0.8); font-style: italic; letter-spacing: 0.02em; }
 
@@ -44,7 +59,6 @@
 
     .image-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 3rem -4rem; align-items: end; }
     .image-pair .pair-item { overflow: hidden; position: relative; cursor: pointer; }
-    .image-pair .pair-item:first-child { margin-top: -2rem; }
     .image-pair .pair-item img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.3s ease; }
     .image-pair .pair-item:hover img { transform: scale(1.03); opacity: 0.92; }
     .image-pair figcaption { font-size: 0.72rem; color: var(--color-text-muted); margin-top: 0.5rem; font-style: italic; }
@@ -71,9 +85,51 @@
     .course-nav a:hover { color: var(--color-accent); }
 
     @media (max-width: 868px) { .inline-image, .featured-image, .image-pair { margin: 2rem -1rem; } }
-    @media (max-width: 768px) { .course-number { font-size: 5rem; } .course-body p:first-of-type::first-letter { font-size: 2.8rem; } .course-hero-image img { height: 50vh; } .full-bleed-image img { height: 45vh; } .image-pair { grid-template-columns: 1fr; gap: 1.5rem; } .image-pair .pair-item:first-child { margin-top: 0; } }
-    @media (max-width: 480px) { .inline-image, .featured-image { margin: 2rem 0; } }
+     }
+
+    /* Reveal fix: content visible immediately, gentle CSS animation */
+    .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: revealFade 0.8s ease-out;
+    }
+    @keyframes revealFade {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* Mobile & cross-browser fixes */
+    @media (max-width: 768px) {
+      .course-number { font-size: 5rem; }
+      .course-hero-image img { aspect-ratio: 16 / 9; max-height: 50vh; min-height: 220px; }
+      .full-bleed-image img { max- min-height: 220px; }
+      .image-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+      .pull-quote { font-size: 1.25rem; }
+      .lightbox-nav { font-size: 2rem; padding: 0.5rem; }
+      .lightbox img { max-width: 95vw; max-height: 85vh; }
+      .lightbox-caption { font-size: 0.75rem; max-width: 90vw; bottom: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .inline-image, .featured-image { margin: 2rem 0; }
+      .course-meta { gap: var(--space-sm); }
+      .course-meta-item { min-width: 45%; }
+      .course-hero-image img { aspect-ratio: 4 / 3; max-height: 45vh; }
+      .lightbox-prev { left: 0.25rem; }
+      .lightbox-next { right: 0.25rem; }
+    }
+    /* Safari fixes */
+    @supports (-webkit-touch-callout: none) {
+      .course-hero-image img { -webkit-aspect-ratio: 21 / 9; }
+      .lightbox { -webkit-backdrop-filter: blur(2px); }
+    }
+    /* Touch device lightbox improvements */
+    @media (hover: none) and (pointer: coarse) {
+      .lightbox-close { font-size: 2.5rem; top: 1rem; right: 1rem; padding: 0.5rem; }
+      .lightbox-nav { font-size: 3rem; }
+    }
   </style>
+
+  <noscript><style>.reveal{opacity:1!important;transform:none!important;animation:none!important}</style></noscript>
 </head>
 <body>
 
@@ -95,7 +151,7 @@
 
   <!-- ===== HERO IMAGE: Tunnel shot on film ===== -->
   <div class="course-hero-image">
-    <img src="../../assets/images/courses/hollywood/hero-tunnel-flag.jpg" alt="A gravel path leading through a wooden tunnel carved into a grass-covered mound at Hollywood Golf Club, the flag and green visible through the far end, shot on 35mm film with soft warm tones" loading="eager">
+    <img src="../../assets/images/courses/hollywood/hero-tunnel-flag.jpg" alt="A gravel path leading through a wooden tunnel carved into a grass-covered mound at Hollywood Golf Club, the flag and green visible through the far end, shot on 35mm film with soft warm tones" loading="eager" loading="eager">
   </div>
 
   <!-- ===== COURSE CONTENT ===== -->
