@@ -303,6 +303,7 @@ body::before {
   .hero h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
   .course-item { grid-template-columns: 50px 1fr auto; }
   .course-num { font-size: 1.8rem; }
+  .reveal { opacity: 1; transform: none; }
 }
 @media (max-width: 480px) {
   .stats-row { grid-template-columns: 1fr 1fr; gap: var(--space-sm); }

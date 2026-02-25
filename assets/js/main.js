@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const reveals = document.querySelectorAll('.reveal');
-  if (reveals.length) {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (reveals.length && !isMobile) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
