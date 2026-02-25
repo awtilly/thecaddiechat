@@ -270,7 +270,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* --- Subtle paper texture --- */
 body::before {
-  content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.015;
+  content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.015;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat; background-size: 256px;
 }
@@ -290,16 +290,31 @@ body::before {
   .footer-grid { flex-direction: column; gap: var(--space-md); }
   .footer-bottom { flex-direction: column; gap: var(--space-sm); text-align: center; }
 }
+/* --- Mobile nav overlay backdrop --- */
+.nav-overlay {
+  display: none; position: fixed; inset: 0; z-index: 1099;
+  background: rgba(28, 28, 28, 0.5); opacity: 0;
+  transition: opacity 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-overlay.visible { display: block; opacity: 1; }
+
 @media (max-width: 768px) {
-  .nav { background: rgba(247, 244, 239, 0.95); }
+  .nav { background: rgba(247, 244, 239, 0.98); }
   .nav-links {
     position: fixed; top: 0; right: 0; bottom: 0; width: 280px;
     background: var(--color-bg-elevated); flex-direction: column; justify-content: center;
-    align-items: center; gap: var(--space-lg); transform: translateX(100%);
-    transition: transform 0.4s ease; z-index: 999; box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+    align-items: center; gap: var(--space-md); transform: translateX(100%);
+    transition: transform 0.4s ease; z-index: 1100;
+    box-shadow: -10px 0 40px rgba(0,0,0,0.15);
   }
   .nav-links.open { transform: translateX(0); }
-  .nav-toggle { display: flex; z-index: 1001; }
+  .nav-links li { width: 100%; text-align: center; }
+  .nav-links a {
+    display: block; padding: 0.85rem var(--space-md);
+    font-size: 0.9rem; letter-spacing: 0.14em;
+  }
+  .nav-toggle { display: flex; z-index: 1101; position: relative; }
   .hero h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
   .course-item { grid-template-columns: 50px 1fr auto; }
   .course-num { font-size: 1.8rem; }

@@ -8,18 +8,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggle = document.querySelector('.nav-toggle');
   const links = document.querySelector('.nav-links');
+
+  // Create overlay backdrop for mobile nav
+  const overlay = document.createElement('div');
+  overlay.className = 'nav-overlay';
+  document.body.appendChild(overlay);
+
+  function openMenu() {
+    toggle.classList.add('active');
+    links.classList.add('open');
+    overlay.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    toggle.classList.remove('active');
+    links.classList.remove('open');
+    overlay.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
   if (toggle && links) {
     toggle.addEventListener('click', () => {
-      toggle.classList.toggle('active');
-      links.classList.toggle('open');
-      document.body.style.overflow = links.classList.contains('open') ? 'hidden' : '';
+      if (links.classList.contains('open')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     });
+
+    // Close when tapping the overlay backdrop
+    overlay.addEventListener('click', closeMenu);
+
+    // Close when a nav link is tapped
     links.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        toggle.classList.remove('active');
-        links.classList.remove('open');
-        document.body.style.overflow = '';
-      });
+      a.addEventListener('click', closeMenu);
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && links.classList.contains('open')) {
+        closeMenu();
+      }
     });
   }
 
