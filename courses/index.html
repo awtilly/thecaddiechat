@@ -7,6 +7,60 @@
   <meta name="description" content="Courses we've worked on, built, and played — architecture reviews, trip logs, and the places that shaped how we see the game.">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>&#9971;</text></svg>">
+  <style>
+    .dozer-scene {
+      max-width: 240px;
+      margin-top: var(--space-lg);
+      opacity: 0.55;
+      transition: opacity 0.5s ease;
+    }
+    .dozer-scene:hover { opacity: 0.85; }
+    .dozer-scene svg { width: 100%; height: auto; }
+
+    .dozer-group {
+      animation: dozerDrive 8s ease-in-out infinite;
+    }
+    @keyframes dozerDrive {
+      0% { transform: translateX(0); }
+      60% { transform: translateX(185px); }
+      70% { transform: translateX(185px); }
+      100% { transform: translateX(0); }
+    }
+
+    .dozer-dirt {
+      animation: dirtGrow 8s ease-in-out infinite;
+    }
+    @keyframes dirtGrow {
+      0% { transform: scaleX(1); }
+      60% { transform: scaleX(2.2); }
+      70% { transform: scaleX(2.2); }
+      100% { transform: scaleX(1); }
+    }
+
+    .dozer-puff {
+      animation: puffFloat 1.5s ease-in-out infinite;
+    }
+    @keyframes puffFloat {
+      0% { opacity: 0.3; transform: translateY(0) scale(1); }
+      50% { opacity: 0.15; transform: translateY(-4px) scale(1.4); }
+      100% { opacity: 0; transform: translateY(-8px) scale(1.8); }
+    }
+
+    .dozer-body circle {
+      animation: wheelSpin 0.6s linear infinite;
+    }
+    @keyframes wheelSpin {
+      /* subtle rotation feel via opacity pulse */
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.5; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dozer-group, .dozer-dirt, .dozer-puff, .dozer-body circle {
+        animation: none;
+      }
+    }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -42,6 +96,51 @@
     <div style="margin-top: var(--space-xl);">
       <span class="section-label">Coming Soon</span>
       <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.85; max-width: 640px; margin-top: var(--space-sm);">More course reviews, architecture deep dives, and stories from the courses we've built and worked on are on the way. Stay tuned.</p>
+
+      <!-- Easter egg: bulldozer building a green -->
+      <div class="dozer-scene" aria-hidden="true">
+        <svg viewBox="0 0 300 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- ground line -->
+          <line x1="0" y1="52" x2="300" y2="52" stroke="#c8c3ba" stroke-width="1"/>
+
+          <!-- flag on green -->
+          <g class="dozer-flag">
+            <ellipse cx="258" cy="51" rx="22" ry="3" fill="#c8c3ba" opacity="0.4"/>
+            <line x1="258" y1="51" x2="258" y2="28" stroke="#c8c3ba" stroke-width="1.5"/>
+            <polygon points="258,28 274,33 258,38" fill="#c8c3ba" opacity="0.6"/>
+          </g>
+
+          <!-- dirt pile (moves with bulldozer) -->
+          <g class="dozer-group">
+            <g class="dozer-dirt">
+              <ellipse cx="48" cy="49" rx="10" ry="5" fill="#c8c3ba" opacity="0.35"/>
+              <ellipse cx="46" cy="46" rx="6" ry="3" fill="#c8c3ba" opacity="0.25"/>
+            </g>
+
+            <!-- bulldozer body -->
+            <g class="dozer-body">
+              <!-- cab -->
+              <rect x="8" y="32" width="16" height="12" rx="1.5" stroke="#9a948c" stroke-width="1.5" fill="none"/>
+              <!-- cab window -->
+              <rect x="11" y="34" width="6" height="5" rx="1" stroke="#9a948c" stroke-width="1" fill="none"/>
+              <!-- hood -->
+              <rect x="24" y="36" width="18" height="8" rx="1" stroke="#9a948c" stroke-width="1.5" fill="none"/>
+              <!-- blade -->
+              <path d="M42 34 L46 34 L47 50 L42 50 Z" stroke="#9a948c" stroke-width="1.5" fill="none"/>
+              <!-- exhaust pipe -->
+              <line x1="14" y1="32" x2="14" y2="26" stroke="#9a948c" stroke-width="1.5"/>
+              <!-- exhaust puff -->
+              <circle class="dozer-puff" cx="14" cy="22" r="2" fill="#c8c3ba" opacity="0.3"/>
+              <!-- tracks -->
+              <rect x="6" y="44" width="36" height="7" rx="3.5" stroke="#9a948c" stroke-width="1.5" fill="none"/>
+              <!-- track wheels -->
+              <circle cx="13" cy="47.5" r="2" stroke="#9a948c" stroke-width="1" fill="none"/>
+              <circle cx="24" cy="47.5" r="2" stroke="#9a948c" stroke-width="1" fill="none"/>
+              <circle cx="35" cy="47.5" r="2" stroke="#9a948c" stroke-width="1" fill="none"/>
+            </g>
+          </g>
+        </svg>
+      </div>
     </div>
   </div></section>
 
