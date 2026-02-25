@@ -10,9 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const links = document.querySelector('.nav-links');
 
   // Create overlay backdrop for mobile nav
+  // Append inside .nav so it shares the same stacking context as the sidebar
   const overlay = document.createElement('div');
   overlay.className = 'nav-overlay';
-  document.body.appendChild(overlay);
+  if (nav) {
+    nav.appendChild(overlay);
+  } else {
+    document.body.appendChild(overlay);
+  }
 
   function openMenu() {
     toggle.classList.add('active');
