@@ -306,7 +306,7 @@ body::before {
 }
 /* --- Mobile nav overlay backdrop --- */
 .nav-overlay {
-  display: none; position: fixed; inset: 0; z-index: 1099;
+  display: none; position: fixed; inset: 0; z-index: 1050;
   background: rgba(28, 28, 28, 0.5); opacity: 0;
   transition: opacity 0.3s ease;
   -webkit-tap-highlight-color: transparent;
@@ -314,13 +314,16 @@ body::before {
 .nav-overlay.visible { display: block; opacity: 1; }
 
 @media (max-width: 768px) {
-  .nav { background: rgba(247, 244, 239, 0.98); }
+  /* Remove backdrop-filter on mobile — it creates a containing block
+     that breaks position:fixed on the slide-out nav panel */
+  .nav { background: rgba(247, 244, 239, 0.98); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .nav-links {
-    position: fixed; top: 0; right: 0; bottom: 0; width: 280px;
+    position: fixed; top: 0; right: 0; bottom: 0; width: 280px; height: 100vh; height: 100dvh;
     background: var(--color-bg-elevated); flex-direction: column; justify-content: center;
     align-items: center; gap: var(--space-md); transform: translateX(100%);
     transition: transform 0.4s ease; z-index: 1100;
     box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+    overflow-y: auto;
   }
   .nav-links.open { transform: translateX(0); }
   .nav-links li { width: 100%; text-align: center; }
@@ -328,6 +331,7 @@ body::before {
     display: block; padding: 0.85rem var(--space-md);
     font-size: 0.9rem; letter-spacing: 0.14em;
   }
+  .nav-links .nav-stoek { letter-spacing: 0; }
   .nav-toggle { display: flex; z-index: 1101; position: relative; }
   .hero h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
   .course-item { grid-template-columns: 50px 1fr auto; }
