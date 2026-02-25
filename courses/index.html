@@ -4,156 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Courses | The Caddie Chat</title>
-  <meta name="description" content="Nine days, eight courses, and a search for the heart of Golden Age golf architecture in the American Northeast.">
+  <meta name="description" content="Courses we've worked on, built, and played — architecture reviews, trip logs, and the places that shaped how we see the game.">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>&#9971;</text></svg>">
-  <noscript><style>.reveal{opacity:1!important;transform:none!important;animation:none!important}</style></noscript>
-  <style>
-    /* Hero section */
-    .series-hero {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-    }
-    .series-hero img {
-      width: 100%;
-      aspect-ratio: 21 / 9;
-      max-height: 60vh;
-      min-height: 260px;
-      object-fit: cover;
-      object-position: center 60%;
-      display: block;
-    }
-    .series-hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.3) 100%);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 2rem 3rem;
-    }
-    .series-hero-overlay .section-label {
-      color: rgba(255,255,255,0.6);
-    }
-    .series-hero-overlay h1 {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 500;
-      line-height: 1.1;
-      color: #fff;
-      margin-top: 0.5rem;
-    }
-    .series-hero-overlay h1 em {
-      font-style: italic;
-      color: var(--color-accent);
-    }
-
-    /* Course list with thumbnails */
-    .course-list { display: grid; grid-template-columns: 1fr; gap: 0; }
-    .course-item {
-      display: grid;
-      grid-template-columns: 80px 100px 1fr auto;
-      align-items: center;
-      gap: var(--space-md);
-      padding: var(--space-md) 0;
-      border-bottom: 1px solid var(--color-border);
-      transition: background 0.3s ease, padding 0.3s ease;
-      text-decoration: none;
-    }
-    .course-item:first-child { border-top: 1px solid var(--color-border); }
-    .course-item:hover {
-      background: var(--color-bg-elevated);
-      padding-left: var(--space-sm);
-      padding-right: var(--space-sm);
-    }
-    .course-num {
-      font-family: var(--font-display);
-      font-size: 2.5rem;
-      font-weight: 400;
-      color: var(--color-text-muted);
-      line-height: 1;
-      font-style: italic;
-    }
-    .course-item:hover .course-num { color: var(--color-accent); }
-    .course-thumb {
-      width: 100px;
-      height: 68px;
-      overflow: hidden;
-      border-radius: 2px;
-    }
-    .course-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.5s ease;
-    }
-    .course-item:hover .course-thumb img { transform: scale(1.08); }
-    .course-info h3 {
-      font-family: var(--font-display);
-      font-size: 1.35rem;
-      font-weight: 500;
-      line-height: 1.3;
-      margin-bottom: 0.25rem;
-    }
-    .course-info p { color: var(--color-text-secondary); font-size: 0.88rem; }
-    .course-arrow {
-      font-size: 1.2rem;
-      color: var(--color-text-muted);
-      transition: color 0.3s ease, transform 0.3s ease;
-    }
-    .course-item:hover .course-arrow {
-      color: var(--color-accent);
-      transform: translateX(4px);
-    }
-
-    .trip-intro {
-      max-width: 720px;
-      margin-bottom: var(--space-xl);
-    }
-    .trip-intro p {
-      color: var(--color-text-secondary);
-      font-size: 1.05rem;
-      line-height: 1.85;
-      margin-bottom: var(--space-sm);
-    }
-
-    /* Reveal fix */
-    .reveal {
-      opacity: 1 !important;
-      transform: none !important;
-      animation: revealFade 0.8s ease-out;
-    }
-    @keyframes revealFade {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: none; }
-    }
-
-    /* Mobile */
-    @media (max-width: 768px) {
-      .course-item {
-        grid-template-columns: 50px 80px 1fr auto;
-      }
-      .course-num { font-size: 1.8rem; }
-      .course-thumb { width: 80px; height: 55px; }
-      .series-hero img { aspect-ratio: 16 / 9; max-height: 45vh; }
-      .series-hero-overlay { padding: 0 1.5rem 2rem; }
-    }
-    @media (max-width: 480px) {
-      .course-item {
-        grid-template-columns: 40px 1fr auto;
-      }
-      .course-thumb { display: none; }
-      .course-num { font-size: 1.5rem; }
-      .course-info h3 { font-size: 1.15rem; }
-      .series-hero img { aspect-ratio: 4 / 3; max-height: 40vh; }
-    }
-  </style>
 </head>
 <body>
-
-  <!-- ===== NAVIGATION ===== -->
   <nav class="nav">
     <div class="container">
       <a href="/" class="nav-logo">The Caddie <span>Chat</span></a>
@@ -163,133 +18,41 @@
         <li><a href="/camera-roll/">Camera Roll</a></li>
         <li><a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram</a></li>
       </ul>
-      <button class="nav-toggle" aria-label="Menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
-  <!-- ===== HERO IMAGE ===== -->
-  <div class="series-hero">
-    <img src="../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg" alt="A tee shot through the dune corridor at Friar's Head with Long Island Sound visible through the gap, shot on 35mm film" loading="eager">
-    <div class="series-hero-overlay">
-      <div class="container">
-        <span class="section-label">Architecture & Reviews</span>
-        <h1>Courses</h1>
+  <header class="page-header"><div class="container">
+    <span class="section-label">Architecture & Reviews</span>
+    <h1>Courses</h1>
+    <p>The courses we've worked on, built, and played — from Golden Age gems to modern masterpieces, these are the places that shaped how we see the game.</p>
+  </div></header>
+  <div class="divider"></div>
+  <section class="section-pad-lg"><div class="container">
+    <span class="section-label">Featured Collection</span>
+    <a href="/courses/golden-age-golf/" class="featured-post reveal" style="text-decoration: none;">
+      <div class="featured-post-image"><img src="../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg" alt="Golden Age Golf — a tee shot through the dune corridor at Friar's Head"></div>
+      <div><span class="section-label">8 Courses &middot; Northeast Trip</span>
+        <h2>Golden Age Golf</h2>
+        <p>Nine days, eight courses, and a search for the heart of Golden Age golf architecture in the American Northeast. From Tillinghast to Travis, from public gems to the most exclusive private clubs.</p>
+        <span class="btn btn-arrow" style="margin-top: 1rem;">View the Collection</span>
       </div>
+    </a>
+
+    <div style="margin-top: var(--space-xl);">
+      <span class="section-label">Coming Soon</span>
+      <p style="color: var(--color-text-secondary); font-size: 1.05rem; line-height: 1.85; max-width: 640px; margin-top: var(--space-sm);">More course reviews, architecture deep dives, and stories from the courses we've built and worked on are on the way. Stay tuned.</p>
     </div>
-  </div>
+  </div></section>
 
-  <!-- ===== TRIP INTRO ===== -->
-  <section class="section-pad-lg">
-    <div class="container">
-      <div class="trip-intro reveal">
-        <p>Nine days, eight courses, and a search for the heart of Golden Age golf in the Northeast.</p>
-        <p>This trip was not just mine. It was a journey shared with two fellow Evans Scholars and Old Barnwell caddies, chasing the designs that shaped the game we love.</p>
-        <p>From Tillinghast to Travis, from the public gems to the most exclusive private clubs, these are the courses and the stories from the road.</p>
-      </div>
-
-      <!-- ===== COURSE LIST ===== -->
-      <div class="course-list">
-
-        <a href="/courses/stonewall/" class="course-item reveal">
-          <span class="course-num">01</span>
-          <div class="course-thumb"><img src="../assets/images/courses/stonewall/hero-walking-bunkers.jpg" alt="Stonewall" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Stonewall</h3>
-            <p>Old North Course, Tom Doak's vision of strategic restraint</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/francis-a-byrne/" class="course-item reveal">
-          <span class="course-num">02</span>
-          <div class="course-thumb"><img src="../assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg" alt="Francis A. Byrne" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Francis A. Byrne Golf Course</h3>
-            <p>A public Charles Banks course hiding in plain sight</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/mountain-ridge/" class="course-item reveal">
-          <span class="course-num">03</span>
-          <div class="course-thumb"><img src="../assets/images/courses/mountain-ridge/hero-clubhouse-bunker.jpg" alt="Mountain Ridge CC" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Mountain Ridge CC</h3>
-            <p>Donald Ross in the hills of northern New Jersey</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/essex-county/" class="course-item reveal">
-          <span class="course-num">04</span>
-          <div class="course-thumb"><img src="../assets/images/courses/essex-county/hero-bag-panoramic.jpg" alt="Essex County CC" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Essex County CC</h3>
-            <p>Golden Age elegance where three architects left their marks</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/north-jersey/" class="course-item reveal">
-          <span class="course-num">05</span>
-          <div class="course-thumb"><img src="../assets/images/courses/north-jersey/hero-clubhouse-bunkers.jpg" alt="North Jersey CC" loading="lazy"></div>
-          <div class="course-info">
-            <h3>North Jersey CC</h3>
-            <p>Walter Travis restored by Brian Schneider of Renaissance Golf</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/hollywood/" class="course-item reveal">
-          <span class="course-num">06</span>
-          <div class="course-thumb"><img src="../assets/images/courses/hollywood/hero-tunnel-flag.jpg" alt="Hollywood GC" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Hollywood GC</h3>
-            <p>Travis with the volume turned up on the Jersey Shore</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/winged-foot/" class="course-item reveal">
-          <span class="course-num">07</span>
-          <div class="course-thumb"><img src="../assets/images/courses/winged-foot/arrival-gps-clubhouse.jpg" alt="Winged Foot GC" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Winged Foot GC</h3>
-            <p>Tillinghast's crown jewel, East and West in a single day</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-        <a href="/courses/friars-head/" class="course-item reveal">
-          <span class="course-num">08</span>
-          <div class="course-thumb"><img src="../assets/images/courses/friars-head/hero-clubhouse-bluff.jpg" alt="Friar's Head" loading="lazy"></div>
-          <div class="course-info">
-            <h3>Friar's Head</h3>
-            <p>Coore & Crenshaw's links on Long Island's North Shore</p>
-          </div>
-          <span class="course-arrow">&rarr;</span>
-        </a>
-
-      </div>
+  <section class="section-pad section-elevated"><div class="container">
+    <div class="cta-banner reveal">
+      <h2>The chase <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">continues.</em></h2>
+      <p>More courses, more architecture, more stories from the road.</p>
+      <a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener" class="btn btn-primary btn-arrow">Follow on Instagram</a>
     </div>
-  </section>
+  </div></section>
 
-  <!-- ===== CTA ===== -->
-  <section class="section-pad" style="background: var(--color-bg-elevated);">
-    <div class="container">
-      <div class="cta-banner reveal">
-        <h2>The chase <em style="font-family: var(--font-display); font-style: italic; color: var(--color-accent);">continues.</em></h2>
-        <p>More courses, more architecture, more stories from the golden age are on the way.</p>
-        <a href="/" class="btn btn-arrow">Back to Home</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
@@ -310,7 +73,6 @@
       </div>
     </div>
   </footer>
-
   <script src="../assets/js/main.js"></script>
 </body>
 </html>
