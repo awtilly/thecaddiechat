@@ -79,10 +79,6 @@ img { max-width: 100%; height: auto; display: block; }
 }
 .nav-links a:hover { color: var(--color-accent); }
 .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
-.nav-links .nav-ig { display: inline-flex; align-items: center; color: var(--color-text-muted); }
-.nav-links .nav-ig:hover { color: var(--color-accent); }
-.nav-links .nav-ig svg { width: 18px; height: 18px; }
-.nav-links .nav-ig::after { display: none; }
 .nav-links .nav-stoek { text-transform: none; letter-spacing: 0; font-weight: 500; }
 .nav-links .nav-stoek::after { display: none; }
 .nav-links .nav-stoek .stoek { color: #d45d5d; }
