@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Task Command</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-0: #08090c;
+  --bg-1: #0e1017;
+  --bg-2: #151820;
+  --bg-3: #1c2030;
+  --bg-4: #242940;
+  --border: #1f2435;
+  --border-h: #2d3350;
+  --border-active: #4a6cf7;
+  --tx-1: #eaecf5;
+  --tx-2: #a0a8c4;
+  --tx-3: #5c6380;
+  --tx-4: #363d55;
+  --blue: #4a6cf7;
+  --blue-g: #4a6cf720;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --purple: #a78bfa;
+  --proj-bg: #0d1a2a;
+  --proj-tx: #5eaed6;
+  --pers-bg: #18122e;
+  --pers-tx: #b8a5e0;
+  --r: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Outfit',system-ui,sans-serif; background:var(--bg-0); color:var(--tx-1); min-height:100vh; -webkit-font-smoothing:antialiased; }
+::selection { background:var(--blue); color:#fff; }
+input, select, textarea, button { font-family:inherit; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+/* PASSWORD GATE */
+#gate { position:fixed; inset:0; background:var(--bg-0); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px; }
+#gate.hidden { display:none; }
+#gate h2 { font-size:22px; font-weight:600; color:var(--tx-2); }
+#gate .sub { font-size:13px; color:var(--tx-3); margin-top:-12px; }
+#gate input { width:280px; padding:12px 16px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); color:var(--tx-1); font-size:14px; outline:none; text-align:center; letter-spacing:2px; }
+#gate input:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-g); }
+#gate .err { color:var(--red); font-size:12px; min-height:16px; }
+#gate button { padding:10px 32px; background:var(--blue); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:600; font-size:14px; }
+#gate button:hover { opacity:0.9; }
+#gate .hint { font-size:11px; color:var(--tx-4); max-width:260px; text-align:center; line-height:1.5; }
+
+/* APP */
+.app { display:none; max-width:1200px; margin:0 auto; padding:20px 24px 60px; }
+.app.visible { display:block; }
+
+/* HEADER */
+.hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+.hdr h1 { font-size:24px; font-weight:700; color:var(--tx-1); }
+.hdr h1 span { color:var(--blue); font-weight:400; }
+.hdr .greet { font-size:13px; color:var(--tx-3); margin-top:2px; }
+#stats { display:flex; gap:6px; flex-wrap:wrap; }
+.stat { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; background:var(--bg-2); color:var(--tx-2); border:1px solid var(--border); white-space:nowrap; }
+.stat.urg { background:#2a1215; color:#fca5a5; border-color:#4a1a1a; }
+.stat.grn { background:#0d2918; color:#86efac; border-color:#1a3a2a; }
+
+/* INPUT SECTION */
+.inp-wrap { background:var(--bg-2); border-radius:var(--r-lg); border:1px solid var(--border); padding:4px; margin-bottom:4px; transition:border-color 0.15s, box-shadow 0.15s; }
+.inp-wrap:focus-within { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-g); }
+#mainForm { display:flex; gap:4px; }
+.inp-main { flex:1; background:transparent; border:none; color:var(--tx-1); font-size:14px; padding:12px; outline:none; }
+.inp-main::placeholder { color:var(--tx-4); }
+.inp-btn { padding:8px 16px; background:var(--blue); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:600; font-size:13px; white-space:nowrap; }
+.inp-btn:hover { opacity:0.9; }
+.inp-btn.processing { animation:pulse 1s infinite; }
+#preview { display:flex; flex-wrap:wrap; gap:5px; padding:6px 10px; min-height:8px; }
+
+/* PREVIEW CHIPS */
+.pchip { padding:2px 7px; border-radius:4px; font-weight:500; display:inline-flex; align-items:center; gap:3px; font-size:11px; }
+.pchip.proj { background:var(--proj-bg); color:var(--proj-tx); }
+.pchip.pers { background:var(--pers-bg); color:var(--pers-tx); }
+.pchip.pri-high { background:#2a1215; color:#fca5a5; }
+.pchip.pri-medium { background:#2a2010; color:#fcd34d; }
+.pchip.pri-low { background:#0d2918; color:#86efac; }
+.pchip.due { background:var(--bg-3); color:var(--tx-2); }
+.pchip.cnt { background:var(--bg-3); color:var(--tx-2); }
+.pchip.ai { background:#1a1030; color:var(--purple); }
+
+/* PARSE MODE TOGGLE */
+#parseMode { display:inline-flex; gap:4px; margin-top:6px; margin-bottom:16px; }
+#parseMode button { padding:4px 10px; background:transparent; border:1px solid var(--border); border-radius:var(--r); color:var(--tx-3); font-size:11px; font-weight:500; cursor:pointer; }
+#parseMode button.active { background:var(--bg-3); color:var(--tx-1); border-color:var(--border-h); }
+#parseMode button:hover { border-color:var(--border-h); }
+#helpBtn { margin-left:auto; }
+
+/* SYNTAX HELP */
+#syntaxHelp { display:none; background:var(--bg-1); border:1px solid var(--border); border-radius:var(--r); padding:12px 14px; font-size:11px; color:var(--tx-3); line-height:1.7; margin-bottom:16px; }
+#syntaxHelp.visible { display:block; }
+#syntaxHelp strong { color:var(--tx-2); }
+#syntaxHelp code { font-family:'JetBrains Mono',monospace; background:var(--bg-3); padding:1px 5px; border-radius:3px; color:var(--tx-2); font-size:10px; }
+
+/* TOOLBAR */
+.toolbar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; align-items:center; }
+.toolbar select, .toolbar button { background:var(--bg-2); color:var(--tx-2); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:11px; font-weight:500; cursor:pointer; outline:none; }
+.toolbar select:hover, .toolbar button:hover { border-color:var(--border-h); }
+.toolbar button.act { background:var(--bg-3); color:var(--tx-1); }
+.tright { margin-left:auto; display:flex; gap:4px; }
+
+/* BOARD VIEW */
+.board { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+.col-hdr { display:flex; align-items:center; gap:6px; padding:8px 4px; margin-bottom:8px; }
+.cdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.clbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+.ccnt { font-size:11px; color:var(--tx-4); margin-left:auto; }
+.col-empty { font-size:12px; color:var(--tx-4); padding:12px 8px; text-align:center; }
+
+/* TASK CARD */
+.card { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); padding:12px 14px; margin-bottom:6px; animation:fadeUp 0.2s ease; }
+.card:hover { border-color:var(--border-h); }
+.card.done { opacity:0.45; background:var(--bg-1); }
+.card.done .ctitle { text-decoration:line-through; color:var(--tx-4); }
+.card.overdue { border-color:var(--red); }
+.ctop { display:flex; gap:8px; }
+.ck { width:20px; height:20px; border-radius:4px; border:1.5px solid var(--tx-4); background:transparent; color:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; margin-top:1px; }
+.ck:hover { border-color:var(--tx-2); }
+.ck.on { background:var(--green); border-color:var(--green); color:#fff; }
+.cbod { flex:1; min-width:0; }
+.ctitle { font-size:13px; font-weight:500; line-height:1.4; word-break:break-word; }
+.cmeta { display:flex; flex-wrap:wrap; gap:5px; margin-top:5px; align-items:center; }
+.pdot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.pdot.high { background:var(--red); }
+.pdot.medium { background:var(--amber); }
+.pdot.low { background:var(--green); }
+.tg { font-size:10px; padding:1px 6px; border-radius:3px; font-weight:500; }
+.tg.proj { background:var(--proj-bg); color:var(--proj-tx); }
+.tg.pers { background:var(--pers-bg); color:var(--pers-tx); }
+.tg.due { background:var(--bg-3); color:var(--tx-2); }
+.tg.due.od { background:#2a1215; color:#fca5a5; }
+.cnotes { font-size:11px; color:var(--tx-3); margin-top:5px; font-style:italic; word-break:break-word; }
+.cacts { opacity:0; transition:opacity 0.15s; display:flex; gap:2px; flex-shrink:0; }
+.card:hover .cacts { opacity:1; }
+.cacts button { background:transparent; border:none; color:var(--tx-4); cursor:pointer; font-size:14px; padding:2px 4px; border-radius:3px; }
+.cacts button:hover { color:var(--tx-2); background:var(--bg-3); }
+
+/* EDIT PANEL */
+.epan { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+.epan select, .epan input { background:var(--bg-1); border:1px solid var(--border); border-radius:4px; padding:5px 8px; font-size:11px; color:var(--tx-1); outline:none; width:100%; }
+.epan select:focus, .epan input:focus { border-color:var(--blue); }
+.epan .full { grid-column:1 / -1; }
+.epan label { font-size:10px; color:var(--tx-3); display:block; margin-bottom:2px; }
+
+/* TABLE VIEW */
+.tbl-wrap { overflow-x:auto; border-radius:var(--r); border:1px solid var(--border); }
+.tbl { width:100%; border-collapse:collapse; font-size:12px; }
+.tbl th { text-align:left; padding:8px 10px; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color:var(--tx-3); font-weight:600; border-bottom:1px solid var(--border); background:var(--bg-1); position:sticky; top:0; white-space:nowrap; }
+.tbl td { padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.tbl tr:hover td { background:var(--bg-2); }
+.tbl tr.done-row td { opacity:0.4; }
+.tbl .tn { font-size:11px; color:var(--tx-3); font-style:italic; }
+.tbl select { background:var(--bg-1); border:1px solid var(--border); border-radius:4px; padding:3px 6px; font-size:11px; color:var(--tx-1); outline:none; }
+.tbl .del-btn { background:transparent; border:none; color:var(--tx-4); cursor:pointer; font-size:14px; padding:2px 6px; border-radius:3px; }
+.tbl .del-btn:hover { color:var(--red); background:var(--bg-3); }
+.tbl .tck { width:18px; height:18px; border-radius:3px; border:1.5px solid var(--tx-4); background:transparent; color:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; }
+.tbl .tck:hover { border-color:var(--tx-2); }
+.tbl .tck.on { background:var(--green); border-color:var(--green); color:#fff; }
+
+/* MODAL */
+.mover { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; }
+.modal { background:var(--bg-2); border-radius:var(--r-xl); border:1px solid var(--border); padding:24px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; animation:fadeUp 0.2s ease; }
+.modal h3 { font-size:18px; font-weight:600; margin-bottom:16px; }
+.modal input, .modal select { background:var(--bg-1); border:1px solid var(--border); border-radius:var(--r); padding:8px 12px; color:var(--tx-1); font-size:13px; outline:none; width:100%; }
+.modal input:focus, .modal select:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-g); }
+.modal input::placeholder { color:var(--tx-4); }
+.mgrid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+.mgrid .full { grid-column:1 / -1; }
+.mgrid label { font-size:11px; color:var(--tx-3); display:block; margin-bottom:3px; }
+.bpri { width:100%; padding:10px; background:var(--blue); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:600; font-size:14px; margin-top:8px; }
+.bpri:hover { opacity:0.9; }
+
+/* SETTINGS MODAL */
+.modal.settings { max-width:560px; }
+.sbox { background:var(--bg-1); border:1px solid var(--border); border-radius:var(--r); padding:14px; margin-bottom:16px; }
+.sbox h4 { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.sbox p { font-size:12px; color:var(--tx-3); margin-bottom:8px; line-height:1.5; }
+.srow { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.srow input, .srow select { flex:1; min-width:0; }
+.srow button { padding:6px 12px; background:var(--bg-3); color:var(--tx-2); border:1px solid var(--border); border-radius:var(--r); cursor:pointer; font-size:11px; font-weight:500; white-space:nowrap; }
+.srow button:hover { border-color:var(--border-h); color:var(--tx-1); }
+.srow button.danger { color:var(--red); }
+.srow button.danger:hover { background:#2a1215; }
+.stags { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; min-height:24px; }
+.stag { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:500; }
+.stag.proj { background:var(--proj-bg); color:var(--proj-tx); }
+.stag.pers { background:var(--pers-bg); color:var(--pers-tx); }
+.stag.alias { background:var(--bg-3); color:var(--tx-2); }
+.stag button { background:transparent; border:none; color:inherit; cursor:pointer; opacity:0.5; font-size:12px; padding:0 2px; }
+.stag button:hover { opacity:1; }
+.sfooter { border-top:1px solid var(--border); padding-top:14px; margin-top:8px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.sfooter button { padding:8px 16px; border-radius:var(--r); font-size:12px; font-weight:500; cursor:pointer; border:1px solid var(--border); }
+.btn-sec { background:var(--bg-3); color:var(--tx-2); }
+.btn-sec:hover { color:var(--tx-1); border-color:var(--border-h); }
+.btn-danger { background:transparent; color:var(--red); }
+.btn-danger:hover { background:#2a1215; }
+.api-status { font-size:11px; }
+
+/* TIPS */
+#tips { text-align:center; margin-top:40px; color:var(--tx-3); }
+#tips .big { font-size:48px; opacity:0.3; }
+#tips h3 { font-size:14px; margin:8px 0; color:var(--tx-4); }
+#tips .ex { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); padding:6px 12px; margin:3px; color:var(--tx-3); }
+
+/* RESPONSIVE */
+@media (max-width:640px) {
+  .board { grid-template-columns:1fr; }
+  .hdr { flex-direction:column; }
+  .tright { margin-left:0; width:100%; overflow-x:auto; }
+  .mgrid { grid-template-columns:1fr; }
+  .sfooter { flex-direction:column; }
+  .sfooter button { width:100%; }
+  .toolbar { gap:4px; }
+  .app { padding:16px 12px 40px; }
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h2>&#128274; Task Command</h2>
+  <p class="sub">Enter access code</p>
+  <input type="password" id="gateInput" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="off">
+  <div class="err" id="gateErr"></div>
+  <button onclick="tryLogin()">Enter</button>
+  <p class="hint">First time? Default code: golf2026 — Change it in Settings after login.</p>
+</div>
+
+<div class="app" id="app">
+  <div class="hdr">
+    <div>
+      <h1>Task <span>Command</span></h1>
+      <p class="greet" id="greeting"></p>
+    </div>
+    <div id="stats"></div>
+  </div>
+
+  <div class="inp-wrap">
+    <form id="mainForm">
+      <input type="text" id="mainInput" class="inp-main" placeholder='Type naturally: "Dave needs CC irrigation quote by Friday #high"' autocomplete="off">
+      <button type="submit" id="mainBtn" class="inp-btn">Add &#9166;</button>
+    </form>
+    <div id="preview"></div>
+  </div>
+
+  <div id="parseMode">
+    <button data-mode="smart" class="active" onclick="setParseMode('smart',this)">&#9889; Smart Parse</button>
+    <button data-mode="ai" onclick="setParseMode('ai',this)">&#129504; AI Parse</button>
+    <button id="helpBtn" onclick="document.getElementById('syntaxHelp').classList.toggle('visible')">&#128214; Help</button>
+  </div>
+
+  <div id="syntaxHelp">
+    <strong>Projects:</strong> Type name or alias — <code>CC</code>=Crown Colony, <code>HW</code>=Headwaters, <code>NN</code>=Naples National, <code>LGC</code>=Linville GC<br>
+    <strong>People:</strong> <code>Dave needs...</code> | <code>@Dave</code> | <code>from Dave:</code><br>
+    <strong>Priority:</strong> <code>#high</code> <code>#med</code> <code>#low</code> | <code>urgent</code> <code>ASAP</code> <code>important</code><br>
+    <strong>Dates:</strong> <code>by Friday</code> | <code>tomorrow</code> | <code>next Monday</code> | <code>EOW</code> | <code>by 3/15</code><br>
+    <strong>Multi:</strong> Separate with <code>,</code> or <code>;</code> &nbsp; <strong>Notes:</strong> after <code>--</code><br>
+    &#129504; <strong>AI Mode:</strong> Toggle above + set key in &#9881; Settings
+  </div>
+
+  <div class="toolbar">
+    <select id="fProj" onchange="render()"></select>
+    <select id="fPers" onchange="render()"></select>
+    <select id="fStat" onchange="render()">
+      <option value="active" selected>Active</option>
+      <option value="done">Completed</option>
+      <option value="all">All</option>
+    </select>
+    <div class="tright">
+      <button id="vBoard" class="act" onclick="setView('board')">&#9638; Board</button>
+      <button id="vList" onclick="setView('list')">&#9776; List</button>
+      <button id="vTable" onclick="setView('table')">&#9636; Table</button>
+      <button onclick="showQuickAdd()">+ Add</button>
+      <button onclick="showSettings()">&#9881;</button>
+    </div>
+  </div>
+
+  <div id="content"></div>
+
+  <div id="tips">
+    <div class="big">&#128203;</div>
+    <h3>Try typing:</h3>
+    <span class="ex">Get irrigation quote for Crown Colony by Friday #high</span>
+    <span class="ex">Dave needs drainage plan for HW tomorrow</span>
+    <span class="ex">@Architect review NN blueprints #med -- check setbacks</span>
+    <span class="ex">Order sand, Call vendor about pricing; Email client update</span>
+  </div>
+</div>
+
+<div id="mc"></div>
+
+<script>
+/* === HELPERS === */
+const LS = key => JSON.parse(localStorage.getItem(key) || "null");
+const SS = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+/* === DEFAULTS === */
+const DEF_PROJECTS = ["Crown Colony","Headwaters","Linville GC","Naples National","The Caddie Chat","Personal","General / Office"];
+const DEF_PEOPLE = ["Self","Dave","Architect","Owner / Client","Vendor"];
+const STATUSES = {
+  todo:        { label:"To Do",       color:"#94a3b8" },
+  in_progress: { label:"In Progress", color:"#60a5fa" },
+  waiting:     { label:"Waiting On",  color:"#c084fc" },
+  done:        { label:"Done",        color:"#34d399" }
+};
+
+/* === STATE === */
+let tasks = LS("tc-tasks") || [];
+let projects = LS("tc-projects") || [...DEF_PROJECTS];
+let people = LS("tc-people") || [...DEF_PEOPLE];
+let aliases = LS("tc-aliases") || {};
+let config = LS("tc-config") || { password:"golf2026", apiKey:"", parseMode:"smart" };
+let view = "board";
+let editId = null;
+
+function save() {
+  SS("tc-tasks", tasks);
+  SS("tc-projects", projects);
+  SS("tc-people", people);
+  SS("tc-aliases", aliases);
+  SS("tc-config", config);
+}
+
+/* === UTILITIES === */
+function iso(d) { return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function fmtD(d) { if(!d) return ""; return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+function escRx(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function isOverdue(task) {
+  if (!task.due_date || task.status === "done") return false;
+  return new Date(task.due_date) < new Date(new Date().toDateString());
+}
+
+/* === PASSWORD GATE === */
+function tryLogin() {
+  const v = document.getElementById("gateInput").value;
+  if (v === config.password) {
+    document.getElementById("gate").classList.add("hidden");
+    document.getElementById("app").classList.add("visible");
+    sessionStorage.setItem("tc-auth", "1");
+    render();
+  } else {
+    document.getElementById("gateErr").textContent = "Wrong code";
+  }
+}
+
+/* === SMART PARSER === */
+function getProjectAliases() {
+  const m = {
+    "cc":"Crown Colony","crown colony":"Crown Colony","crown":"Crown Colony",
+    "hw":"Headwaters","headwaters":"Headwaters",
+    "lgc":"Linville GC","linville":"Linville GC","linville gc":"Linville GC",
+    "nn":"Naples National","naples":"Naples National","naples national":"Naples National",
+    "caddie chat":"The Caddie Chat","tcc":"The Caddie Chat","blog":"The Caddie Chat",
+    "personal":"Personal"
+  };
+  for (const [k, v] of Object.entries(aliases)) {
+    m[k.toLowerCase()] = v;
+  }
+  for (const p of projects) {
+    const low = p.toLowerCase();
+    if (!m[low]) m[low] = p;
+    const initials = p.split(/\s+/).map(w => w[0]).join("").toLowerCase();
+    if (initials.length >= 2 && !m[initials]) m[initials] = p;
+  }
+  return m;
+}
+
+function getPeopleAliases() {
+  const m = {
+    "dave":"Dave","architect":"Architect","arch":"Architect",
+    "owner":"Owner / Client","client":"Owner / Client","vendor":"Vendor"
+  };
+  for (const p of people) {
+    const low = p.toLowerCase();
+    if (!m[low]) m[low] = p;
+  }
+  return m;
+}
+
+function parseInput(raw) {
+  return raw.split(/[,;]/).map(s => s.trim()).filter(Boolean).map(parseSingle);
+}
+
+function parseSingle(text) {
+  const PA = getProjectAliases();
+  const PeA = getPeopleAliases();
+  let rem = text, project = null, person = null, priority = "low", dueDate = null, notes = null;
+
+  // STEP 1: Extract notes
+  const nm = rem.match(/\s*(?:--|—|note:|notes:)\s*(.+)$/i);
+  if (nm) { notes = nm[1].trim(); rem = rem.slice(0, nm.index); }
+
+  // STEP 2: Extract priority
+  if (/#high|#urgent|#crit/i.test(rem)) { priority = "high"; rem = rem.replace(/#(?:high|urgent|crit)\b/gi, ""); }
+  else if (/#med|#medium/i.test(rem)) { priority = "medium"; rem = rem.replace(/#(?:med|medium)\b/gi, ""); }
+  else if (/#low/i.test(rem)) { priority = "low"; rem = rem.replace(/#low\b/gi, ""); }
+  else if (/\b(urgent|asap|critical|emergency|immediately)\b/i.test(rem)) { priority = "high"; rem = rem.replace(/\b(urgent|asap|critical|emergency|immediately)\b/gi, ""); }
+  else if (/\b(important|soon|priority)\b/i.test(rem)) { priority = "medium"; rem = rem.replace(/\b(important|soon|priority)\b/gi, ""); }
+
+  // STEP 3: Extract due date
+  dueDate = extractDate(rem);
+  if (dueDate) rem = stripDate(rem);
+
+  // STEP 4: Extract person
+  const am = rem.match(/@(\w+)/i);
+  if (am) {
+    const look = am[1].toLowerCase();
+    person = PeA[look] || cap(am[1]);
+    rem = rem.replace(/@\w+/i, "");
+  } else {
+    const fm = rem.match(/\bfrom\s+(\w+)[\s:]/i);
+    if (fm) {
+      const look = fm[1].toLowerCase();
+      person = PeA[look] || cap(fm[1]);
+      rem = rem.replace(/\bfrom\s+\w+[\s:]/i, "");
+    } else {
+      const sm = rem.match(/^(\w+)\s+(?:needs?|asked?|wants?|requested?|said)\b/i);
+      if (sm && PeA[sm[1].toLowerCase()]) {
+        person = PeA[sm[1].toLowerCase()];
+        rem = rem.replace(/^\w+\s+(?:needs?|asked?|wants?|requested?|said)\s*/i, "");
+      } else {
+        person = "Self";
+      }
+    }
+  }
+
+  // STEP 5: Extract project
+  const paKeys = Object.keys(PA).sort((a, b) => b.length - a.length);
+  for (const alias of paKeys) {
+    const rx = new RegExp("\\b" + escRx(alias) + "\\b", "i");
+    if (rx.test(rem)) {
+      project = PA[alias];
+      rem = rem.replace(new RegExp("\\s*(?:for|on|about|at|re:?)?\\s*" + escRx(alias) + "\\b", "i"), " ");
+      break;
+    }
+  }
+  if (!project) project = "General / Office";
+
+  // STEP 6: Clean title
+  rem = rem.replace(/\s+/g, " ").replace(/^[\s\-\u2013\u2014:,;]+/, "").replace(/[\s\-\u2013\u2014:,;]+$/, "").trim();
+  if (rem.length > 0) rem = rem[0].toUpperCase() + rem.slice(1);
+  if (!rem) rem = text.trim();
+
+  return { title: rem, project, person, priority, due_date: dueDate, notes };
+}
+
+function extractDate(text) {
+  const today = new Date();
+  const low = text.toLowerCase();
+
+  // Explicit date
+  const ed = text.match(/\b(?:by|due|before)?\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+  if (ed) {
+    let yr = ed[3] ? (ed[3].length === 2 ? 2000 + parseInt(ed[3]) : parseInt(ed[3])) : today.getFullYear();
+    return iso(new Date(yr, parseInt(ed[1]) - 1, parseInt(ed[2])));
+  }
+
+  // Day of week
+  const dw = text.match(/\b(?:by|due|before|on|this|next)\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i);
+  if (dw) {
+    const days = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
+    const target = days[dw[1].toLowerCase()];
+    let diff = target - today.getDay();
+    if (diff <= 0) diff += 7;
+    if (/next/i.test(dw[0])) diff += 7;
+    const d = new Date(today); d.setDate(d.getDate() + diff);
+    return iso(d);
+  }
+
+  // Today
+  if (/\b(today|eod|end of day)\b/i.test(low)) return iso(today);
+
+  // Tomorrow
+  if (/\btomorrow\b/i.test(low)) { const d = new Date(today); d.setDate(d.getDate() + 1); return iso(d); }
+
+  // End of week
+  if (/\b(end of week|eow)\b/i.test(low)) {
+    let diff = 5 - today.getDay();
+    if (diff <= 0) diff += 7;
+    const d = new Date(today); d.setDate(d.getDate() + diff);
+    return iso(d);
+  }
+
+  // Next week
+  if (/\bnext week\b/i.test(low)) {
+    let diff = 8 - today.getDay();
+    const d = new Date(today); d.setDate(d.getDate() + diff);
+    return iso(d);
+  }
+
+  // End of month
+  if (/\b(end of month|eom)\b/i.test(low)) {
+    return iso(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+  }
+
+  // In X days
+  const xd = text.match(/\bin\s+(\d+)\s+days?\b/i);
+  if (xd) { const d = new Date(today); d.setDate(d.getDate() + parseInt(xd[1])); return iso(d); }
+
+  return null;
+}
+
+function stripDate(text) {
+  return text
+    .replace(/\b(?:by|due|before|on)\s+\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\b/gi, "")
+    .replace(/\b(?:by|due|before|on|this|next)\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi, "")
+    .replace(/\b(?:today|eod|end of day|tomorrow|end of week|eow|next week|end of month|eom)\b/gi, "")
+    .replace(/\bdue\b/gi, "")
+    .replace(/\bin\s+\d+\s+days?\b/gi, "");
+}
+
+/* === AI PARSER === */
+async function aiParse(text) {
+  if (!config.apiKey) throw new Error("No API key");
+  const today = new Date().toISOString().split("T")[0];
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": config.apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: `Parse task descriptions into structured JSON. Today is ${today}.
+Known projects: ${projects.join(", ")}
+Known people: ${people.join(", ")}
+
+Return ONLY valid JSON with NO markdown backticks and NO preamble:
+{"tasks":[{"title":"concise task title","project":"exact match from known projects or General / Office","person":"exact match from known people or Self","priority":"high|medium|low","due_date":"YYYY-MM-DD or null","notes":"extracted context or null"}]}
+
+Rules:
+- Split multiple tasks separated by commas, semicolons, or "and"
+- Infer priority from urgency words (urgent/ASAP/critical → high, important/soon → medium)
+- Infer dates from relative terms (tomorrow, next Friday, end of week, etc.)
+- Fuzzy match project names and aliases
+- Fuzzy match people names
+- Default project: "General / Office"
+- Default person: "Self"
+- Default priority: "low"`,
+      messages: [{ role: "user", content: text }]
+    })
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error.message);
+  const raw = data.content.filter(b => b.type === "text").map(b => b.text).join("").replace(/```json|```/g, "").trim();
+  return JSON.parse(raw).tasks;
+}
+
+/* === LIVE PREVIEW === */
+function updatePreview() {
+  const v = document.getElementById("mainInput").value.trim();
+  const prev = document.getElementById("preview");
+  if (!v) { prev.innerHTML = ""; return; }
+  const parsed = parseInput(v);
+  const chips = [];
+  if (parsed.length > 1) chips.push('<span class="pchip cnt">\u{1F4DD} ' + parsed.length + ' tasks</span>');
+  const t = parsed[0];
+  if (t.project !== "General / Office") chips.push('<span class="pchip proj">\u{1F4C1} ' + esc(t.project) + '</span>');
+  if (t.person !== "Self") chips.push('<span class="pchip pers">\u{1F464} ' + esc(t.person) + '</span>');
+  const pi = { high: ["\u{1F534}", "pri-high"], medium: ["\u{1F7E1}", "pri-medium"], low: ["\u{1F7E2}", "pri-low"] };
+  const [icon, cls] = pi[t.priority] || pi.low;
+  chips.push('<span class="pchip ' + cls + '">' + icon + ' ' + t.priority + '</span>');
+  if (t.due_date) chips.push('<span class="pchip due">\u{1F4C5} ' + fmtD(t.due_date) + '</span>');
+  if (config.parseMode === "ai" && config.apiKey) chips.push('<span class="pchip ai">\u{1F9E0} AI</span>');
+  prev.innerHTML = chips.join("");
+}
+
+/* === FORM SUBMISSION === */
+async function handleSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById("mainInput");
+  const text = input.value.trim();
+  if (!text) return;
+  let parsed;
+  const btn = document.getElementById("mainBtn");
+
+  if (config.parseMode === "ai" && config.apiKey) {
+    btn.textContent = "Parsing...";
+    btn.classList.add("processing");
+    btn.disabled = true;
+    try {
+      parsed = await aiParse(text);
+      parsed = parsed.map(t => ({
+        title: t.title || text,
+        project: t.project || "General / Office",
+        person: t.person || "Self",
+        priority: t.priority || "low",
+        due_date: t.due_date || null,
+        notes: t.notes || null
+      }));
+    } catch (err) {
+      console.error("AI parse failed, falling back:", err);
+      parsed = parseInput(text);
+    } finally {
+      btn.textContent = "Add \u23CE";
+      btn.classList.remove("processing");
+      btn.disabled = false;
+    }
+  } else {
+    parsed = parseInput(text);
+  }
+
+  for (const t of parsed) {
+    if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
+    if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
+    tasks.unshift({
+      id: crypto.randomUUID(),
+      title: t.title,
+      project: t.project,
+      person: t.person,
+      priority: t.priority,
+      status: "todo",
+      due_date: t.due_date,
+      notes: t.notes || "",
+      created_at: new Date().toISOString(),
+      completed_at: null
+    });
+  }
+
+  input.value = "";
+  document.getElementById("preview").innerHTML = "";
+  save();
+  render();
+}
+
+/* === RENDER SYSTEM === */
+function render() {
+  updateFilters();
+  updateStats();
+  const ft = filtered();
+  const content = document.getElementById("content");
+  const tips = document.getElementById("tips");
+  tips.style.display = tasks.length === 0 ? "block" : "none";
+
+  if (view === "board") renderBoard(ft, content);
+  else if (view === "list") renderList(ft, content);
+  else renderTable(ft, content);
+}
+
+function getFilters() {
+  return {
+    project: document.getElementById("fProj").value,
+    person: document.getElementById("fPers").value,
+    status: document.getElementById("fStat").value
+  };
+}
+
+function filtered() {
+  const f = getFilters();
+  return tasks.filter(t => {
+    if (f.project !== "All Projects" && t.project !== f.project) return false;
+    if (f.person !== "All People" && t.person !== f.person) return false;
+    if (f.status === "active" && t.status === "done") return false;
+    if (f.status === "done" && t.status !== "done") return false;
+    return true;
+  });
+}
+
+function updateFilters() {
+  const projEl = document.getElementById("fProj");
+  const persEl = document.getElementById("fPers");
+  const allProj = [...new Set([...projects, ...tasks.map(t => t.project)])].sort();
+  const allPers = [...new Set([...people, ...tasks.map(t => t.person)])].sort();
+
+  const pv = projEl.value;
+  projEl.innerHTML = '<option>All Projects</option>' + allProj.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+  if ([...projEl.options].some(o => o.value === pv)) projEl.value = pv;
+
+  const ev = persEl.value;
+  persEl.innerHTML = '<option>All People</option>' + allPers.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+  if ([...persEl.options].some(o => o.value === ev)) persEl.value = ev;
+}
+
+function updateStats() {
+  const active = tasks.filter(t => t.status !== "done").length;
+  const urgent = tasks.filter(t => t.priority === "high" && t.status !== "done").length;
+  const overdue = tasks.filter(t => isOverdue(t)).length;
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  const doneWeek = tasks.filter(t => t.status === "done" && t.completed_at && new Date(t.completed_at) >= weekAgo).length;
+
+  let h = '<span class="stat">' + active + ' active</span>';
+  if (urgent > 0) h += '<span class="stat urg">' + urgent + ' urgent</span>';
+  if (overdue > 0) h += '<span class="stat urg">' + overdue + ' overdue</span>';
+  h += '<span class="stat grn">' + doneWeek + ' done this week</span>';
+  document.getElementById("stats").innerHTML = h;
+}
+
+/* === CARD HTML === */
+function cardHTML(task) {
+  const done = task.status === "done";
+  const od = isOverdue(task);
+  let cls = "card";
+  if (done) cls += " done";
+  if (od) cls += " overdue";
+
+  let editPanel = "";
+  if (editId === task.id) {
+    const statOpts = Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (task.status === k ? ' selected' : '') + '>' + esc(v.label) + '</option>').join("");
+    const priOpts = [["high","\u{1F534} High"],["medium","\u{1F7E1} Medium"],["low","\u{1F7E2} Low"]].map(([v, l]) => '<option value="' + v + '"' + (task.priority === v ? ' selected' : '') + '>' + l + '</option>').join("");
+    const projOpts = [...new Set([...projects, task.project])].map(p => '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>').join("");
+    const persOpts = [...new Set([...people, task.person])].map(p => '<option value="' + esc(p) + '"' + (task.person === p ? ' selected' : '') + '>' + esc(p) + '</option>').join("");
+
+    editPanel = '<div class="epan">' +
+      '<div><label>Status</label><select onchange="upd(\'' + task.id + '\',{status:this.value})">' + statOpts + '</select></div>' +
+      '<div><label>Priority</label><select onchange="upd(\'' + task.id + '\',{priority:this.value})">' + priOpts + '</select></div>' +
+      '<div><label>Project</label><select onchange="upd(\'' + task.id + '\',{project:this.value})">' + projOpts + '</select></div>' +
+      '<div><label>From</label><select onchange="upd(\'' + task.id + '\',{person:this.value})">' + persOpts + '</select></div>' +
+      '<div class="full"><label>Due Date</label><input type="date" value="' + (task.due_date || '') + '" onchange="upd(\'' + task.id + '\',{due_date:this.value||null})"></div>' +
+      '<div class="full"><label>Notes</label><input type="text" value="' + esc(task.notes) + '" onchange="upd(\'' + task.id + '\',{notes:this.value})"></div>' +
+      '</div>';
+  }
+
+  const dateChip = task.due_date ? '<span class="tg due' + (od ? ' od' : '') + '">' + (od ? '\u26A0 ' : '') + fmtD(task.due_date) + '</span>' : '';
+  const notesDiv = task.notes ? '<div class="cnotes">' + esc(task.notes) + '</div>' : '';
+
+  return '<div class="' + cls + '">' +
+    '<div class="ctop">' +
+      '<button class="ck' + (done ? ' on' : '') + '" onclick="tog(\'' + task.id + '\')">' + (done ? '\u2713' : '') + '</button>' +
+      '<div class="cbod">' +
+        '<div class="ctitle">' + esc(task.title) + '</div>' +
+        '<div class="cmeta">' +
+          '<span class="pdot ' + task.priority + '"></span>' +
+          '<span class="tg proj">' + esc(task.project) + '</span>' +
+          '<span class="tg pers">via ' + esc(task.person) + '</span>' +
+          dateChip +
+        '</div>' +
+        notesDiv +
+      '</div>' +
+      '<div class="cacts">' +
+        '<button onclick="edt(\'' + task.id + '\')">\u270E</button>' +
+        '<button onclick="del(\'' + task.id + '\')">\u00D7</button>' +
+      '</div>' +
+    '</div>' +
+    editPanel +
+  '</div>';
+}
+
+/* === VIEW RENDERERS === */
+function renderBoard(ft, el) {
+  const f = getFilters();
+  let cols;
+  if (f.status === "done") cols = ["done"];
+  else if (f.status === "all") cols = Object.keys(STATUSES);
+  else cols = ["todo", "in_progress", "waiting"];
+
+  const priOrder = { high: 0, medium: 1, low: 2 };
+  let html = '<div class="board">';
+  for (const s of cols) {
+    const st = STATUSES[s];
+    const colTasks = ft.filter(t => t.status === s).sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2));
+    html += '<div>' +
+      '<div class="col-hdr" style="border-bottom:2px solid ' + st.color + '40">' +
+        '<span class="cdot" style="background:' + st.color + '"></span>' +
+        '<span class="clbl" style="color:' + st.color + '">' + st.label + '</span>' +
+        '<span class="ccnt">' + colTasks.length + '</span>' +
+      '</div>';
+    if (colTasks.length === 0) {
+      html += '<div class="col-empty">No tasks</div>';
+    } else {
+      html += colTasks.map(cardHTML).join("");
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+function renderList(ft, el) {
+  const priOrder = { high: 0, medium: 1, low: 2 };
+  const sorted = [...ft].sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at));
+  if (sorted.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--tx-4);padding:40px">No tasks match filters.</div>';
+    return;
+  }
+  el.innerHTML = sorted.map(cardHTML).join("");
+}
+
+function renderTable(ft, el) {
+  const priOrder = { high: 0, medium: 1, low: 2 };
+  const sorted = [...ft].sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at));
+  if (sorted.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--tx-4);padding:40px">No tasks match filters.</div>';
+    return;
+  }
+
+  let html = '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
+    '<th style="width:30px"></th><th>Task</th><th>Project</th><th>From</th><th>Priority</th><th>Due</th><th>Status</th><th></th>' +
+    '</tr></thead><tbody>';
+
+  for (const t of sorted) {
+    const done = t.status === "done";
+    const od = isOverdue(t);
+    const statOpts = Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (t.status === k ? ' selected' : '') + '>' + esc(v.label) + '</option>').join("");
+    const titleHtml = done ? '<s style="color:var(--tx-4)">' + esc(t.title) + '</s>' : esc(t.title);
+    const notesHtml = t.notes ? ' <span class="tn">\u2014 ' + esc(t.notes) + '</span>' : '';
+    const dateHtml = t.due_date ? (od ? '<span style="color:var(--red)">\u26A0 ' + fmtD(t.due_date) + '</span>' : fmtD(t.due_date)) : '';
+
+    html += '<tr class="' + (done ? 'done-row' : '') + '">' +
+      '<td><button class="tck' + (done ? ' on' : '') + '" onclick="tog(\'' + t.id + '\')">' + (done ? '\u2713' : '') + '</button></td>' +
+      '<td>' + titleHtml + notesHtml + '</td>' +
+      '<td><span class="tg proj">' + esc(t.project) + '</span></td>' +
+      '<td style="color:var(--tx-2)">' + esc(t.person) + '</td>' +
+      '<td><span class="pdot ' + t.priority + '" style="display:inline-block;vertical-align:middle;margin-right:4px"></span>' + cap(t.priority) + '</td>' +
+      '<td>' + dateHtml + '</td>' +
+      '<td><select onchange="upd(\'' + t.id + '\',{status:this.value})">' + statOpts + '</select></td>' +
+      '<td><button class="del-btn" onclick="del(\'' + t.id + '\')">\u00D7</button></td>' +
+      '</tr>';
+  }
+
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+/* === TASK ACTIONS === */
+function tog(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  if (t.status === "done") { t.status = "todo"; t.completed_at = null; }
+  else { t.status = "done"; t.completed_at = new Date().toISOString(); }
+  save(); render();
+}
+
+function edt(id) {
+  editId = (editId === id) ? null : id;
+  render();
+}
+
+function upd(id, updates) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  Object.assign(t, updates);
+  if (updates.status === "done" && !t.completed_at) t.completed_at = new Date().toISOString();
+  if (updates.status && updates.status !== "done") t.completed_at = null;
+  save(); render();
+}
+
+function del(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  save(); render();
+}
+
+function setView(v) {
+  view = v;
+  document.getElementById("vBoard").classList.toggle("act", v === "board");
+  document.getElementById("vList").classList.toggle("act", v === "list");
+  document.getElementById("vTable").classList.toggle("act", v === "table");
+  render();
+}
+
+function setParseMode(mode, btn) {
+  config.parseMode = mode;
+  save();
+  document.querySelectorAll("#parseMode button[data-mode]").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+/* === QUICK ADD MODAL === */
+function showQuickAdd() {
+  const projOpts = projects.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+  const persOpts = people.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+
+  document.getElementById("mc").innerHTML =
+    '<div class="mover" onclick="if(event.target===this)closeM()">' +
+      '<div class="modal">' +
+        '<h3>Quick Add Task</h3>' +
+        '<input type="text" id="qaT" placeholder="Task description..." onkeydown="if(event.key===\'Enter\')submitQA()">' +
+        '<div class="mgrid">' +
+          '<div><label>Project</label><select id="qaP">' + projOpts + '</select></div>' +
+          '<div><label>From</label><select id="qaPe">' + persOpts + '</select></div>' +
+          '<div><label>Priority</label><select id="qaPr"><option value="low">\u{1F7E2} Low</option><option value="medium">\u{1F7E1} Medium</option><option value="high">\u{1F534} High</option></select></div>' +
+          '<div><label>Due Date</label><input type="date" id="qaD"></div>' +
+          '<div class="full"><label>Notes</label><input type="text" id="qaN" placeholder="Optional notes..."></div>' +
+        '</div>' +
+        '<button class="bpri" onclick="submitQA()">Add Task</button>' +
+      '</div>' +
+    '</div>';
+  setTimeout(() => { const el = document.getElementById("qaT"); if (el) el.focus(); }, 50);
+}
+
+function submitQA() {
+  const title = document.getElementById("qaT").value.trim();
+  if (!title) return;
+  tasks.unshift({
+    id: crypto.randomUUID(),
+    title: title,
+    project: document.getElementById("qaP").value,
+    person: document.getElementById("qaPe").value,
+    priority: document.getElementById("qaPr").value,
+    status: "todo",
+    due_date: document.getElementById("qaD").value || null,
+    notes: document.getElementById("qaN").value || "",
+    created_at: new Date().toISOString(),
+    completed_at: null
+  });
+  save(); render(); closeM();
+}
+
+/* === SETTINGS MODAL === */
+function showSettings() {
+  const apiStatus = config.apiKey
+    ? '<span class="api-status" style="color:var(--green)">\u25CF Connected</span>'
+    : '<span class="api-status" style="color:var(--tx-4)">\u25CB Not configured</span>';
+
+  const removeBtn = config.apiKey ? '<button class="danger" onclick="config.apiKey=\'\';save();showSettings()">Remove</button>' : '';
+
+  const projTags = projects.map((p, i) => '<span class="stag proj">' + esc(p) + '<button onclick="rmProj(' + i + ')">\u00D7</button></span>').join("");
+  const persTags = people.map((p, i) => '<span class="stag pers">' + esc(p) + '<button onclick="rmPers(' + i + ')">\u00D7</button></span>').join("");
+
+  let aliasHTML = "";
+  const aliasEntries = Object.entries(aliases);
+  if (aliasEntries.length > 0) {
+    aliasHTML = aliasEntries.map(([k, v]) => '<span class="stag alias">' + esc(k) + ' \u2192 ' + esc(v) + '<button onclick="rmAlias(\'' + esc(k) + '\')">\u00D7</button></span>').join("");
+  } else {
+    aliasHTML = '<span style="font-size:11px;color:var(--tx-4)">No custom shortcuts yet</span>';
+  }
+
+  const projSelectOpts = projects.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+
+  document.getElementById("mc").innerHTML =
+    '<div class="mover" onclick="if(event.target===this)closeM()">' +
+      '<div class="modal settings">' +
+        '<h3>Settings</h3>' +
+
+        '<div class="sbox">' +
+          '<h4 style="color:var(--purple)">\u{1F9E0} Claude API Key</h4>' +
+          '<p>Add your Anthropic API key for AI-powered parsing. Stored locally in your browser only.</p>' +
+          '<input type="password" id="apiKeyInput" value="' + esc(config.apiKey) + '" placeholder="sk-ant-..." style="font-family:\'JetBrains Mono\',monospace;font-size:12px;margin-bottom:8px">' +
+          '<div class="srow">' + apiStatus + '<button onclick="config.apiKey=document.getElementById(\'apiKeyInput\').value.trim();save();showSettings()">Save Key</button>' + removeBtn + '</div>' +
+        '</div>' +
+
+        '<div class="sbox">' +
+          '<h4>\u{1F512} Access Code</h4>' +
+          '<div class="srow"><input type="text" id="newPW" value="' + esc(config.password) + '" style="font-family:\'JetBrains Mono\',monospace"><button onclick="config.password=document.getElementById(\'newPW\').value.trim()||config.password;save();alert(\'Access code updated!\')">Save</button></div>' +
+        '</div>' +
+
+        '<div class="sbox">' +
+          '<h4>\u{1F4C1} Projects</h4>' +
+          '<div class="stags">' + projTags + '</div>' +
+          '<div class="srow"><input type="text" id="newProj" placeholder="New project name..." onkeydown="if(event.key===\'Enter\'){addProj()}"><button onclick="addProj()">Add</button></div>' +
+        '</div>' +
+
+        '<div class="sbox">' +
+          '<h4>\u{1F3F7}\uFE0F Project Shortcuts</h4>' +
+          '<p>Add custom abbreviations for quick typing (e.g. \'BRC\' \u2192 \'Bear Creek CC\')</p>' +
+          '<div class="stags">' + aliasHTML + '</div>' +
+          '<div class="srow"><input type="text" id="newAliasKey" placeholder="Shortcut e.g. BRC" style="max-width:120px"><select id="newAliasVal">' + projSelectOpts + '</select><button onclick="addAlias()">Add</button></div>' +
+        '</div>' +
+
+        '<div class="sbox">' +
+          '<h4>\u{1F465} People</h4>' +
+          '<div class="stags">' + persTags + '</div>' +
+          '<div class="srow"><input type="text" id="newPers" placeholder="New person name..." onkeydown="if(event.key===\'Enter\'){addPers()}"><button onclick="addPers()">Add</button></div>' +
+        '</div>' +
+
+        '<div class="sfooter">' +
+          '<button class="btn-sec" onclick="exportCSV()">\u{1F4E4} Export CSV</button>' +
+          '<button class="btn-danger" onclick="if(window.confirm(\'Clear all completed tasks?\')){tasks=tasks.filter(t=>t.status!==\'done\');save();render();closeM()}">Clear Completed</button>' +
+          '<button class="btn-sec" onclick="closeM()">Done</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  setTimeout(() => { const el = document.getElementById("apiKeyInput"); if (el) el.focus(); }, 50);
+}
+
+function addProj() {
+  const v = document.getElementById("newProj").value.trim();
+  if (v && !projects.includes(v)) { projects.push(v); save(); showSettings(); }
+}
+
+function rmProj(i) { projects.splice(i, 1); save(); showSettings(); }
+
+function addPers() {
+  const v = document.getElementById("newPers").value.trim();
+  if (v && !people.includes(v)) { people.push(v); save(); showSettings(); }
+}
+
+function rmPers(i) { people.splice(i, 1); save(); showSettings(); }
+
+function addAlias() {
+  const k = document.getElementById("newAliasKey").value.trim();
+  const v = document.getElementById("newAliasVal").value;
+  if (k && v) { aliases[k.toLowerCase()] = v; save(); showSettings(); }
+}
+
+function rmAlias(k) { delete aliases[k]; save(); showSettings(); }
+
+function exportCSV() {
+  const rows = [["Title","Project","Person","Priority","Status","Due Date","Notes","Created"]];
+  for (const t of tasks) {
+    rows.push([t.title, t.project, t.person, t.priority, t.status, t.due_date || "", t.notes || "", t.created_at]);
+  }
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "tasks-" + iso(new Date()) + ".csv";
+  a.click();
+}
+
+function closeM() { document.getElementById("mc").innerHTML = ""; }
+
+/* === INIT === */
+document.getElementById("gateInput").addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
+document.getElementById("mainInput").addEventListener("input", updatePreview);
+document.getElementById("mainForm").addEventListener("submit", handleSubmit);
+
+// Greeting
+const hr = new Date().getHours();
+document.getElementById("greeting").textContent =
+  hr < 12 ? "Good morning \u2014 what needs to get done today?" :
+  hr < 17 ? "Good afternoon \u2014 let's knock some tasks out." :
+  "Good evening \u2014 wrapping up or planning ahead?";
+
+// Restore parse mode toggle
+if (config.parseMode === "ai") {
+  document.querySelectorAll("#parseMode button[data-mode]").forEach(b => b.classList.remove("active"));
+  const aiBtn = document.querySelector('#parseMode button[data-mode="ai"]');
+  if (aiBtn) aiBtn.classList.add("active");
+}
+
+// Auto-login
+if (sessionStorage.getItem("tc-auth") === "1") {
+  document.getElementById("gate").classList.add("hidden");
+  document.getElementById("app").classList.add("visible");
+  render();
+}
+</script>
+</body>
+</html>
