@@ -274,8 +274,8 @@ input, select, textarea, button { font-family:inherit; }
     <strong>Priority:</strong> <code>#high</code> <code>#med</code> <code>#low</code> | <code>urgent</code> <code>ASAP</code> <code>important</code><br>
     <strong>Dates:</strong> <code>by Friday</code> | <code>tomorrow</code> | <code>next Monday</code> | <code>EOW</code> | <code>by 3/15</code><br>
     <strong>Multi:</strong> Separate with <code>,</code> or <code>;</code> &nbsp; <strong>Notes:</strong> after <code>--</code><br>
-    <strong>Quick add:</strong> <code>/p Bear Creek CC</code> creates a new project &nbsp; <code>/person Jim</code> adds a new person<br>
-    &#129504; <strong>AI Mode:</strong> Toggle above + set key in &#9881; Settings
+    <strong>Quick add:</strong> <code>/p Bear Creek CC</code> creates a project &nbsp; <code>/person Jim</code> adds a person (works without AI)<br>
+    &#129504; <strong>AI Mode:</strong> With AI on, just type naturally — <code>Bear Creek CC</code> auto-creates a project, <code>call Jim about drainage</code> creates a task. Set key in &#9881; Settings
   </div>
 
   <div class="toolbar">
@@ -547,29 +547,42 @@ async function aiParse(text) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: `Parse task descriptions into structured JSON. Today is ${today}.
+      system: `You are a task management assistant. Interpret user input and return structured JSON. Today is ${today}.
+
 Known projects: ${projects.join(", ")}
 Known people: ${people.join(", ")}
 
-Return ONLY valid JSON with NO markdown backticks and NO preamble:
-{"tasks":[{"title":"concise task title","project":"exact match from known projects or General / Office","person":"exact match from known people or Self","priority":"high|medium|low","due_date":"YYYY-MM-DD or null","notes":"extracted context or null"}]}
+Return ONLY valid JSON with NO markdown backticks and NO preamble.
 
-Rules:
-- Split multiple tasks separated by commas, semicolons, or "and"
-- Infer priority from urgency words (urgent/ASAP/critical → high, important/soon → medium)
-- Infer dates from relative terms (tomorrow, next Friday, end of week, etc.)
-- Fuzzy match project names and aliases
-- Fuzzy match people names
-- Default project: "General / Office"
-- Default person: "Self"
-- Default priority: "low"`,
+Determine the user's INTENT from their input. There are 3 possible intents:
+
+1. "tasks" — They want to create one or more tasks (this is the most common intent — any actionable item)
+   Return: {"intent":"tasks","items":[{"title":"concise task title","project":"exact match from known projects or General / Office","person":"exact match from known people or Self","priority":"high|medium|low","due_date":"YYYY-MM-DD or null","notes":"extracted context or null"}]}
+
+2. "new_projects" — They want to add new project(s) to their list. Triggered when input is clearly a project/job/site name and NOT a task. Examples: "Bear Creek CC", "add Pinehurst to projects", "new project: Sawgrass Renovation"
+   Return: {"intent":"new_projects","items":["Project Name 1","Project Name 2"]}
+
+3. "new_people" — They want to add new person(s) to their people list. Examples: "add Mike to my team", "new person: Sarah the surveyor", "Jim"
+   Return: {"intent":"new_people","items":["Person Name 1"]}
+
+IMPORTANT intent rules:
+- If it sounds like something to DO, it's a task — even if short ("call Dave", "check drainage")
+- If it's just a name of a place, course, company, or job site with no action, it's a new project
+- If it's just a person's name with no action, it's a new person
+- "Add [name] to projects/people" is explicitly creating a project or person, NOT a task
+- When unsure between project and task, default to task
+- For tasks: split multiples separated by commas, semicolons, or "and"
+- For tasks: infer priority from urgency words (urgent/ASAP/critical → high, important/soon → medium)
+- For tasks: infer dates from relative terms (tomorrow, next Friday, end of week, etc.)
+- For tasks: fuzzy match project names and people names
+- For tasks: default project "General / Office", default person "Self", default priority "low"`,
       messages: [{ role: "user", content: text }]
     })
   });
   const data = await resp.json();
   if (data.error) throw new Error(data.error.message);
   const raw = data.content.filter(b => b.type === "text").map(b => b.text).join("").replace(/```json|```/g, "").trim();
-  return JSON.parse(raw).tasks;
+  return JSON.parse(raw);
 }
 
 /* === LIVE PREVIEW === */
@@ -613,33 +626,20 @@ async function handleSubmit(e) {
   const text = input.value.trim();
   if (!text) return;
 
-  // Slash commands: /p or /project to create a project, /person to add a person
+  // Slash command fallback (works without AI)
   const projCmd = text.match(/^\/p(?:roject)?\s+(.+)/i);
   if (projCmd) {
     const name = projCmd[1].trim();
-    if (name && !projects.some(p => p.toLowerCase() === name.toLowerCase())) {
-      projects.push(name);
-      save();
-    }
-    input.value = "";
-    document.getElementById("preview").innerHTML = "";
-    render();
-    return;
+    if (name && !projects.some(p => p.toLowerCase() === name.toLowerCase())) projects.push(name);
+    input.value = ""; document.getElementById("preview").innerHTML = ""; save(); render(); return;
   }
   const personCmd = text.match(/^\/person\s+(.+)/i);
   if (personCmd) {
     const name = personCmd[1].trim();
-    if (name && !people.some(p => p.toLowerCase() === name.toLowerCase())) {
-      people.push(name);
-      save();
-    }
-    input.value = "";
-    document.getElementById("preview").innerHTML = "";
-    render();
-    return;
+    if (name && !people.some(p => p.toLowerCase() === name.toLowerCase())) people.push(name);
+    input.value = ""; document.getElementById("preview").innerHTML = ""; save(); render(); return;
   }
 
-  let parsed;
   const btn = document.getElementById("mainBtn");
 
   if (config.parseMode === "ai" && config.apiKey) {
@@ -647,8 +647,33 @@ async function handleSubmit(e) {
     btn.classList.add("processing");
     btn.disabled = true;
     try {
-      parsed = await aiParse(text);
-      parsed = parsed.map(t => ({
+      const result = await aiParse(text);
+
+      // Handle intent-based responses
+      if (result.intent === "new_projects") {
+        let added = 0;
+        for (const name of result.items) {
+          if (name && !projects.some(p => p.toLowerCase() === name.toLowerCase())) { projects.push(name); added++; }
+        }
+        save(); render();
+        input.value = ""; document.getElementById("preview").innerHTML = "";
+        btn.textContent = "Add \u23CE"; btn.classList.remove("processing"); btn.disabled = false;
+        return;
+      }
+
+      if (result.intent === "new_people") {
+        let added = 0;
+        for (const name of result.items) {
+          if (name && !people.some(p => p.toLowerCase() === name.toLowerCase())) { people.push(name); added++; }
+        }
+        save(); render();
+        input.value = ""; document.getElementById("preview").innerHTML = "";
+        btn.textContent = "Add \u23CE"; btn.classList.remove("processing"); btn.disabled = false;
+        return;
+      }
+
+      // Default: tasks intent
+      const parsed = (result.items || result.tasks || []).map(t => ({
         title: t.title || text,
         project: t.project || "General / Office",
         person: t.person || "Self",
@@ -656,33 +681,41 @@ async function handleSubmit(e) {
         due_date: t.due_date || null,
         notes: t.notes || null
       }));
+      for (const t of parsed) {
+        if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
+        if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
+        tasks.unshift({
+          id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
+          priority: t.priority, status: "todo", due_date: t.due_date, notes: t.notes || "",
+          created_at: new Date().toISOString(), completed_at: null
+        });
+      }
     } catch (err) {
       console.error("AI parse failed, falling back:", err);
-      parsed = parseInput(text);
+      const parsed = parseInput(text);
+      for (const t of parsed) {
+        if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
+        if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
+        tasks.unshift({
+          id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
+          priority: t.priority, status: "todo", due_date: t.due_date, notes: t.notes || "",
+          created_at: new Date().toISOString(), completed_at: null
+        });
+      }
     } finally {
-      btn.textContent = "Add \u23CE";
-      btn.classList.remove("processing");
-      btn.disabled = false;
+      btn.textContent = "Add \u23CE"; btn.classList.remove("processing"); btn.disabled = false;
     }
   } else {
-    parsed = parseInput(text);
-  }
-
-  for (const t of parsed) {
-    if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
-    if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
-    tasks.unshift({
-      id: crypto.randomUUID(),
-      title: t.title,
-      project: t.project,
-      person: t.person,
-      priority: t.priority,
-      status: "todo",
-      due_date: t.due_date,
-      notes: t.notes || "",
-      created_at: new Date().toISOString(),
-      completed_at: null
-    });
+    const parsed = parseInput(text);
+    for (const t of parsed) {
+      if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
+      if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
+      tasks.unshift({
+        id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
+        priority: t.priority, status: "todo", due_date: t.due_date, notes: t.notes || "",
+        created_at: new Date().toISOString(), completed_at: null
+      });
+    }
   }
 
   input.value = "";
