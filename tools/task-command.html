@@ -123,6 +123,11 @@ input, select, textarea, button { font-family:inherit; }
 .clbl { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
 .ccnt { font-size:13px; color:var(--tx-4); margin-left:auto; }
 .col-empty { font-size:14px; color:var(--tx-4); padding:16px 8px; text-align:center; }
+.col-body { min-height:60px; border-radius:var(--r); transition:background 0.15s; padding:2px; }
+.board-col.drag-over .col-body { background:var(--blue-g); outline:2px dashed var(--blue); outline-offset:-2px; border-radius:var(--r); }
+.card[draggable] { cursor:grab; }
+.card[draggable]:active { cursor:grabbing; }
+.card.dragging { opacity:0.4; transform:scale(0.97); }
 
 /* TASK CARD */
 .card { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; margin-bottom:8px; animation:fadeUp 0.2s ease; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
@@ -814,7 +819,7 @@ function cardHTML(task) {
   const dateChip = task.due_date ? '<span class="tg due' + (od ? ' od' : '') + '">' + (od ? '\u26A0 ' : '') + fmtD(task.due_date) + '</span>' : '';
   const notesDiv = task.notes ? '<div class="cnotes">' + esc(task.notes) + '</div>' : '';
 
-  return '<div class="' + cls + '">' +
+  return '<div class="' + cls + '" draggable="true" data-task-id="' + task.id + '" ondragstart="dragStart(event)" ondragend="dragEnd(event)">' +
     '<div class="ctop">' +
       '<button class="ck' + (done ? ' on' : '') + '" onclick="tog(\'' + task.id + '\')">' + (done ? '\u2713' : '') + '</button>' +
       '<div class="cbod">' +
@@ -849,18 +854,19 @@ function renderBoard(ft, el) {
   for (const s of cols) {
     const st = STATUSES[s];
     const colTasks = ft.filter(t => t.status === s).sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2));
-    html += '<div>' +
+    html += '<div class="board-col" data-status="' + s + '" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">' +
       '<div class="col-hdr" style="border-bottom:2px solid ' + st.color + '40">' +
         '<span class="cdot" style="background:' + st.color + '"></span>' +
         '<span class="clbl" style="color:' + st.color + '">' + st.label + '</span>' +
         '<span class="ccnt">' + colTasks.length + '</span>' +
-      '</div>';
+      '</div>' +
+      '<div class="col-body">';
     if (colTasks.length === 0) {
       html += '<div class="col-empty">No tasks</div>';
     } else {
       html += colTasks.map(cardHTML).join("");
     }
-    html += '</div>';
+    html += '</div></div>';
   }
   html += '</div>';
   el.innerHTML = html;
@@ -1099,6 +1105,122 @@ function exportCSV() {
 }
 
 function closeM() { document.getElementById("mc").innerHTML = ""; }
+
+/* === DRAG & DROP === */
+let dragTaskId = null;
+
+function dragStart(e) {
+  dragTaskId = e.target.closest('.card').dataset.taskId;
+  e.target.closest('.card').classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragTaskId);
+}
+
+function dragEnd(e) {
+  e.target.closest('.card').classList.remove('dragging');
+  document.querySelectorAll('.board-col').forEach(c => c.classList.remove('drag-over'));
+  dragTaskId = null;
+}
+
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const col = e.target.closest('.board-col');
+  if (col) col.classList.add('drag-over');
+}
+
+function dragLeave(e) {
+  const col = e.target.closest('.board-col');
+  if (col && !col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+}
+
+function drop(e) {
+  e.preventDefault();
+  const col = e.target.closest('.board-col');
+  if (!col || !dragTaskId) return;
+  col.classList.remove('drag-over');
+  const newStatus = col.dataset.status;
+  const task = tasks.find(t => t.id === dragTaskId);
+  if (!task || task.status === newStatus) return;
+  task.status = newStatus;
+  if (newStatus === 'done') { task.completed_at = new Date().toISOString(); }
+  else { task.completed_at = null; }
+  save();
+  render();
+}
+
+// Touch drag support for mobile
+let touchDragEl = null;
+let touchClone = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchMoved = false;
+
+document.addEventListener('touchstart', function(e) {
+  const card = e.target.closest('.card[draggable]');
+  if (!card || e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
+  touchDragEl = card;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchMoved = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', function(e) {
+  if (!touchDragEl) return;
+  const dx = e.touches[0].clientX - touchStartX;
+  const dy = e.touches[0].clientY - touchStartY;
+  if (!touchMoved && Math.abs(dx) + Math.abs(dy) < 10) return;
+  touchMoved = true;
+  e.preventDefault();
+
+  if (!touchClone) {
+    touchClone = touchDragEl.cloneNode(true);
+    touchClone.style.cssText = 'position:fixed;z-index:2000;width:' + touchDragEl.offsetWidth + 'px;opacity:0.85;pointer-events:none;transform:rotate(2deg);box-shadow:0 8px 24px rgba(0,0,0,0.15);';
+    document.body.appendChild(touchClone);
+    touchDragEl.classList.add('dragging');
+  }
+  touchClone.style.left = (e.touches[0].clientX - touchDragEl.offsetWidth / 2) + 'px';
+  touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
+
+  document.querySelectorAll('.board-col').forEach(c => {
+    const r = c.getBoundingClientRect();
+    if (e.touches[0].clientX >= r.left && e.touches[0].clientX <= r.right && e.touches[0].clientY >= r.top && e.touches[0].clientY <= r.bottom) {
+      c.classList.add('drag-over');
+    } else {
+      c.classList.remove('drag-over');
+    }
+  });
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+  if (!touchDragEl) return;
+  if (touchClone) {
+    const touch = e.changedTouches[0];
+    let dropped = false;
+    document.querySelectorAll('.board-col').forEach(c => {
+      const r = c.getBoundingClientRect();
+      if (touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom) {
+        const newStatus = c.dataset.status;
+        const taskId = touchDragEl.dataset.taskId;
+        const task = tasks.find(t => t.id === taskId);
+        if (task && task.status !== newStatus) {
+          task.status = newStatus;
+          if (newStatus === 'done') task.completed_at = new Date().toISOString();
+          else task.completed_at = null;
+          save();
+          dropped = true;
+        }
+      }
+      c.classList.remove('drag-over');
+    });
+    touchClone.remove();
+    touchClone = null;
+    if (dropped) render();
+  }
+  touchDragEl.classList.remove('dragging');
+  touchDragEl = null;
+  touchMoved = false;
+});
 
 /* === VOICE INPUT === */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
