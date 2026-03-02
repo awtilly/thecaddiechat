@@ -274,6 +274,7 @@ input, select, textarea, button { font-family:inherit; }
     <strong>Priority:</strong> <code>#high</code> <code>#med</code> <code>#low</code> | <code>urgent</code> <code>ASAP</code> <code>important</code><br>
     <strong>Dates:</strong> <code>by Friday</code> | <code>tomorrow</code> | <code>next Monday</code> | <code>EOW</code> | <code>by 3/15</code><br>
     <strong>Multi:</strong> Separate with <code>,</code> or <code>;</code> &nbsp; <strong>Notes:</strong> after <code>--</code><br>
+    <strong>Quick add:</strong> <code>/p Bear Creek CC</code> creates a new project &nbsp; <code>/person Jim</code> adds a new person<br>
     &#129504; <strong>AI Mode:</strong> Toggle above + set key in &#9881; Settings
   </div>
 
@@ -576,6 +577,21 @@ function updatePreview() {
   const v = document.getElementById("mainInput").value.trim();
   const prev = document.getElementById("preview");
   if (!v) { prev.innerHTML = ""; return; }
+  // Slash command previews
+  const cmdMatch = v.match(/^\/p(?:roject)?\s+(.+)/i);
+  if (cmdMatch) {
+    const name = cmdMatch[1].trim();
+    const exists = projects.some(p => p.toLowerCase() === name.toLowerCase());
+    prev.innerHTML = '<span class="pchip proj">' + (exists ? '\u26A0 Already exists: ' : '+ New project: ') + esc(name) + '</span>';
+    return;
+  }
+  const personCmd = v.match(/^\/person\s+(.+)/i);
+  if (personCmd) {
+    const name = personCmd[1].trim();
+    const exists = people.some(p => p.toLowerCase() === name.toLowerCase());
+    prev.innerHTML = '<span class="pchip pers">' + (exists ? '\u26A0 Already exists: ' : '+ New person: ') + esc(name) + '</span>';
+    return;
+  }
   const parsed = parseInput(v);
   const chips = [];
   if (parsed.length > 1) chips.push('<span class="pchip cnt">\u{1F4DD} ' + parsed.length + ' tasks</span>');
@@ -596,6 +612,33 @@ async function handleSubmit(e) {
   const input = document.getElementById("mainInput");
   const text = input.value.trim();
   if (!text) return;
+
+  // Slash commands: /p or /project to create a project, /person to add a person
+  const projCmd = text.match(/^\/p(?:roject)?\s+(.+)/i);
+  if (projCmd) {
+    const name = projCmd[1].trim();
+    if (name && !projects.some(p => p.toLowerCase() === name.toLowerCase())) {
+      projects.push(name);
+      save();
+    }
+    input.value = "";
+    document.getElementById("preview").innerHTML = "";
+    render();
+    return;
+  }
+  const personCmd = text.match(/^\/person\s+(.+)/i);
+  if (personCmd) {
+    const name = personCmd[1].trim();
+    if (name && !people.some(p => p.toLowerCase() === name.toLowerCase())) {
+      people.push(name);
+      save();
+    }
+    input.value = "";
+    document.getElementById("preview").innerHTML = "";
+    render();
+    return;
+  }
+
   let parsed;
   const btn = document.getElementById("mainBtn");
 
