@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold Astro project, create layouts/components, port CSS, set up CI/CD
+- [x] 01-01-PLAN.md — Scaffold Astro project, create layouts/components, port CSS, set up CI/CD
 - [ ] 01-02-PLAN.md — Migrate all content to MDX, create routes, validate URLs, visual verification
 
 ### Phase 2: Image & Font Performance
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Astro Migration | 0/2 | Not started | - |
+| 1. Astro Migration | 1/2 | In progress | - |
 | 2. Image & Font Performance | 0/1 | Not started | - |
 | 3. Design Language | 0/1 | Not started | - |
 | 4. Cinematic Animation | 0/2 | Not started | - |
