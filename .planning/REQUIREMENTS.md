@@ -67,27 +67,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FNDN-01 | — | Pending |
-| FNDN-02 | — | Pending |
-| FNDN-03 | — | Pending |
-| FNDN-04 | — | Pending |
-| FNDN-05 | — | Pending |
-| FNDN-06 | — | Pending |
-| ANIM-01 | — | Pending |
-| ANIM-02 | — | Pending |
-| ANIM-03 | — | Pending |
-| ANIM-04 | — | Pending |
-| ANIM-05 | — | Pending |
-| TRNS-01 | — | Pending |
-| VISL-01 | — | Pending |
-| VISL-02 | — | Pending |
-| VISL-03 | — | Pending |
+| FNDN-01 | Phase 1: Astro Migration | Pending |
+| FNDN-02 | Phase 1: Astro Migration | Pending |
+| FNDN-03 | Phase 2: Image & Font Performance | Pending |
+| FNDN-04 | Phase 2: Image & Font Performance | Pending |
+| FNDN-05 | Phase 1: Astro Migration | Pending |
+| FNDN-06 | Phase 1: Astro Migration | Pending |
+| ANIM-01 | Phase 4: Cinematic Animation | Pending |
+| ANIM-02 | Phase 4: Cinematic Animation | Pending |
+| ANIM-03 | Phase 4: Cinematic Animation | Pending |
+| ANIM-04 | Phase 3: Design Language | Pending |
+| ANIM-05 | Phase 4: Cinematic Animation | Pending |
+| TRNS-01 | Phase 4: Cinematic Animation | Pending |
+| VISL-01 | Phase 3: Design Language | Pending |
+| VISL-02 | Phase 5: Visual Polish & Cohesion | Pending |
+| VISL-03 | Phase 5: Visual Polish & Cohesion | Pending |
 
 **Coverage:**
 - v1 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after initial definition*
+*Last updated: 2026-03-04 after roadmap creation*
