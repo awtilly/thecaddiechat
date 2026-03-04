@@ -1,0 +1,66 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import FeaturedPost from '../../components/FeaturedPost.astro';
+import PostCard from '../../components/PostCard.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import { getCollection } from 'astro:content';
+
+const chronicles = await getCollection('chronicles');
+// Sort by date descending
+chronicles.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Featured = first (most recent), rest go in grid
+const featured = chronicles[0];
+const rest = chronicles.slice(1);
+---
+<PageLayout
+  title="Chronicles | The Caddie Chat"
+  description="First-person stories from inside the ropes -- caddying on the PGA Tour."
+  pageTitle="Chronicles"
+  pageSubtitle="First-person stories from carrying bags on the PGA Tour -- the moments between the shots that most people never see."
+  sectionLabel="Inside the Ropes"
+>
+  <section class="section-pad-lg">
+    <div class="container">
+      <FeaturedPost
+        title={featured.data.title}
+        description={featured.data.description}
+        href={`/chronicles/${featured.id}/`}
+        image={featured.data.heroImage.src}
+        label="Featured"
+      />
+
+      <div class="post-grid">
+        {rest.map((chronicle) => (
+          <PostCard
+            title={chronicle.data.title}
+            description={chronicle.data.description}
+            href={`/chronicles/${chronicle.id}/`}
+            image={chronicle.data.heroImage.src}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBanner
+    heading='More stories <em>coming.</em>'
+    description="The bag isn't down yet. Follow along for new chronicles from inside the ropes."
+    buttonText="Follow on Instagram"
+    buttonHref="https://instagram.com/thecaddiechat"
+    buttonExternal={true}
+  />
+</PageLayout>
+
+<style>
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+  @media (max-width: 700px) {
+    .post-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

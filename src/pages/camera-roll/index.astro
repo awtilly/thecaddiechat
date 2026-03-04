@@ -1,0 +1,82 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+---
+<PageLayout
+  title="Camera Roll | The Caddie Chat"
+  description="Photography galleries -- film rolls from abroad, tournament moments, and city streets."
+  pageTitle='Camera<br><em>Roll</em>'
+  pageSubtitle="A visual journal -- film rolls from abroad, tournament moments, and city streets through a caddie's lens."
+  sectionLabel="Photography"
+>
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="gallery-section reveal">
+        <div class="gallery-section-header">
+          <h2>Film Rolls</h2>
+          <span>3 Collections</span>
+        </div>
+        <div class="collection-grid">
+          <a href="#ireland" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1590089415225-401ed6f9db8e?w=700&q=80" alt="Ireland">
+            <div class="collection-card-overlay"><h3>Ireland</h3><p>Emerald greens and ancient stone</p></div>
+          </a>
+          <a href="#scotland" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="Scotland">
+            <div class="collection-card-overlay"><h3>Scotland</h3><p>Links land and highland skies</p></div>
+          </a>
+          <a href="#italy" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=700&q=80" alt="Italy">
+            <div class="collection-card-overlay"><h3>Italy</h3><p>Light, color, and la dolce vita</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="gallery-section reveal">
+        <div class="gallery-section-header">
+          <h2>Cities</h2>
+          <span>4 Collections</span>
+        </div>
+        <div class="collection-grid">
+          <a href="#chicago" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=700&q=80" alt="Chicago">
+            <div class="collection-card-overlay"><h3>Chicago</h3><p>The city that raised me</p></div>
+          </a>
+          <a href="#new-york" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=700&q=80" alt="New York">
+            <div class="collection-card-overlay"><h3>New York</h3><p>Concrete canyons and quiet corners</p></div>
+          </a>
+          <a href="#nashville" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1545419913-775e3e1643c1?w=700&q=80" alt="Nashville">
+            <div class="collection-card-overlay"><h3>Nashville</h3><p>Music, murals, and southern light</p></div>
+          </a>
+          <a href="#stlouis" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?w=700&q=80" alt="Saint Louis">
+            <div class="collection-card-overlay"><h3>Saint Louis</h3><p>The Gateway and beyond</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="gallery-section reveal">
+        <div class="gallery-section-header">
+          <h2>Tournaments</h2>
+          <span>1 Collection</span>
+        </div>
+        <div class="collection-grid">
+          <a href="#bmw" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=700&q=80" alt="BMW Championship">
+            <div class="collection-card-overlay"><h3>BMW Championship 2024</h3><p>Inside the ropes at a FedEx Cup playoff</p></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBanner
+    heading='See more on <em>Instagram.</em>'
+    description="Daily shots, behind-the-scenes, and work in progress -- the feed is always alive."
+    buttonText="@thecaddiechat"
+    buttonHref="https://instagram.com/thecaddiechat"
+    buttonExternal={true}
+  />
+</PageLayout>

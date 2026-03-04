@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import CourseItem from '../../../components/CourseItem.astro';
+import CtaBanner from '../../../components/CtaBanner.astro';
+import Footer from '../../../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+const courses = await getCollection('courses');
+// Sort by courseNumber ascending
+courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
+---
+<BaseLayout
+  title="Golden Age Golf | Courses | The Caddie Chat"
+  description="Nine days, eight courses, and a search for the heart of Golden Age golf architecture in the American Northeast."
+>
+  <Nav />
+
+  <div class="series-hero">
+    <img src="/assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg" alt="A tee shot through the dune corridor at Friar's Head with Long Island Sound visible through the gap, shot on 35mm film" loading="eager">
+    <div class="series-hero-overlay">
+      <div class="container">
+        <span class="section-label"><a href="/courses/">Courses</a> / Golden Age Golf</span>
+        <h1>Golden Age <em>Golf</em></h1>
+      </div>
+    </div>
+  </div>
+
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="trip-intro reveal">
+        <p>Nine days, eight courses, and a search for the heart of Golden Age golf in the Northeast.</p>
+        <p>This trip was not just mine. It was a journey shared with two fellow Evans Scholars and Old Barnwell caddies, chasing the designs that shaped the game we love.</p>
+        <p>From Tillinghast to Travis, from the public gems to the most exclusive private clubs, these are the courses and the stories from the road.</p>
+      </div>
+
+      <div class="course-list">
+        {courses.map((course) => (
+          <CourseItem
+            title={course.data.title}
+            architect={course.data.architect}
+            courseNumber={course.data.courseNumber}
+            href={`/courses/${course.id}/`}
+            image={course.data.heroImage.src}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBanner
+    heading='The chase <em>continues.</em>'
+    description="More courses, more architecture, more stories from the golden age are on the way."
+    buttonText="Back to Courses"
+    buttonHref="/courses/"
+  />
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .series-hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+  .series-hero img {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    max-height: 60vh;
+    min-height: 260px;
+    object-fit: cover;
+    object-position: center 60%;
+    display: block;
+  }
+  .series-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.3) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 2rem 3rem;
+  }
+  .series-hero-overlay :global(.section-label) {
+    color: rgba(255,255,255,0.6);
+  }
+  .series-hero-overlay :global(.section-label) a {
+    color: rgba(255,255,255,0.6);
+    transition: color 0.3s ease;
+  }
+  .series-hero-overlay :global(.section-label) a:hover {
+    color: rgba(255,255,255,0.9);
+  }
+  .series-hero-overlay h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    color: #fff;
+    margin-top: 0.5rem;
+  }
+  .series-hero-overlay h1 em {
+    font-style: italic;
+    color: var(--color-accent);
+  }
+  .trip-intro {
+    max-width: 720px;
+    margin-bottom: var(--space-xl);
+  }
+  .trip-intro p {
+    color: var(--color-text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    margin-bottom: var(--space-sm);
+  }
+  .course-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  @media (max-width: 768px) {
+    .series-hero img { aspect-ratio: 16 / 9; max-height: 45vh; }
+    .series-hero-overlay { padding: 0 1.5rem 2rem; }
+  }
+  @media (max-width: 480px) {
+    .series-hero img { aspect-ratio: 4 / 3; max-height: 40vh; }
+  }
+</style>

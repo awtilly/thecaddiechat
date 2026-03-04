@@ -1,0 +1,35 @@
+---
+import CourseLayout from '../../layouts/CourseLayout.astro';
+import InlineImage from '../../components/mdx/InlineImage.astro';
+import FeaturedImage from '../../components/mdx/FeaturedImage.astro';
+import FullBleed from '../../components/mdx/FullBleed.astro';
+import ImagePair from '../../components/mdx/ImagePair.astro';
+import Memorabilia from '../../components/mdx/Memorabilia.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const courses = await getCollection('courses');
+  return courses.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, architect, year, location, heroImage, courseNumber, style, prev, next } = entry.data;
+---
+<CourseLayout
+  title={title}
+  description={description}
+  architect={architect}
+  year={year}
+  location={location}
+  heroImage={heroImage}
+  courseNumber={courseNumber}
+  style={style}
+  prev={prev}
+  next={next}
+>
+  <Content components={{ InlineImage, FeaturedImage, FullBleed, ImagePair, Memorabilia }} />
+</CourseLayout>

@@ -1,0 +1,32 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import InlineImage from '../../components/mdx/InlineImage.astro';
+import FeaturedImage from '../../components/mdx/FeaturedImage.astro';
+import FullBleed from '../../components/mdx/FullBleed.astro';
+import ImagePair from '../../components/mdx/ImagePair.astro';
+import Memorabilia from '../../components/mdx/Memorabilia.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const chronicles = await getCollection('chronicles');
+  return chronicles.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, date, heroImage, meta, prev, next } = entry.data;
+---
+<ArticleLayout
+  title={title}
+  description={description}
+  date={date}
+  heroImage={heroImage}
+  meta={meta}
+  prev={prev}
+  next={next}
+>
+  <Content components={{ InlineImage, FeaturedImage, FullBleed, ImagePair, Memorabilia }} />
+</ArticleLayout>
