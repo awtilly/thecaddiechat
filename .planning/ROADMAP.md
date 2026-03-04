@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All 19+ pages render with correct content using Astro component layouts (BaseLayout, PageLayout, CardGrid)
   3. Every existing URL works without redirects or 404s -- visiting any old link lands on the correct page
   4. Content lives in MDX files organized as Astro content collections, not raw HTML
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Scaffold Astro project, create layouts/components, port CSS, set up CI/CD
+- [ ] 01-02-PLAN.md — Migrate all content to MDX, create routes, validate URLs, visual verification
 
 ### Phase 2: Image & Font Performance
 **Goal**: Photography loads fast with modern formats and responsive sizing, and fonts render without layout shift or render-blocking imports
