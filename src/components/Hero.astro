@@ -1,0 +1,257 @@
+---
+// Hero.astro - Homepage hero section with parallax
+---
+<section class="hero">
+  <div class="hero-bg">
+    <img src="/assets/images/courses/friars-head/hero-clubhouse-bluff.jpg" alt="Friar's Head clubhouse perched on the bluff at golden hour">
+  </div>
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="container hero-layout">
+    <div class="hero-content">
+      <span class="hero-kicker">Stories from Inside the Ropes</span>
+      <h1>
+        <span class="hero-line">Caddie.</span>
+        <span class="hero-line">Builder.</span>
+        <span class="hero-line"><em>Storyteller.</em></span>
+      </h1>
+      <p class="hero-sub">Golden age architecture, PGA Tour life, and the world seen through a caddie's lens.</p>
+      <div class="hero-cta">
+        <a href="/courses/golden-age-golf/" class="btn btn-primary btn-arrow">Golden Age Golf</a>
+        <a href="/chronicles/" class="btn btn-arrow">Read the Chronicles</a>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <span class="hero-location">Friar's Head &mdash; Long Island, NY</span>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: heroZoom 20s ease forwards;
+    will-change: transform;
+  }
+  @keyframes heroZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg img { animation: none; }
+    :global(.hero-line) { opacity: 1; transform: none; animation: none; }
+    .hero-kicker, .hero-sub, .hero-cta, .hero-meta { opacity: 1; transform: none; animation: none; }
+    .hero-scroll-line::after { animation: none; }
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, rgba(28,28,28,0.85) 0%, rgba(28,28,28,0.4) 40%, transparent 70%),
+      linear-gradient(135deg, rgba(28,28,28,0.45) 0%, transparent 60%);
+  }
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+  .hero-layout {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: var(--space-xl);
+    padding-top: calc(var(--nav-height) + var(--space-lg));
+  }
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: var(--space-md);
+    opacity: 0;
+    animation: heroFadeIn 0.8s ease 0.3s forwards;
+  }
+  .hero-kicker::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1.5px;
+    background: var(--color-accent-light);
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 8vw, 7rem);
+    font-weight: 500;
+    line-height: 1.02;
+    margin-bottom: var(--space-md);
+    color: #fff;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: #c9ddb8;
+  }
+  :global(.hero-line) {
+    display: block;
+    opacity: 0;
+    transform: translateY(50px);
+    animation: heroLineIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  :global(.hero-line:nth-child(1)) { animation-delay: 0.5s; }
+  :global(.hero-line:nth-child(2)) { animation-delay: 0.7s; }
+  :global(.hero-line:nth-child(3)) { animation-delay: 0.9s; }
+  @keyframes heroLineIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-sub {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    margin-bottom: var(--space-lg);
+    line-height: 1.75;
+    opacity: 0;
+    animation: heroFadeIn 0.8s ease 1.2s forwards;
+  }
+  .hero-cta {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: heroFadeIn 0.8s ease 1.4s forwards;
+  }
+  .hero-cta :global(.btn) { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .hero-cta :global(.btn:hover) { background: #fff; color: var(--color-dark); border-color: #fff; }
+  .hero-cta :global(.btn-primary) { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+  .hero-cta :global(.btn-primary:hover) { background: #fff; color: var(--color-accent); border-color: #fff; }
+  @keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-meta {
+    position: absolute;
+    bottom: var(--space-xl);
+    right: var(--space-md);
+    opacity: 0;
+    animation: heroFadeIn 0.8s ease 1.6s forwards;
+  }
+  .hero-location {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: heroFadeIn 0.8s ease 2s forwards;
+  }
+  .hero-scroll span {
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+  .hero-scroll-line {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.12);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-scroll-line::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 1px;
+    height: 100%;
+    background: rgba(255,255,255,0.5);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0% { top: -100%; }
+    50% { top: 100%; }
+    100% { top: 100%; }
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
+    .hero-layout { padding-bottom: var(--space-lg); }
+    .hero-meta { display: none; }
+    .hero-kicker { font-size: 0.6rem; }
+    .hero-scroll { bottom: var(--space-sm); }
+    .hero-scroll-line { height: 28px; }
+  }
+  @media (max-width: 480px) {
+    .hero-cta { flex-direction: column; }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const hero = document.querySelector('.hero');
+    const heroContent = document.querySelector('.hero-content');
+    const heroBg = document.querySelector('.hero-bg img');
+    const heroScroll = document.querySelector('.hero-scroll');
+
+    if (hero && heroContent && heroBg) {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!prefersReduced) {
+        window.addEventListener('scroll', () => {
+          const y = window.scrollY;
+          const h = (hero as HTMLElement).offsetHeight;
+          if (y < h) {
+            const ratio = y / h;
+            (heroContent as HTMLElement).style.opacity = String(1 - ratio * 1.5);
+            (heroContent as HTMLElement).style.transform = `translateY(${y * 0.25}px)`;
+            (heroBg as HTMLElement).style.transform = `scale(${1 + 0.08 * (y / h)}) translateY(${y * 0.15}px)`;
+            if (heroScroll) (heroScroll as HTMLElement).style.opacity = String(1 - ratio * 3);
+          }
+        }, { passive: true });
+      }
+    }
+  });
+</script>

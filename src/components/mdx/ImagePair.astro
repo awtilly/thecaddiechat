@@ -1,0 +1,50 @@
+---
+// ImagePair.astro - Side-by-side image grid
+// Usage in MDX: wraps two InlineImage components
+---
+<div class="image-pair">
+  <slot />
+</div>
+
+<style>
+  .image-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 3rem -4rem;
+    align-items: end;
+  }
+  .image-pair :global(figure) {
+    overflow: hidden;
+    position: relative;
+    margin: 0;
+  }
+  .image-pair :global(img) {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.6s ease, opacity 0.3s ease;
+  }
+  .image-pair :global(figure:hover img) {
+    transform: scale(1.03);
+    opacity: 0.92;
+  }
+  .image-pair :global(figcaption) {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  @media (max-width: 868px) {
+    .image-pair { margin: 2rem -1rem; }
+  }
+  @media (max-width: 768px) {
+    .image-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
+  @media (max-width: 480px) {
+    .image-pair { margin: 2rem 0; }
+  }
+</style>

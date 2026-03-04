@@ -1,0 +1,65 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+<figure class="featured-image">
+  <Image src={src} alt={alt} loading="lazy" data-lightbox />
+  {caption && (
+    <div class="featured-caption">
+      <span class="caption-line"></span>
+      <p>{caption}</p>
+    </div>
+  )}
+</figure>
+
+<style>
+  .featured-image {
+    margin: 3rem -4rem;
+    position: relative;
+  }
+  .featured-image :global(img) {
+    width: 100%;
+    border-radius: 2px;
+    display: block;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  .featured-image:hover :global(img) {
+    opacity: 0.92;
+  }
+  .featured-caption {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .caption-line {
+    width: 40px;
+    min-width: 40px;
+    height: 1px;
+    background: var(--color-accent);
+    margin-top: 0.6rem;
+  }
+  .featured-caption p {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media (max-width: 868px) {
+    .featured-image { margin: 2rem -1rem; }
+  }
+  @media (max-width: 480px) {
+    .featured-image { margin: 2rem 0; }
+  }
+</style>

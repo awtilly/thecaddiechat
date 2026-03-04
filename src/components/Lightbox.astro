@@ -1,0 +1,196 @@
+---
+// Lightbox.astro - Image lightbox for course pages
+// Automatically collects clickable images from the page
+---
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+  <button class="lightbox-nav lightbox-prev" aria-label="Previous image">&#8249;</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-nav lightbox-next" aria-label="Next image">&#8250;</button>
+  <div class="lightbox-caption" id="lightbox-caption"></div>
+</div>
+
+<style>
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.95);
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    cursor: zoom-out;
+  }
+  :global(.lightbox.active) {
+    display: flex;
+  }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 2px;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease;
+  }
+  .lightbox-close:hover {
+    color: #fff;
+  }
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 2.5rem;
+    cursor: pointer;
+    padding: 1rem;
+    transition: color 0.3s ease;
+  }
+  .lightbox-nav:hover {
+    color: #fff;
+  }
+  .lightbox-prev {
+    left: 1rem;
+  }
+  .lightbox-next {
+    right: 1rem;
+  }
+  .lightbox-caption {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+    max-width: 600px;
+  }
+
+  @media (max-width: 768px) {
+    .lightbox-nav { font-size: 2rem; padding: 0.5rem; }
+    .lightbox img { max-width: 95vw; max-height: 85vh; }
+    .lightbox-caption { font-size: 0.75rem; max-width: 90vw; bottom: 1rem; }
+  }
+  @media (max-width: 480px) {
+    .lightbox-prev { left: 0.25rem; }
+    .lightbox-next { right: 0.25rem; }
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .lightbox-close { font-size: 2.5rem; top: 1rem; right: 1rem; padding: 0.5rem; }
+    .lightbox-nav { font-size: 3rem; }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    if (!lightbox || !lightboxImg || !lightboxCaption) return;
+
+    // Collect all clickable images from course-body
+    const courseBody = document.querySelector('.course-body');
+    if (!courseBody) return;
+
+    interface LightboxImage {
+      src: string;
+      caption: string;
+    }
+
+    const images: LightboxImage[] = [];
+    const clickableImages = courseBody.querySelectorAll('img[data-lightbox]');
+
+    clickableImages.forEach((img) => {
+      const imgEl = img as HTMLImageElement;
+      const figure = imgEl.closest('figure');
+      const caption = figure?.querySelector('figcaption')?.textContent || imgEl.alt || '';
+      images.push({ src: imgEl.src, caption });
+    });
+
+    // Also collect from hero image
+    const heroImg = document.querySelector('.course-hero-image img') as HTMLImageElement | null;
+    if (heroImg) {
+      images.push({ src: heroImg.src, caption: heroImg.alt || '' });
+    }
+
+    let currentIndex = 0;
+
+    function openLightbox(index: number) {
+      if (images.length === 0) return;
+      currentIndex = index;
+      lightboxImg.src = images[index].src;
+      lightboxImg.alt = images[index].caption;
+      lightboxCaption.textContent = images[index].caption;
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function navigate(dir: number) {
+      currentIndex = (currentIndex + dir + images.length) % images.length;
+      lightboxImg.src = images[currentIndex].src;
+      lightboxImg.alt = images[currentIndex].caption;
+      lightboxCaption.textContent = images[currentIndex].caption;
+    }
+
+    // Make images clickable
+    clickableImages.forEach((img, i) => {
+      (img as HTMLElement).style.cursor = 'pointer';
+      img.addEventListener('click', () => openLightbox(i));
+    });
+
+    // Lightbox controls
+    lightbox.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('lightbox-nav') ||
+          target.classList.contains('lightbox-prev') ||
+          target.classList.contains('lightbox-next')) return;
+      closeLightbox();
+    });
+
+    const closeBtn = lightbox.querySelector('.lightbox-close');
+    closeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeLightbox();
+    });
+
+    const prevBtn = lightbox.querySelector('.lightbox-prev');
+    prevBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigate(-1);
+    });
+
+    const nextBtn = lightbox.querySelector('.lightbox-next');
+    nextBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigate(1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') navigate(-1);
+      if (e.key === 'ArrowRight') navigate(1);
+    });
+
+    // Expose openLightbox globally for inline onclick handlers
+    (window as any).openLightbox = openLightbox;
+  });
+</script>

@@ -1,0 +1,157 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import ArticleNav from '../components/ArticleNav.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  date?: Date;
+  heroImage?: ImageMetadata;
+  meta?: string;
+  prev?: { slug: string; title: string };
+  next?: { slug: string; title: string };
+}
+
+const { title, description, date, heroImage, meta, prev, next } = Astro.props;
+---
+<BaseLayout title={`${title} | The Caddie Chat`} description={description}>
+  <Nav />
+  <div class="container">
+    <header class="article-header">
+      <div class="breadcrumb">
+        <a href="/chronicles/">Chronicles</a> &nbsp;/&nbsp; {title.length > 50 ? title.substring(0, 47) + '...' : title}
+      </div>
+      <h1>{title}</h1>
+      <div class="article-meta">
+        {meta && <span>{meta}</span>}
+        {meta && ' \u00B7 '}
+        The Caddie Chat
+      </div>
+    </header>
+  </div>
+  <div class="divider"></div>
+  {heroImage && (
+    <div class="article-hero-image">
+      <img src={heroImage.src} width={heroImage.width} height={heroImage.height} alt={title} />
+    </div>
+  )}
+  <section class="section-pad">
+    <div class="article-body">
+      <slot />
+    </div>
+    <ArticleNav prev={prev} next={next} basePath="/chronicles/" />
+  </section>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .article-header {
+    padding: calc(var(--nav-height) + var(--space-xl)) 0 var(--space-md);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .breadcrumb {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+  }
+  .breadcrumb a {
+    color: var(--color-accent);
+    transition: color 0.3s;
+  }
+  .breadcrumb a:hover {
+    color: var(--color-text-primary);
+  }
+  .article-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 500;
+    line-height: 1.1;
+    margin-bottom: var(--space-sm);
+  }
+  .article-meta {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .article-hero-image {
+    max-width: 900px;
+    margin: 0 auto var(--space-lg);
+    overflow: hidden;
+  }
+  .article-hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+</style>
+
+<style is:global>
+  .article-body {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-bottom: var(--space-2xl);
+  }
+  .article-body p {
+    color: var(--color-text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.9;
+    margin-bottom: 1.5rem;
+  }
+  .article-body h2 {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-primary);
+  }
+  .article-body h3 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+    color: var(--color-text-primary);
+  }
+  .article-body blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-md);
+    margin: var(--space-md) 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--color-text-primary);
+    line-height: 1.7;
+  }
+  .article-body .pull-quote {
+    text-align: center;
+    padding: var(--space-lg) 0;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-style: italic;
+    color: var(--color-accent);
+    line-height: 1.4;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .article-inline-image {
+    margin: var(--space-md) 0;
+  }
+  .article-inline-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--color-border);
+  }
+  .article-inline-image figcaption {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: var(--space-xs);
+    font-style: italic;
+    text-align: center;
+  }
+</style>

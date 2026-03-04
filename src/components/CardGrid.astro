@@ -1,0 +1,19 @@
+---
+// CardGrid.astro - Container for ContentCard grid
+---
+<div class="content-sections">
+  <slot />
+</div>
+
+<style>
+  .content-sections {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+  @media (max-width: 900px) {
+    .content-sections {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

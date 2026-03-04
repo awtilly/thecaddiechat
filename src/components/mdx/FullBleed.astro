@@ -1,0 +1,49 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+<figure class="full-bleed-image">
+  <Image src={src} alt={alt} loading="lazy" data-lightbox />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .full-bleed-image {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    position: relative;
+    overflow: hidden;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  .full-bleed-image :global(img) {
+    width: 100%;
+    object-fit: cover;
+    object-position: center 50%;
+    display: block;
+    cursor: pointer;
+    transition: transform 0.8s ease;
+  }
+  .full-bleed-image:hover :global(img) {
+    transform: scale(1.015);
+  }
+  figcaption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3rem 2rem 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.8);
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+</style>

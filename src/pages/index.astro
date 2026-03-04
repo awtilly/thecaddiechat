@@ -1,13 +1,147 @@
 ---
-// Placeholder - will be replaced in Task 2
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import StatsRow from '../components/StatsRow.astro';
+import CardGrid from '../components/CardGrid.astro';
+import ContentCard from '../components/ContentCard.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import Footer from '../components/Footer.astro';
 ---
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>The Caddie Chat</title>
-</head>
-<body>
-  <h1>The Caddie Chat</h1>
-</body>
-</html>
+<BaseLayout
+  title="The Caddie Chat | Caddie. Builder. Storyteller."
+  description="Stories from inside the ropes, golden age golf courses, and the world through a caddie's lens."
+>
+  <Nav />
+  <Hero />
+
+  <section class="section-pad-lg">
+    <div class="container">
+      <div class="intro-grid reveal">
+        <div class="intro-text">
+          <span class="section-label">About</span>
+          <h2>Every round tells a story. Every course has a soul.</h2>
+          <p>I'm Joe Stoehner — caddie, Evans Scholar, and storyteller. From carrying bags for Viktor Hovland and Tyrrell Hatton on the PGA Tour to chasing golden age architecture across the Northeast, this is where I document the game's most human moments.</p>
+          <p>The Caddie Chat is a home for the stories, photography, and perspectives that emerge when you spend your life inside the ropes.</p>
+          <div style="margin-top: 2rem;">
+            <a href="/chronicles/" class="btn btn-arrow">Start Reading</a>
+          </div>
+        </div>
+        <div class="intro-image">
+          <img src="/assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg" alt="On the course">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <StatsRow stats={[
+        { count: 3, suffix: '+', label: 'PGA Tour Bags' },
+        { count: 8, label: 'Golden Age Courses' },
+        { count: 8, label: 'Photo Collections' },
+        { count: 9, label: 'Days on the Road' },
+      ]} />
+    </div>
+  </section>
+
+  <section class="section-pad-lg">
+    <div class="container">
+      <span class="section-label reveal">Explore</span>
+      <h2 class="explore-heading reveal">Three Worlds. One Story.</h2>
+      <CardGrid>
+        <ContentCard
+          title="Chronicles"
+          description="First-person stories from inside the ropes — caddying for Viktor Hovland, Tyrrell Hatton, Matt Fitzpatrick, and the moments that happen between the shots."
+          image="/assets/images/chronicles/viktor-hovland/inline-2.jpg"
+          href="/chronicles/"
+          tag="01"
+        />
+        <ContentCard
+          title="Golden Age Golf"
+          description="Nine days, eight courses, and a search for the heart of Golden Age architecture in the Northeast — from Tillinghast to Travis, Winged Foot to Friar's Head."
+          image="/assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg"
+          href="/courses/golden-age-golf/"
+          tag="02"
+        />
+        <ContentCard
+          title="Camera Roll"
+          description="Film rolls from abroad, tournament galleries, and city photography — a visual journal of the places and perspectives that shape the journey."
+          image="/assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg"
+          href="/camera-roll/"
+          tag="03"
+        />
+      </CardGrid>
+    </div>
+  </section>
+
+  <CtaBanner
+    heading='The story is still<br>being <em>written.</em>'
+    description="New chronicles, course reviews, and photography galleries are always in progress. Follow the journey on Instagram or check back for the latest."
+    buttonText="Follow on Instagram"
+    buttonHref="https://instagram.com/thecaddiechat"
+    buttonExternal={true}
+  />
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+  .intro-text h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: var(--space-md);
+  }
+  .intro-text p {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.85;
+    margin-bottom: var(--space-sm);
+  }
+  .intro-image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4/5;
+  }
+  .intro-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+  .intro-image:hover img {
+    transform: scale(1.03);
+  }
+  .intro-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--color-border);
+    pointer-events: none;
+  }
+  .explore-heading {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: var(--space-lg);
+  }
+
+  @media (max-width: 900px) {
+    .intro-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-lg);
+    }
+    .intro-image {
+      max-width: 500px;
+    }
+  }
+</style>

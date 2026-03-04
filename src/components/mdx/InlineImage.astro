@@ -1,0 +1,46 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+<figure class="inline-image">
+  <Image src={src} alt={alt} loading="lazy" data-lightbox />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .inline-image {
+    margin: 2.5rem -4rem;
+    position: relative;
+  }
+  .inline-image :global(img) {
+    width: 100%;
+    border-radius: 2px;
+    display: block;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  .inline-image :global(img:hover) {
+    opacity: 0.92;
+  }
+  figcaption {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 0.75rem;
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 868px) {
+    .inline-image { margin: 2rem -1rem; }
+  }
+  @media (max-width: 480px) {
+    .inline-image { margin: 2rem 0; }
+  }
+</style>

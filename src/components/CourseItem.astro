@@ -1,0 +1,110 @@
+---
+interface Props {
+  title: string;
+  architect: string;
+  year?: number;
+  courseNumber: string;
+  href: string;
+  image?: string;
+}
+
+const { title, architect, courseNumber, href, image } = Astro.props;
+---
+<a href={href} class="course-item reveal">
+  <span class="course-num">{courseNumber}</span>
+  {image && (
+    <div class="course-thumb">
+      <img src={image} alt={title} loading="lazy">
+    </div>
+  )}
+  <div class="course-info">
+    <h3>{title}</h3>
+    <p>{architect}</p>
+  </div>
+  <span class="course-arrow">&rarr;</span>
+</a>
+
+<style>
+  .course-item {
+    display: grid;
+    grid-template-columns: 80px 100px 1fr auto;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: background 0.3s ease, padding 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+  .course-item:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+  .course-item:hover {
+    background: var(--color-bg-elevated);
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+  }
+  .course-num {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    line-height: 1;
+    font-style: italic;
+  }
+  .course-item:hover .course-num {
+    color: var(--color-accent);
+  }
+  .course-thumb {
+    width: 100px;
+    height: 68px;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .course-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+  .course-item:hover .course-thumb img {
+    transform: scale(1.08);
+  }
+  .course-info h3 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+  }
+  .course-info p {
+    color: var(--color-text-secondary);
+    font-size: 0.88rem;
+  }
+  .course-arrow {
+    font-size: 1.2rem;
+    color: var(--color-text-muted);
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+  .course-item:hover .course-arrow {
+    color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 768px) {
+    .course-item {
+      grid-template-columns: 50px 80px 1fr auto;
+    }
+    .course-num { font-size: 1.8rem; }
+    .course-thumb { width: 80px; height: 55px; }
+  }
+  @media (max-width: 480px) {
+    .course-item {
+      grid-template-columns: 40px 1fr auto;
+    }
+    .course-thumb { display: none; }
+    .course-num { font-size: 1.5rem; }
+    .course-info h3 { font-size: 1.15rem; }
+  }
+</style>
