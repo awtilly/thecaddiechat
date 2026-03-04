@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-04T19:39:15Z"
-last_activity: 2026-03-04 -- Completed Plan 01-01 (Scaffold & Components)
+stopped_at: Completed 01-02-PLAN.md (Phase 1 complete)
+last_updated: "2026-03-04T22:09:20.324Z"
+last_activity: 2026-03-04 -- Completed Plan 01-02 (Content Migration)
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 7
-  completed_plans: 1
-  percent: 14
+  completed_plans: 2
+  percent: 29
 ---
 
 # Project State
@@ -21,32 +21,32 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Jaw-dropping, immersive visual experience that makes visitors stop scrolling and feel inside the story
-**Current focus:** Phase 1 - Astro Migration
+**Current focus:** Phase 1 complete, ready for Phase 2 - Image & Font Performance
 
 ## Current Position
 
-Phase: 1 of 5 (Astro Migration)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-04 -- Completed Plan 01-01 (Scaffold & Components)
+Phase: 1 of 5 (Astro Migration) -- COMPLETE
+Plan: 2 of 2 in current phase (all plans done)
+Status: Phase 1 complete
+Last activity: 2026-03-04 -- Completed Plan 01-02 (Content Migration)
 
-Progress: [#.........] 14%
+Progress: [###.......] 29%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 10 min
-- Total execution time: 0.17 hours
+- Total plans completed: 2
+- Average duration: 18 min
+- Total execution time: 0.58 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Astro Migration | 1/2 | 10 min | 10 min |
+| 1. Astro Migration | 2/2 | 35 min | 18 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min
+- Last 5 plans: 10min, 25min
 - Trend: Starting
 
 *Updated after each plan completion*
@@ -64,6 +64,10 @@ Recent decisions affecting current work:
 - 01-01: npm chosen as package manager (simplest, widest GitHub Actions support)
 - 01-01: Lightbox uses data-lightbox attribute for explicit opt-in
 - 01-01: ImagePair uses slot pattern wrapping InlineImage children
+- 01-02: Image paths in frontmatter use relative ../../assets/images/ references for Astro image pipeline
+- 01-02: MDX body images use import() expressions for dynamic Astro optimization
+- 01-02: Course route injects all 5 MDX components via Content components prop
+- 01-02: entry.id used for getStaticPaths params (Astro 5 Content Layer API)
 
 ### Pending Todos
 
@@ -72,10 +76,10 @@ None yet.
 ### Blockers/Concerns
 
 - GSAP Club licensing decision (ScrollSmoother vs free Lenis) -- affects Phase 4 planning
-- Hero component uses hardcoded public/ image paths -- Plan 02 will update when images move to src/assets/
+- Hero component uses hardcoded public/ image paths -- Phase 2 should migrate to src/assets/ with Astro Image component
 
 ## Session Continuity
 
-Last session: 2026-03-04T19:39:15Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-astro-migration/01-01-SUMMARY.md
+Last session: 2026-03-04T22:09:11.783Z
+Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Resume file: None

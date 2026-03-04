@@ -12,7 +12,7 @@ Transform The Caddie Chat from a vanilla HTML/CSS/JS site into a cinematic, imme
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Astro Migration** - Rebuild site on Astro with content collections, shared layouts, CI/CD, and URL preservation
+- [x] **Phase 1: Astro Migration** - Rebuild site on Astro with content collections, shared layouts, CI/CD, and URL preservation (completed 2026-03-04)
 - [ ] **Phase 2: Image & Font Performance** - Image optimization pipeline and self-hosted fonts for fast photography loading
 - [ ] **Phase 3: Design Language** - Magazine-quality typography system and motion design tokens
 - [ ] **Phase 4: Cinematic Animation** - GSAP + Lenis scroll experience, parallax heroes, scroll storytelling, and page transitions
@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Scaffold Astro project, create layouts/components, port CSS, set up CI/CD
-- [ ] 01-02-PLAN.md — Migrate all content to MDX, create routes, validate URLs, visual verification
+- [x] 01-02-PLAN.md — Migrate all content to MDX, create routes, validate URLs, visual verification
 
 ### Phase 2: Image & Font Performance
 **Goal**: Photography loads fast with modern formats and responsive sizing, and fonts render without layout shift or render-blocking imports
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Astro Migration | 1/2 | In progress | - |
+| 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
 | 2. Image & Font Performance | 0/1 | Not started | - |
 | 3. Design Language | 0/1 | Not started | - |
 | 4. Cinematic Animation | 0/2 | Not started | - |
