@@ -54,28 +54,29 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     margin: 0 auto;
   }
   .breadcrumb {
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--color-text-muted);
     margin-bottom: var(--space-md);
   }
   .breadcrumb a {
     color: var(--color-accent);
-    transition: color 0.3s;
+    transition: var(--transition-color);
   }
   .breadcrumb a:hover {
     color: var(--color-text-primary);
   }
   .article-header h1 {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: var(--font-size-2xl);
     font-weight: 500;
-    line-height: 1.1;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
     margin-bottom: var(--space-sm);
   }
   .article-meta {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--color-text-muted);
   }
   .article-hero-image {
@@ -92,28 +93,41 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
 
 <style is:global>
   .article-body {
-    max-width: 720px;
+    max-width: var(--measure-wide);
     margin: 0 auto;
     padding-bottom: var(--space-2xl);
   }
   .article-body p {
     color: var(--color-text-secondary);
-    font-size: 1.05rem;
-    line-height: 1.9;
+    font-size: var(--font-size-base);
+    line-height: var(--leading-loose);
     margin-bottom: 1.5rem;
+  }
+  .article-body > p:first-child::first-letter {
+    font-family: var(--font-display);
+    font-size: var(--font-size-4xl);
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.08em;
+    margin-top: 0.05em;
+    color: var(--color-accent);
+    font-weight: 700;
   }
   .article-body h2 {
     font-family: var(--font-display);
-    font-size: 1.8rem;
+    font-size: var(--font-size-xl);
     font-weight: 500;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
     margin-top: var(--space-lg);
     margin-bottom: var(--space-sm);
     color: var(--color-text-primary);
   }
   .article-body h3 {
     font-family: var(--font-display);
-    font-size: 1.3rem;
+    font-size: var(--font-size-lg);
     font-weight: 500;
+    line-height: var(--leading-snug);
     margin-top: var(--space-md);
     margin-bottom: var(--space-xs);
     color: var(--color-text-primary);
@@ -124,20 +138,22 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     margin: var(--space-md) 0;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1.15rem;
+    font-size: var(--font-size-md);
     color: var(--color-text-primary);
-    line-height: 1.7;
+    line-height: var(--leading-relaxed);
   }
   .article-body .pull-quote {
     text-align: center;
-    padding: var(--space-lg) 0;
+    padding: var(--space-lg) var(--space-md);
     font-family: var(--font-display);
-    font-size: 1.6rem;
+    font-size: var(--font-size-xl);
     font-style: italic;
     color: var(--color-accent);
-    line-height: 1.4;
-    max-width: 600px;
-    margin: 0 auto;
+    line-height: var(--leading-snug);
+    max-width: none;
+    margin: var(--space-lg) auto;
+    border-top: 1.5px solid var(--color-border-strong);
+    border-bottom: 1.5px solid var(--color-border-strong);
   }
   .article-inline-image {
     margin: var(--space-md) 0;
@@ -149,7 +165,7 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     border: 1px solid var(--color-border);
   }
   .article-inline-image figcaption {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     color: var(--color-text-muted);
     margin-top: var(--space-xs);
     font-style: italic;
