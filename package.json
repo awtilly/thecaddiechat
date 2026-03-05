@@ -8,10 +8,13 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "validate-urls": "node scripts/validate-urls.mjs"
+    "validate-urls": "node scripts/validate-urls.mjs",
+    "validate-images": "node scripts/validate-images.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
+    "@fontsource-variable/dm-sans": "^5.2.8",
+    "@fontsource-variable/playfair-display": "^5.2.8",
     "astro": "^5.18.0"
   }
 }

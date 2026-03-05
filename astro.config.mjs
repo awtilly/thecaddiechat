@@ -9,4 +9,8 @@ export default defineConfig({
     format: 'directory',
   },
   integrations: [mdx()],
+  image: {
+    layout: 'constrained',
+    responsiveStyles: true,
+  },
 });

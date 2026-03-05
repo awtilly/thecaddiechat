@@ -6,6 +6,8 @@ interface Props {
 
 const { title, description } = Astro.props;
 import '../styles/global.css';
+import '@fontsource-variable/playfair-display';
+import '@fontsource-variable/dm-sans';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -15,8 +17,6 @@ import '../styles/global.css';
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
   <slot />
