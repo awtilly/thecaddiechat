@@ -61,7 +61,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Define typography scale, motion tokens, and transition shorthands as CSS custom properties in global.css; import Playfair Display true italic
+- [x] 03-01-PLAN.md — Define typography scale, motion tokens, and transition shorthands as CSS custom properties in global.css; import Playfair Display true italic
 - [ ] 03-02-PLAN.md — Apply tokens to ArticleLayout (drop cap, editorial pull quotes), CourseLayout, PageLayout, and Nav; visual verification
 
 ### Phase 4: Cinematic Animation
@@ -102,6 +102,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
 | 2. Image & Font Performance | 3/3 | Complete | 2026-03-05 |
-| 3. Design Language | 0/2 | Not started | - |
+| 3. Design Language | 1/2 | In Progress | - |
 | 4. Cinematic Animation | 0/2 | Not started | - |
 | 5. Visual Polish & Cohesion | 0/1 | Not started | - |

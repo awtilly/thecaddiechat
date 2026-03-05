@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 02-03-PLAN.md (Phase 2 complete)
-last_updated: "2026-03-05T14:38:51.626Z"
-last_activity: 2026-03-05 -- Completed Plan 02-03 (Camera Roll Gallery)
+status: in-progress
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-05T15:20:14Z"
+last_activity: 2026-03-05 -- Completed Plan 03-01 (Design Tokens)
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 56
+  total_plans: 7
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Jaw-dropping, immersive visual experience that makes visitors stop scrolling and feel inside the story
-**Current focus:** Phase 2 complete, ready for Phase 3 - Design Language
+**Current focus:** Phase 3 - Design Language (Plan 01 complete, Plan 02 next)
 
 ## Current Position
 
-Phase: 2 of 5 (Image & Font Performance) -- COMPLETE
-Plan: 3 of 3 in current phase (all done)
-Status: Phase 2 complete, ready for Phase 3
-Last activity: 2026-03-05 -- Completed Plan 02-03 (Camera Roll Gallery)
+Phase: 3 of 5 (Design Language) -- IN PROGRESS
+Plan: 1 of 2 in current phase (1 complete)
+Status: Plan 03-01 (Design Tokens) complete, ready for Plan 03-02
+Last activity: 2026-03-05 -- Completed Plan 03-01 (Design Tokens)
 
-Progress: [#####.....] 56%
+Progress: [########..] 86%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 11 min
-- Total execution time: 0.85 hours
+- Total plans completed: 6
+- Average duration: 9 min
+- Total execution time: 0.88 hours
 
 **By Phase:**
 
@@ -45,9 +45,10 @@ Progress: [#####.....] 56%
 |-------|-------|-------|----------|
 | 1. Astro Migration | 2/2 | 35 min | 18 min |
 | 2. Image & Font Performance | 3/3 | 16 min | 5 min |
+| 3. Design Language | 1/2 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 25min, 3min, 5min, 8min
+- Last 5 plans: 25min, 3min, 5min, 8min, 2min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -78,6 +79,9 @@ Recent decisions affecting current work:
 - 02-03: Film roll groups derived from first 9 digits of filename prefix
 - 02-03: Generic "Roll N" labels accepted -- no custom category names needed
 - 02-03: Limited Image widths to [400, 800, 1200] to keep build time manageable with 133 images
+- 03-01: Major Third 1.25 ratio for type scale (range 0.64rem-4.77rem covers all existing needs)
+- 03-01: Motion easing tokens use GSAP-compatible cubic-bezier values for Phase 4 compatibility
+- 03-01: Transition shorthands composed from duration and easing tokens for DRY usage
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T14:33:00Z
-Stopped at: Completed 02-03-PLAN.md (Phase 2 complete)
+Last session: 2026-03-05T15:20:14Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None

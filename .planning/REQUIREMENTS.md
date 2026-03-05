@@ -21,7 +21,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **ANIM-01**: Scroll-reveal animations — content elegantly appears as user scrolls
 - [ ] **ANIM-02**: Smooth scroll behavior via Lenis across all pages
 - [ ] **ANIM-03**: GSAP-powered cinematic hero animations with parallax depth
-- [ ] **ANIM-04**: Motion design system defined (easing tokens, duration tokens, distance tokens)
+- [x] **ANIM-04**: Motion design system defined (easing tokens, duration tokens, distance tokens)
 - [ ] **ANIM-05**: Scroll-driven storytelling sequences on chronicle and course pages
 
 ### Transitions
@@ -30,7 +30,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Visual Polish
 
-- [ ] **VISL-01**: Magazine-quality typography system with proper hierarchy
+- [x] **VISL-01**: Magazine-quality typography system with proper hierarchy
 - [ ] **VISL-02**: Premium hover states on cards, links, and navigation elements
 - [ ] **VISL-03**: Consistent visual language and animation style across all 19+ pages
 
@@ -76,10 +76,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ANIM-01 | Phase 4: Cinematic Animation | Pending |
 | ANIM-02 | Phase 4: Cinematic Animation | Pending |
 | ANIM-03 | Phase 4: Cinematic Animation | Pending |
-| ANIM-04 | Phase 3: Design Language | Pending |
+| ANIM-04 | Phase 3: Design Language | Complete |
 | ANIM-05 | Phase 4: Cinematic Animation | Pending |
 | TRNS-01 | Phase 4: Cinematic Animation | Pending |
-| VISL-01 | Phase 3: Design Language | Pending |
+| VISL-01 | Phase 3: Design Language | Complete |
 | VISL-02 | Phase 5: Visual Polish & Cohesion | Pending |
 | VISL-03 | Phase 5: Visual Polish & Cohesion | Pending |
 
