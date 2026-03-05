@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-05T20:05:04Z"
-last_activity: 2026-03-05 -- Completed Plan 04-02 (Hero & Storytelling Animations)
+status: completed
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-03-05T20:46:00Z"
+last_activity: 2026-03-05 -- Completed Plan 04-03 (Lightbox Lifecycle Migration)
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 10
+  completed_plans: 10
   percent: 100
 ---
 
@@ -26,18 +26,18 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 4 of 5 (Cinematic Animation) -- COMPLETE
-Plan: 2 of 2 in current phase (2 complete)
-Status: Phase 04 complete, ready for Phase 05
-Last activity: 2026-03-05 -- Completed Plan 04-02 (Hero & Storytelling Animations)
+Plan: 3 of 3 in current phase (3 complete)
+Status: Phase 04 complete (including gap closure), ready for Phase 05
+Last activity: 2026-03-05 -- Completed Plan 04-03 (Lightbox Lifecycle Migration)
 
 Progress: [==========] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 8 min
-- Total execution time: 1.09 hours
+- Total plans completed: 10
+- Average duration: 7 min
+- Total execution time: 1.12 hours
 
 **By Phase:**
 
@@ -46,10 +46,10 @@ Progress: [==========] 100%
 | 1. Astro Migration | 2/2 | 35 min | 18 min |
 | 2. Image & Font Performance | 3/3 | 16 min | 5 min |
 | 3. Design Language | 2/2 | 10 min | 5 min |
-| 4. Cinematic Animation | 2/2 | 7 min | 4 min |
+| 4. Cinematic Animation | 3/3 | 9 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 8min, 2min, 8min, 4min, 3min
+- Last 5 plans: 2min, 8min, 4min, 3min, 2min
 - Trend: Stable fast
 
 *Updated after each plan completion*
@@ -93,6 +93,7 @@ Recent decisions affecting current work:
 - 04-02: Hero entrance uses gsap.from() with absolute timeline positions for choreographed reveal
 - 04-02: Storytelling animations layer per-element effects on top of global scroll-reveal batch
 - 04-02: Pull quotes start CSS-hidden (opacity:0, translateX:-30px) to prevent FOUC before GSAP initializes
+- 04-03: No logic changes needed in Lightbox -- only the lifecycle event was wrong
 
 ### Pending Todos
 
@@ -101,10 +102,10 @@ None yet.
 ### Blockers/Concerns
 
 - ~~GSAP Club licensing decision (ScrollSmoother vs free Lenis)~~ RESOLVED: Using free Lenis for smooth scroll + free GSAP ScrollTrigger
-- ~~Hero.astro and Lightbox.astro still use DOMContentLoaded -- should be migrated in 04-02~~ RESOLVED: Hero.astro script removed entirely (GSAP handles from BaseLayout); Lightbox.astro remains as-is (separate concern)
+- ~~Hero.astro and Lightbox.astro still use DOMContentLoaded -- should be migrated in 04-02~~ RESOLVED: Hero.astro script removed entirely (GSAP handles from BaseLayout); Lightbox.astro migrated in 04-03 gap closure plan
 
 ## Session Continuity
 
-Last session: 2026-03-05T20:05:04Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-05T20:46:00Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
