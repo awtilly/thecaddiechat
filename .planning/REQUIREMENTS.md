@@ -12,7 +12,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **FNDN-01**: Site rebuilt on Astro with reusable component layouts (BaseLayout, PageLayout, CardGrid)
 - [x] **FNDN-02**: All existing content migrated from HTML to MDX with content collections
 - [ ] **FNDN-03**: Image optimization pipeline generating responsive srcset, WebP/AVIF formats, and blur-up placeholders
-- [ ] **FNDN-04**: Fonts self-hosted (eliminate Google Fonts render-blocking import)
+- [x] **FNDN-04**: Fonts self-hosted (eliminate Google Fonts render-blocking import)
 - [x] **FNDN-05**: GitHub Actions CI/CD pipeline deploying to GitHub Pages on push
 - [x] **FNDN-06**: All existing URLs preserved (no broken links)
 
@@ -70,7 +70,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FNDN-01 | Phase 1: Astro Migration | Complete |
 | FNDN-02 | Phase 1: Astro Migration | Complete |
 | FNDN-03 | Phase 2: Image & Font Performance | Pending |
-| FNDN-04 | Phase 2: Image & Font Performance | Pending |
+| FNDN-04 | Phase 2: Image & Font Performance | Complete |
 | FNDN-05 | Phase 1: Astro Migration | Complete |
 | FNDN-06 | Phase 1: Astro Migration | Complete |
 | ANIM-01 | Phase 4: Cinematic Animation | Pending |
@@ -90,4 +90,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after roadmap creation*
+*Last updated: 2026-03-05 after plan 02-01 completion*

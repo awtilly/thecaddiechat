@@ -46,7 +46,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Validation script, Fontsource font self-hosting, Astro responsive image config
+- [x] 02-01-PLAN.md — Validation script, Fontsource font self-hosting, Astro responsive image config
 - [ ] 02-02-PLAN.md — Migrate all components and pages from raw img tags to Astro Image/Picture
 - [ ] 02-03-PLAN.md — Rewrite Camera Roll page with local photography and film roll gallery
 
@@ -100,7 +100,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
-| 2. Image & Font Performance | 0/3 | Not started | - |
+| 2. Image & Font Performance | 1/3 | In progress | - |
 | 3. Design Language | 0/1 | Not started | - |
 | 4. Cinematic Animation | 0/2 | Not started | - |
 | 5. Visual Polish & Cohesion | 0/1 | Not started | - |
