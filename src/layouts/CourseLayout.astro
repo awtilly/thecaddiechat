@@ -4,6 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ArticleNav from '../components/ArticleNav.astro';
 import Lightbox from '../components/Lightbox.astro';
+import { Image } from 'astro:assets';
 
 interface Props {
   title: string;
@@ -69,7 +70,7 @@ const firstPart = titleParts.join(' ');
 
   {heroImage && (
     <div class="course-hero-image">
-      <img src={heroImage.src} width={heroImage.width} height={heroImage.height} alt={title} loading="eager" />
+      <Image src={heroImage} alt={title} layout="full-width" priority />
     </div>
   )}
 

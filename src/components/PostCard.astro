@@ -1,9 +1,11 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
   title: string;
   description: string;
   href: string;
-  image: string;
+  image: ImageMetadata;
   date?: string;
 }
 
@@ -11,7 +13,7 @@ const { title, description, href, image } = Astro.props;
 ---
 <a href={href} class="post-card reveal">
   <div class="post-card-image">
-    <img src={image} alt={title} loading="lazy">
+    <Image src={image} alt={title} loading="lazy" />
   </div>
   <div class="post-card-body">
     <h3>{title}</h3>

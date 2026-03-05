@@ -1,9 +1,11 @@
 ---
 // Hero.astro - Homepage hero section with parallax
+import { Picture } from 'astro:assets';
+import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.jpg';
 ---
 <section class="hero">
   <div class="hero-bg">
-    <img src="/assets/images/courses/friars-head/hero-clubhouse-bluff.jpg" alt="Friar's Head clubhouse perched on the bluff at golden hour">
+    <Picture src={heroImg} alt="Friar's Head clubhouse perched on the bluff at golden hour" formats={['avif', 'webp']} layout="full-width" priority />
   </div>
   <div class="hero-grain" aria-hidden="true"></div>
   <div class="container hero-layout">

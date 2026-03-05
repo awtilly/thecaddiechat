@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ArticleNav from '../components/ArticleNav.astro';
+import { Image } from 'astro:assets';
 
 interface Props {
   title: string;
@@ -34,7 +35,7 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
   <div class="divider"></div>
   {heroImage && (
     <div class="article-hero-image">
-      <img src={heroImage.src} width={heroImage.width} height={heroImage.height} alt={title} />
+      <Image src={heroImage} alt={title} layout="constrained" priority />
     </div>
   )}
   <section class="section-pad">

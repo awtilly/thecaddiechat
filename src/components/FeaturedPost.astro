@@ -1,9 +1,11 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
   title: string;
   description: string;
   href: string;
-  image: string;
+  image: ImageMetadata;
   label?: string;
 }
 
@@ -11,7 +13,7 @@ const { title, description, href, image, label } = Astro.props;
 ---
 <a href={href} class="featured-post reveal" style="text-decoration: none;">
   <div class="featured-post-image">
-    <img src={image} alt={title} loading="lazy">
+    <Image src={image} alt={title} loading="lazy" />
   </div>
   <div>
     {label && <span class="section-label">{label}</span>}

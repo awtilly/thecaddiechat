@@ -1,11 +1,13 @@
 ---
+import { Image } from 'astro:assets';
+
 interface Props {
   title: string;
   architect: string;
   year?: number;
   courseNumber: string;
   href: string;
-  image?: string;
+  image?: ImageMetadata;
 }
 
 const { title, architect, courseNumber, href, image } = Astro.props;
@@ -14,7 +16,7 @@ const { title, architect, courseNumber, href, image } = Astro.props;
   <span class="course-num">{courseNumber}</span>
   {image && (
     <div class="course-thumb">
-      <img src={image} alt={title} loading="lazy">
+      <Image src={image} alt={title} loading="lazy" />
     </div>
   )}
   <div class="course-info">
