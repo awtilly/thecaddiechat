@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Astro Migration** - Rebuild site on Astro with content collections, shared layouts, CI/CD, and URL preservation (completed 2026-03-04)
 - [x] **Phase 2: Image & Font Performance** - Image optimization pipeline and self-hosted fonts for fast photography loading (completed 2026-03-05)
-- [ ] **Phase 3: Design Language** - Magazine-quality typography system and motion design tokens
+- [x] **Phase 3: Design Language** - Magazine-quality typography system and motion design tokens (completed 2026-03-05)
 - [ ] **Phase 4: Cinematic Animation** - GSAP + Lenis scroll experience, parallax heroes, scroll storytelling, and page transitions
 - [ ] **Phase 5: Visual Polish & Cohesion** - Premium hover states and consistent animation language across all pages
 
@@ -62,7 +62,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — Define typography scale, motion tokens, and transition shorthands as CSS custom properties in global.css; import Playfair Display true italic
-- [ ] 03-02-PLAN.md — Apply tokens to ArticleLayout (drop cap, editorial pull quotes), CourseLayout, PageLayout, and Nav; visual verification
+- [x] 03-02-PLAN.md — Apply tokens to ArticleLayout (drop cap, editorial pull quotes), CourseLayout, PageLayout, and Nav; visual verification
 
 ### Phase 4: Cinematic Animation
 **Goal**: Scrolling through the site feels cinematic -- content reveals elegantly, heroes have parallax depth, stories unfold as scroll-driven sequences, and page navigation is seamless
@@ -102,6 +102,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
 | 2. Image & Font Performance | 3/3 | Complete | 2026-03-05 |
-| 3. Design Language | 1/2 | In Progress | - |
+| 3. Design Language | 2/2 | Complete   | 2026-03-05 |
 | 4. Cinematic Animation | 0/2 | Not started | - |
 | 5. Visual Polish & Cohesion | 0/1 | Not started | - |

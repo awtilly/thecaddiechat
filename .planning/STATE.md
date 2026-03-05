@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-03-05T15:20:14Z"
-last_activity: 2026-03-05 -- Completed Plan 03-01 (Design Tokens)
+status: completed
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-03-05T15:32:51Z"
+last_activity: 2026-03-05 -- Completed Plan 03-02 (Layout Tokenization)
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Jaw-dropping, immersive visual experience that makes visitors stop scrolling and feel inside the story
-**Current focus:** Phase 3 - Design Language (Plan 01 complete, Plan 02 next)
+**Current focus:** Phase 3 complete -- ready for Phase 4 (Cinematic Animation)
 
 ## Current Position
 
-Phase: 3 of 5 (Design Language) -- IN PROGRESS
-Plan: 1 of 2 in current phase (1 complete)
-Status: Plan 03-01 (Design Tokens) complete, ready for Plan 03-02
-Last activity: 2026-03-05 -- Completed Plan 03-01 (Design Tokens)
+Phase: 3 of 5 (Design Language) -- COMPLETE
+Plan: 2 of 2 in current phase (2 complete)
+Status: Phase 3 complete, ready for Phase 4 planning
+Last activity: 2026-03-05 -- Completed Plan 03-02 (Layout Tokenization)
 
-Progress: [########..] 86%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 9 min
-- Total execution time: 0.88 hours
+- Total execution time: 1.02 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Progress: [########..] 86%
 |-------|-------|-------|----------|
 | 1. Astro Migration | 2/2 | 35 min | 18 min |
 | 2. Image & Font Performance | 3/3 | 16 min | 5 min |
-| 3. Design Language | 1/2 | 2 min | 2 min |
+| 3. Design Language | 2/2 | 10 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 25min, 3min, 5min, 8min, 2min
-- Trend: Accelerating
+- Last 5 plans: 3min, 5min, 8min, 2min, 8min
+- Trend: Stable fast
 
 *Updated after each plan completion*
 
@@ -82,6 +82,9 @@ Recent decisions affecting current work:
 - 03-01: Major Third 1.25 ratio for type scale (range 0.64rem-4.77rem covers all existing needs)
 - 03-01: Motion easing tokens use GSAP-compatible cubic-bezier values for Phase 4 compatibility
 - 03-01: Transition shorthands composed from duration and easing tokens for DRY usage
+- 03-02: Drop cap uses font-size-4xl token with fine-tuned line-height 0.8 for Playfair Display at large sizes
+- 03-02: Pull quotes get editorial border-top/border-bottom with color-border-strong for visual weight
+- 03-02: Nav typography sizes kept as-is (intentionally specific); only motion values tokenized
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T15:20:14Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-03-05T15:32:51Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
