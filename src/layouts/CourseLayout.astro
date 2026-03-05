@@ -195,6 +195,17 @@ const firstPart = titleParts.join(' ');
     line-height: var(--leading-loose);
     margin-bottom: 1.5rem;
   }
+  .course-body a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(45, 90, 63, 0.3);
+    transition: color var(--duration-fast) var(--ease-out), text-decoration-color var(--duration-fast) var(--ease-out);
+  }
+  .course-body a:hover {
+    color: var(--color-accent-light);
+    text-decoration-color: var(--color-accent-light);
+  }
   .course-body > p:first-child::first-letter {
     font-family: var(--font-display);
     font-size: var(--font-size-4xl);

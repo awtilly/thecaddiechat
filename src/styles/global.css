@@ -140,6 +140,15 @@ img { max-width: 100%; height: auto; display: block; }
 .btn-arrow::after { content: '\2192'; transition: transform var(--duration-fast) var(--ease-out); }
 .btn-arrow:hover::after { transform: translateX(4px); }
 
+/* Focus-visible: keyboard accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* --- Divider --- */
 .divider { width: 100%; height: 1px; background: var(--color-border-strong); }
 
