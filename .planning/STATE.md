@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-05T02:43:22.590Z"
-last_activity: 2026-03-05 -- Completed Plan 02-02 (Image Migration)
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-03-05T14:33:53.791Z"
+last_activity: 2026-03-05 -- Completed Plan 02-03 (Camera Roll Gallery)
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 4
-  percent: 44
+  completed_plans: 5
+  percent: 56
 ---
 
 # Project State
@@ -21,33 +21,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Jaw-dropping, immersive visual experience that makes visitors stop scrolling and feel inside the story
-**Current focus:** Phase 2 - Image & Font Performance (Plan 2 of 3 complete)
+**Current focus:** Phase 2 complete, ready for Phase 3 - Design Language
 
 ## Current Position
 
-Phase: 2 of 5 (Image & Font Performance)
-Plan: 2 of 3 in current phase
-Status: Plan 02-02 complete, ready for 02-03
-Last activity: 2026-03-05 -- Completed Plan 02-02 (Image Migration)
+Phase: 2 of 5 (Image & Font Performance) -- COMPLETE
+Plan: 3 of 3 in current phase (all done)
+Status: Phase 2 complete, ready for Phase 3
+Last activity: 2026-03-05 -- Completed Plan 02-03 (Camera Roll Gallery)
 
-Progress: [####......] 44%
+Progress: [#####.....] 56%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 11 min
-- Total execution time: 0.72 hours
+- Total execution time: 0.85 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Astro Migration | 2/2 | 35 min | 18 min |
-| 2. Image & Font Performance | 2/3 | 8 min | 4 min |
+| 2. Image & Font Performance | 3/3 | 16 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 25min, 3min, 5min
+- Last 5 plans: 10min, 25min, 3min, 5min, 8min
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -74,6 +74,10 @@ Recent decisions affecting current work:
 - 02-02: Picture component used for full-width hero images (Hero, golden-age-golf) with avif/webp formats
 - 02-02: Image component used for constrained card thumbnails and layout heroes with priority loading
 - 02-02: MDX FullBleed uses layout=full-width while InlineImage/FeaturedImage/Memorabilia use layout=constrained
+- 02-03: import.meta.glob with eager loading for bulk camera roll image import (133 images)
+- 02-03: Film roll groups derived from first 9 digits of filename prefix
+- 02-03: Generic "Roll N" labels accepted -- no custom category names needed
+- 02-03: Limited Image widths to [400, 800, 1200] to keep build time manageable with 133 images
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T02:43:22.585Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-05T14:33:00Z
+Stopped at: Completed 02-03-PLAN.md (Phase 2 complete)
 Resume file: None

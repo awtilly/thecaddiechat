@@ -13,7 +13,7 @@ Transform The Caddie Chat from a vanilla HTML/CSS/JS site into a cinematic, imme
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Astro Migration** - Rebuild site on Astro with content collections, shared layouts, CI/CD, and URL preservation (completed 2026-03-04)
-- [ ] **Phase 2: Image & Font Performance** - Image optimization pipeline and self-hosted fonts for fast photography loading
+- [x] **Phase 2: Image & Font Performance** - Image optimization pipeline and self-hosted fonts for fast photography loading (completed 2026-03-05)
 - [ ] **Phase 3: Design Language** - Magazine-quality typography system and motion design tokens
 - [ ] **Phase 4: Cinematic Animation** - GSAP + Lenis scroll experience, parallax heroes, scroll storytelling, and page transitions
 - [ ] **Phase 5: Visual Polish & Cohesion** - Premium hover states and consistent animation language across all pages
@@ -47,8 +47,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Validation script, Fontsource font self-hosting, Astro responsive image config
-- [ ] 02-02-PLAN.md — Migrate all components and pages from raw img tags to Astro Image/Picture
-- [ ] 02-03-PLAN.md — Rewrite Camera Roll page with local photography and film roll gallery
+- [x] 02-02-PLAN.md — Migrate all components and pages from raw img tags to Astro Image/Picture
+- [x] 02-03-PLAN.md — Rewrite Camera Roll page with local photography and film roll gallery
 
 ### Phase 3: Design Language
 **Goal**: The site has a distinctive editorial voice through typography and a defined motion vocabulary that all future animations follow
