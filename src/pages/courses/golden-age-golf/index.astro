@@ -5,6 +5,8 @@ import CourseItem from '../../../components/CourseItem.astro';
 import CtaBanner from '../../../components/CtaBanner.astro';
 import Footer from '../../../components/Footer.astro';
 import { getCollection } from 'astro:content';
+import { Picture } from 'astro:assets';
+import seriesHeroImg from '../../../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg';
 
 const courses = await getCollection('courses');
 // Sort by courseNumber ascending
@@ -17,7 +19,7 @@ courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
   <Nav />
 
   <div class="series-hero">
-    <img src="/assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg" alt="A tee shot through the dune corridor at Friar's Head with Long Island Sound visible through the gap, shot on 35mm film" loading="eager">
+    <Picture src={seriesHeroImg} alt="A tee shot through the dune corridor at Friar's Head with Long Island Sound visible through the gap, shot on 35mm film" formats={['avif', 'webp']} layout="full-width" priority />
     <div class="series-hero-overlay">
       <div class="container">
         <span class="section-label"><a href="/courses/">Courses</a> / Golden Age Golf</span>
@@ -41,7 +43,7 @@ courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
             architect={course.data.architect}
             courseNumber={course.data.courseNumber}
             href={`/courses/${course.id}/`}
-            image={course.data.heroImage.src}
+            image={course.data.heroImage}
           />
         ))}
       </div>

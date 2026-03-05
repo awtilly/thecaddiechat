@@ -7,6 +7,11 @@ import CardGrid from '../components/CardGrid.astro';
 import ContentCard from '../components/ContentCard.astro';
 import CtaBanner from '../components/CtaBanner.astro';
 import Footer from '../components/Footer.astro';
+import { Image } from 'astro:assets';
+import introImg from '../assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg';
+import chroniclesCardImg from '../assets/images/chronicles/viktor-hovland/inline-2.jpg';
+import coursesCardImg from '../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg';
+import cameraCardImg from '../assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg';
 ---
 <BaseLayout
   title="The Caddie Chat | Caddie. Builder. Storyteller."
@@ -28,7 +33,7 @@ import Footer from '../components/Footer.astro';
           </div>
         </div>
         <div class="intro-image">
-          <img src="/assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg" alt="On the course">
+          <Image src={introImg} alt="On the course" loading="lazy" />
         </div>
       </div>
     </div>
@@ -53,21 +58,21 @@ import Footer from '../components/Footer.astro';
         <ContentCard
           title="Chronicles"
           description="First-person stories from inside the ropes — caddying for Viktor Hovland, Tyrrell Hatton, Matt Fitzpatrick, and the moments that happen between the shots."
-          image="/assets/images/chronicles/viktor-hovland/inline-2.jpg"
+          image={chroniclesCardImg}
           href="/chronicles/"
           tag="01"
         />
         <ContentCard
           title="Golden Age Golf"
           description="Nine days, eight courses, and a search for the heart of Golden Age architecture in the Northeast — from Tillinghast to Travis, Winged Foot to Friar's Head."
-          image="/assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg"
+          image={coursesCardImg}
           href="/courses/golden-age-golf/"
           tag="02"
         />
         <ContentCard
           title="Camera Roll"
           description="Film rolls from abroad, tournament galleries, and city photography — a visual journal of the places and perspectives that shape the journey."
-          image="/assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg"
+          image={cameraCardImg}
           href="/camera-roll/"
           tag="03"
         />

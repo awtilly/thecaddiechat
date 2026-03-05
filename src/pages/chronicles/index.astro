@@ -26,7 +26,7 @@ const rest = chronicles.slice(1);
         title={featured.data.title}
         description={featured.data.description}
         href={`/chronicles/${featured.id}/`}
-        image={featured.data.heroImage.src}
+        image={featured.data.heroImage}
         label="Featured"
       />
 
@@ -36,7 +36,7 @@ const rest = chronicles.slice(1);
             title={chronicle.data.title}
             description={chronicle.data.description}
             href={`/chronicles/${chronicle.id}/`}
-            image={chronicle.data.heroImage.src}
+            image={chronicle.data.heroImage}
           />
         ))}
       </div>

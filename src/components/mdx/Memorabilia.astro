@@ -13,7 +13,7 @@ const { src, alt, label, caption } = Astro.props;
 <div class="memorabilia">
   {label && <div class="memorabilia-label">{label}</div>}
   <figure>
-    <Image src={src} alt={alt} loading="lazy" data-lightbox />
+    <Image src={src} alt={alt} loading="lazy" layout="constrained" data-lightbox />
     {caption && <figcaption>{caption}</figcaption>}
   </figure>
 </div>
