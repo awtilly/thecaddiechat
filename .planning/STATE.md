@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-05T20:52:29.122Z"
-last_activity: 2026-03-05 -- Completed Plan 04-03 (Lightbox Lifecycle Migration)
+status: executing
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-05T23:45:12.799Z"
+last_activity: 2026-03-05 -- Completed Plan 05-02 (Motion Token Migration)
 progress:
   total_phases: 5
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Jaw-dropping, immersive visual experience that makes visitors stop scrolling and feel inside the story
-**Current focus:** Phase 4 -- Cinematic Animation (GSAP + Lenis + View Transitions)
+**Current focus:** Phase 5 -- Visual Polish & Cohesion
 
 ## Current Position
 
-Phase: 4 of 5 (Cinematic Animation) -- COMPLETE
-Plan: 3 of 3 in current phase (3 complete)
-Status: Phase 04 complete (including gap closure), ready for Phase 05
-Last activity: 2026-03-05 -- Completed Plan 04-03 (Lightbox Lifecycle Migration)
+Phase: 5 of 5 (Visual Polish & Cohesion) -- IN PROGRESS
+Plan: 2 of 2 in current phase (1 complete: 05-02)
+Status: Executing Phase 05 plans
+Last activity: 2026-03-05 -- Completed Plan 05-02 (Motion Token Migration)
 
-Progress: [==========] 100%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 7 min
-- Total execution time: 1.12 hours
+- Total plans completed: 11
+- Average duration: 6 min
+- Total execution time: 1.15 hours
 
 **By Phase:**
 
@@ -47,9 +47,10 @@ Progress: [==========] 100%
 | 2. Image & Font Performance | 3/3 | 16 min | 5 min |
 | 3. Design Language | 2/2 | 10 min | 5 min |
 | 4. Cinematic Animation | 3/3 | 9 min | 3 min |
+| 5. Visual Polish & Cohesion | 1/2 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 8min, 4min, 3min, 2min
+- Last 5 plans: 8min, 4min, 3min, 2min, 2min
 - Trend: Stable fast
 
 *Updated after each plan completion*
@@ -94,6 +95,7 @@ Recent decisions affecting current work:
 - 04-02: Storytelling animations layer per-element effects on top of global scroll-reveal batch
 - 04-02: Pull quotes start CSS-hidden (opacity:0, translateX:-30px) to prevent FOUC before GSAP initializes
 - 04-03: No logic changes needed in Lightbox -- only the lifecycle event was wrong
+- 05-02: All transitions migrated to motion tokens -- zero hard-coded transition timing values remain in codebase
 
 ### Pending Todos
 
@@ -106,6 +108,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T20:46:00Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-03-05T23:44:18.450Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
