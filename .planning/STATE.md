@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-02-PLAN.md
+stopped_at: Completed 05-01-PLAN.md
 last_updated: "2026-03-05T23:45:12.799Z"
-last_activity: 2026-03-05 -- Completed Plan 05-02 (Motion Token Migration)
+last_activity: 2026-03-05 -- Completed Plan 05-01 (Interaction Polish)
 progress:
   total_phases: 5
-  completed_phases: 5
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 12
+  completed_plans: 11
   percent: 92
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 5 of 5 (Visual Polish & Cohesion) -- IN PROGRESS
-Plan: 2 of 2 in current phase (1 complete: 05-02)
+Plan: 1 of 2 in current phase (1 complete: 05-01)
 Status: Executing Phase 05 plans
-Last activity: 2026-03-05 -- Completed Plan 05-02 (Motion Token Migration)
+Last activity: 2026-03-05 -- Completed Plan 05-01 (Interaction Polish)
 
 Progress: [█████████░] 92%
 
@@ -37,7 +37,7 @@ Progress: [█████████░] 92%
 **Velocity:**
 - Total plans completed: 11
 - Average duration: 6 min
-- Total execution time: 1.15 hours
+- Total execution time: 1.18 hours
 
 **By Phase:**
 
@@ -95,7 +95,10 @@ Recent decisions affecting current work:
 - 04-02: Storytelling animations layer per-element effects on top of global scroll-reveal batch
 - 04-02: Pull quotes start CSS-hidden (opacity:0, translateX:-30px) to prevent FOUC before GSAP initializes
 - 04-03: No logic changes needed in Lightbox -- only the lifecycle event was wrong
-- 05-02: All transitions migrated to motion tokens -- zero hard-coded transition timing values remain in codebase
+- 05-01: Specific property transitions on cards (not transition: all) to avoid View Transition interference
+- 05-01: CourseItem border-left accent replaces padding shift hover (avoids Lenis layout reflow)
+- 05-01: Global :focus-visible with outline-offset: 3px -- no per-component overrides needed
+- 05-01: Footer StoekMedia link excluded from underline via :global(.nav-stoek::after) { display: none }
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T23:44:18.450Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-05T23:44:15Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None

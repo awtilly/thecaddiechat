@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Astro Migration** - Rebuild site on Astro with content collections, shared layouts, CI/CD, and URL preservation (completed 2026-03-04)
 - [x] **Phase 2: Image & Font Performance** - Image optimization pipeline and self-hosted fonts for fast photography loading (completed 2026-03-05)
 - [x] **Phase 3: Design Language** - Magazine-quality typography system and motion design tokens (completed 2026-03-05)
-- [ ] **Phase 4: Cinematic Animation** - GSAP + Lenis scroll experience, parallax heroes, scroll storytelling, and page transitions
+- [x] **Phase 4: Cinematic Animation** - GSAP + Lenis scroll experience, parallax heroes, scroll storytelling, and page transitions (completed 2026-03-05)
 - [ ] **Phase 5: Visual Polish & Cohesion** - Premium hover states and consistent animation language across all pages
 
 ## Phase Details
@@ -79,7 +79,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Install GSAP + Lenis, add ClientRouter for View Transitions, initialize smooth scroll and global scroll-reveal system, migrate all component scripts to astro:page-load lifecycle
 - [x] 04-02-PLAN.md — Replace Hero CSS animations with GSAP timeline + ScrollTrigger parallax, add scroll-driven storytelling animations to article page images and pull quotes
-- [ ] 04-03-PLAN.md — Gap closure: migrate Lightbox.astro from DOMContentLoaded to astro:page-load lifecycle
+- [x] 04-03-PLAN.md — Gap closure: migrate Lightbox.astro from DOMContentLoaded to astro:page-load lifecycle
 
 ### Phase 5: Visual Polish & Cohesion
 **Goal**: Every interaction feels premium, and the animation language is consistent from homepage to deepest course page
@@ -92,7 +92,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Migrate 6 UI components to motion tokens, add cursor:pointer to cards, fix CourseItem hover, add Footer underline animation, global focus-visible rule, article body link styles
+- [x] 05-01-PLAN.md — Migrate 6 UI components to motion tokens, add cursor:pointer to cards, fix CourseItem hover, add Footer underline animation, global focus-visible rule, article body link styles
 - [ ] 05-02-PLAN.md — Migrate 5 MDX image components and 4 page files to motion tokens, verify zero hard-coded transitions remain
 
 ## Progress
@@ -105,5 +105,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
 | 2. Image & Font Performance | 3/3 | Complete | 2026-03-05 |
 | 3. Design Language | 2/2 | Complete   | 2026-03-05 |
-| 4. Cinematic Animation | 2/3 | Gap closure | - |
-| 5. Visual Polish & Cohesion | 0/2 | Planned | - |
+| 4. Cinematic Animation | 3/3 | Complete | 2026-03-05 |
+| 5. Visual Polish & Cohesion | 1/2 | In Progress | - |
