@@ -89,7 +89,7 @@ courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
   }
   .series-hero-overlay :global(.section-label) a {
     color: rgba(255,255,255,0.6);
-    transition: color 0.3s ease;
+    transition: var(--transition-color);
   }
   .series-hero-overlay :global(.section-label) a:hover {
     color: rgba(255,255,255,0.9);
