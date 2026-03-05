@@ -37,11 +37,11 @@ const { title, description, pageTitle, pageSubtitle, sectionLabel } = Astro.prop
   }
   .page-header :global(h1) {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-size: var(--font-size-3xl);
     font-weight: 500;
-    line-height: 1.05;
+    line-height: var(--leading-tight);
     margin-bottom: var(--space-sm);
-    animation: fadeInUp 1s ease;
+    animation: fadeInUp var(--duration-slower) var(--ease-out);
   }
   .page-header :global(h1 em) {
     font-style: italic;
@@ -49,8 +49,8 @@ const { title, description, pageTitle, pageSubtitle, sectionLabel } = Astro.prop
   }
   .page-header p {
     color: var(--color-text-secondary);
-    font-size: 1.1rem;
+    font-size: var(--font-size-base);
     max-width: 600px;
-    line-height: 1.8;
+    line-height: var(--leading-relaxed);
   }
 </style>
