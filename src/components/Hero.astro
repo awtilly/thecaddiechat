@@ -50,17 +50,11 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     width: 100%;
     height: 100%;
     object-fit: cover;
-    animation: heroZoom 20s ease forwards;
-    will-change: transform;
-  }
-  @keyframes heroZoom {
-    from { transform: scale(1); }
-    to { transform: scale(1.08); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hero-bg img { animation: none; }
-    :global(.hero-line) { opacity: 1; transform: none; animation: none; }
-    .hero-kicker, .hero-sub, .hero-cta, .hero-meta { opacity: 1; transform: none; animation: none; }
+    .hero-bg img { transform: none; }
+    :global(.hero-line) { opacity: 1; transform: none; }
+    .hero-kicker, .hero-sub, .hero-cta, .hero-meta, .hero-scroll { opacity: 1; transform: none; }
     .hero-scroll-line::after { animation: none; }
   }
   .hero-bg::after {
@@ -103,7 +97,6 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     color: rgba(255,255,255,0.6);
     margin-bottom: var(--space-md);
     opacity: 0;
-    animation: heroFadeIn 0.8s ease 0.3s forwards;
   }
   .hero-kicker::before {
     content: '';
@@ -128,13 +121,6 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     display: block;
     opacity: 0;
     transform: translateY(50px);
-    animation: heroLineIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  :global(.hero-line:nth-child(1)) { animation-delay: 0.5s; }
-  :global(.hero-line:nth-child(2)) { animation-delay: 0.7s; }
-  :global(.hero-line:nth-child(3)) { animation-delay: 0.9s; }
-  @keyframes heroLineIn {
-    to { opacity: 1; transform: translateY(0); }
   }
   .hero-sub {
     font-size: 1.1rem;
@@ -143,29 +129,22 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     margin-bottom: var(--space-lg);
     line-height: 1.75;
     opacity: 0;
-    animation: heroFadeIn 0.8s ease 1.2s forwards;
   }
   .hero-cta {
     display: flex;
     gap: var(--space-sm);
     flex-wrap: wrap;
     opacity: 0;
-    animation: heroFadeIn 0.8s ease 1.4s forwards;
   }
   .hero-cta :global(.btn) { color: #fff; border-color: rgba(255,255,255,0.4); }
   .hero-cta :global(.btn:hover) { background: #fff; color: var(--color-dark); border-color: #fff; }
   .hero-cta :global(.btn-primary) { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
   .hero-cta :global(.btn-primary:hover) { background: #fff; color: var(--color-accent); border-color: #fff; }
-  @keyframes heroFadeIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
   .hero-meta {
     position: absolute;
     bottom: var(--space-xl);
     right: var(--space-md);
     opacity: 0;
-    animation: heroFadeIn 0.8s ease 1.6s forwards;
   }
   .hero-location {
     font-family: var(--font-body);
@@ -186,7 +165,6 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     align-items: center;
     gap: 0.5rem;
     opacity: 0;
-    animation: heroFadeIn 0.8s ease 2s forwards;
   }
   .hero-scroll span {
     font-family: var(--font-body);
@@ -232,28 +210,3 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
   }
 </style>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const hero = document.querySelector('.hero');
-    const heroContent = document.querySelector('.hero-content');
-    const heroBg = document.querySelector('.hero-bg img');
-    const heroScroll = document.querySelector('.hero-scroll');
-
-    if (hero && heroContent && heroBg) {
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!prefersReduced) {
-        window.addEventListener('scroll', () => {
-          const y = window.scrollY;
-          const h = (hero as HTMLElement).offsetHeight;
-          if (y < h) {
-            const ratio = y / h;
-            (heroContent as HTMLElement).style.opacity = String(1 - ratio * 1.5);
-            (heroContent as HTMLElement).style.transform = `translateY(${y * 0.25}px)`;
-            (heroBg as HTMLElement).style.transform = `scale(${1 + 0.08 * (y / h)}) translateY(${y * 0.15}px)`;
-            if (heroScroll) (heroScroll as HTMLElement).style.opacity = String(1 - ratio * 3);
-          }
-        }, { passive: true });
-      }
-    }
-  });
-</script>

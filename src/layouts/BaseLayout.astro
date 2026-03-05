@@ -35,6 +35,92 @@ import '@fontsource-variable/dm-sans';
     let lenis: Lenis | null = null;
     let ctx: gsap.Context | null = null;
 
+    function initHeroAnimations() {
+      const hero = document.querySelector('.hero');
+      if (!hero) return;
+
+      // Entrance timeline
+      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+      tl.from('.hero-kicker', { opacity: 0, y: 16, duration: 0.6 }, 0.3)
+        .from('.hero-line', { opacity: 0, y: 50, duration: 0.9, stagger: 0.2 }, 0.5)
+        .from('.hero-sub', { opacity: 0, y: 16, duration: 0.6 }, 1.2)
+        .from('.hero-cta', { opacity: 0, y: 16, duration: 0.6 }, 1.4)
+        .from('.hero-meta', { opacity: 0, duration: 0.6 }, 1.6)
+        .from('.hero-scroll', { opacity: 0, duration: 0.6 }, 2.0);
+
+      // Parallax: background moves slower than scroll
+      gsap.to('.hero-bg img', {
+        yPercent: 20,
+        scale: 1.1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        },
+      });
+
+      // Content fades out as user scrolls past hero
+      gsap.to('.hero-content', {
+        opacity: 0,
+        y: 80,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: '60% top',
+          scrub: true,
+        },
+      });
+
+      // Scroll indicator fades out quickly
+      gsap.to('.hero-scroll', {
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: '20% top',
+          scrub: true,
+        },
+      });
+    }
+
+    function initStorytellingAnimations() {
+      // Full-bleed images: scale up from slightly smaller for cinematic reveal
+      gsap.utils.toArray('.full-bleed-image').forEach((el) => {
+        const element = el as Element;
+        gsap.from(element, {
+          scale: 0.95,
+          duration: 1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+
+      // Pull quotes: slide in from left with editorial flair
+      gsap.utils.toArray('.article-body blockquote, .course-body blockquote').forEach((el) => {
+        const element = el as Element;
+        gsap.from(element, {
+          x: -30,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: element,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+        });
+      });
+    }
+
     function init() {
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -66,6 +152,19 @@ import '@fontsource-variable/dm-sans';
           start: 'top 85%',
           once: true,
         });
+
+        // Page-specific animations
+        const path = window.location.pathname;
+
+        // Homepage hero
+        if (path === '/') {
+          initHeroAnimations();
+        }
+
+        // Article pages (chronicles and courses)
+        if (path.match(/^\/(chronicles|courses)\/[^/]+\/$/)) {
+          initStorytellingAnimations();
+        }
       });
     }
 
