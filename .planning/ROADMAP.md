@@ -58,10 +58,11 @@ Plans:
   1. Typography hierarchy is visually distinct and magazine-quality -- headlines, subheads, body, captions, and pull quotes each have clear styling
   2. Motion design tokens (easing curves, durations, distances) are defined and importable for use across all pages
   3. A chronicle story page reads like a magazine feature with proper typographic rhythm and spacing
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — Define typography scale, motion tokens, and transition shorthands as CSS custom properties in global.css; import Playfair Display true italic
+- [ ] 03-02-PLAN.md — Apply tokens to ArticleLayout (drop cap, editorial pull quotes), CourseLayout, PageLayout, and Nav; visual verification
 
 ### Phase 4: Cinematic Animation
 **Goal**: Scrolling through the site feels cinematic -- content reveals elegantly, heroes have parallax depth, stories unfold as scroll-driven sequences, and page navigation is seamless
@@ -100,7 +101,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
-| 2. Image & Font Performance | 1/3 | In progress | - |
-| 3. Design Language | 0/1 | Not started | - |
+| 2. Image & Font Performance | 3/3 | Complete | 2026-03-05 |
+| 3. Design Language | 0/2 | Not started | - |
 | 4. Cinematic Animation | 0/2 | Not started | - |
 | 5. Visual Polish & Cohesion | 0/1 | Not started | - |
