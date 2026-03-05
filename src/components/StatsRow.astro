@@ -13,7 +13,7 @@ interface Props {
 
 const { stats } = Astro.props;
 ---
-<div class="stats-row reveal">
+<div class="stats-row" data-scroll-reveal>
   {stats.map(stat => (
     <div class="stat-item">
       <div
@@ -63,7 +63,7 @@ const { stats } = Astro.props;
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const counters = document.querySelectorAll('[data-count]');
     if (counters.length) {
       const countObserver = new IntersectionObserver((entries) => {
@@ -93,5 +93,5 @@ const { stats } = Astro.props;
       }
       requestAnimationFrame(update);
     }
-  });
+  }, { once: false });
 </script>

@@ -242,7 +242,7 @@
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     const nav = document.querySelector('.nav');
     const hero = document.querySelector('.hero');
     if (nav && hero) {
@@ -305,24 +305,5 @@
         }
       });
     }
-
-    // Scroll reveals
-    const reveals = document.querySelectorAll('.reveal');
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (reveals.length && !isMobile) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-      reveals.forEach(el => observer.observe(el));
-    }
-
-    // Staggered card transitions
-    const cards = document.querySelectorAll('.content-card, .post-card, .collection-card, .course-item');
-    cards.forEach((card, i) => { (card as HTMLElement).style.transitionDelay = `${i * 0.08}s`; });
-  });
+  }, { once: false });
 </script>

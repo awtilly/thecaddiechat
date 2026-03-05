@@ -11,7 +11,7 @@ interface Props {
 
 const { title, description, href, image, label } = Astro.props;
 ---
-<a href={href} class="featured-post reveal" style="text-decoration: none;">
+<a href={href} class="featured-post" data-scroll-reveal style="text-decoration: none;">
   <div class="featured-post-image">
     <Image src={image} alt={title} loading="lazy" />
   </div>

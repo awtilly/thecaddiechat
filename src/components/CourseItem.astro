@@ -12,7 +12,7 @@ interface Props {
 
 const { title, architect, courseNumber, href, image } = Astro.props;
 ---
-<a href={href} class="course-item reveal">
+<a href={href} class="course-item" data-scroll-reveal>
   <span class="course-num">{courseNumber}</span>
   {image && (
     <div class="course-thumb">

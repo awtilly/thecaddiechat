@@ -11,7 +11,7 @@ interface Props {
 
 const { title, description, href, image } = Astro.props;
 ---
-<a href={href} class="post-card reveal">
+<a href={href} class="post-card" data-scroll-reveal>
   <div class="post-card-image">
     <Image src={image} alt={title} loading="lazy" />
   </div>
