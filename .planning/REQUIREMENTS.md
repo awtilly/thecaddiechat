@@ -20,9 +20,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **ANIM-01**: Scroll-reveal animations — content elegantly appears as user scrolls
 - [x] **ANIM-02**: Smooth scroll behavior via Lenis across all pages
-- [ ] **ANIM-03**: GSAP-powered cinematic hero animations with parallax depth
+- [x] **ANIM-03**: GSAP-powered cinematic hero animations with parallax depth
 - [x] **ANIM-04**: Motion design system defined (easing tokens, duration tokens, distance tokens)
-- [ ] **ANIM-05**: Scroll-driven storytelling sequences on chronicle and course pages
+- [x] **ANIM-05**: Scroll-driven storytelling sequences on chronicle and course pages
 
 ### Transitions
 
@@ -75,9 +75,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FNDN-06 | Phase 1: Astro Migration | Complete |
 | ANIM-01 | Phase 4: Cinematic Animation | Complete |
 | ANIM-02 | Phase 4: Cinematic Animation | Complete |
-| ANIM-03 | Phase 4: Cinematic Animation | Pending |
+| ANIM-03 | Phase 4: Cinematic Animation | Complete |
 | ANIM-04 | Phase 3: Design Language | Complete |
-| ANIM-05 | Phase 4: Cinematic Animation | Pending |
+| ANIM-05 | Phase 4: Cinematic Animation | Complete |
 | TRNS-01 | Phase 4: Cinematic Animation | Complete |
 | VISL-01 | Phase 3: Design Language | Complete |
 | VISL-02 | Phase 5: Visual Polish & Cohesion | Pending |

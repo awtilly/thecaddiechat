@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-05T19:59:24Z"
-last_activity: 2026-03-05 -- Completed Plan 04-01 (Animation Foundation)
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-05T20:05:04Z"
+last_activity: 2026-03-05 -- Completed Plan 04-02 (Hero & Storytelling Animations)
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 8
-  percent: 89
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 
 ## Current Position
 
-Phase: 4 of 5 (Cinematic Animation)
-Plan: 1 of 2 in current phase (1 complete)
-Status: Plan 04-01 complete, ready for Plan 04-02
-Last activity: 2026-03-05 -- Completed Plan 04-01 (Animation Foundation)
+Phase: 4 of 5 (Cinematic Animation) -- COMPLETE
+Plan: 2 of 2 in current phase (2 complete)
+Status: Phase 04 complete, ready for Phase 05
+Last activity: 2026-03-05 -- Completed Plan 04-02 (Hero & Storytelling Animations)
 
-Progress: [=========.] 89%
+Progress: [==========] 100%
 
 ## Performance Metrics
 
@@ -46,10 +46,10 @@ Progress: [=========.] 89%
 | 1. Astro Migration | 2/2 | 35 min | 18 min |
 | 2. Image & Font Performance | 3/3 | 16 min | 5 min |
 | 3. Design Language | 2/2 | 10 min | 5 min |
-| 4. Cinematic Animation | 1/2 | 4 min | 4 min |
+| 4. Cinematic Animation | 2/2 | 7 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 8min, 2min, 8min, 4min
+- Last 5 plans: 8min, 2min, 8min, 4min, 3min
 - Trend: Stable fast
 
 *Updated after each plan completion*
@@ -90,6 +90,9 @@ Recent decisions affecting current work:
 - 04-01: GSAP ScrollTrigger.batch for global scroll reveals instead of per-component IntersectionObserver
 - 04-01: data-scroll-reveal attribute pattern replaces .reveal class for GSAP-driven animations
 - 04-01: StatsRow counter keeps vanilla IntersectionObserver (only lifecycle migrated, per research)
+- 04-02: Hero entrance uses gsap.from() with absolute timeline positions for choreographed reveal
+- 04-02: Storytelling animations layer per-element effects on top of global scroll-reveal batch
+- 04-02: Pull quotes start CSS-hidden (opacity:0, translateX:-30px) to prevent FOUC before GSAP initializes
 
 ### Pending Todos
 
@@ -98,10 +101,10 @@ None yet.
 ### Blockers/Concerns
 
 - ~~GSAP Club licensing decision (ScrollSmoother vs free Lenis)~~ RESOLVED: Using free Lenis for smooth scroll + free GSAP ScrollTrigger
-- Hero.astro and Lightbox.astro still use DOMContentLoaded -- should be migrated in 04-02
+- ~~Hero.astro and Lightbox.astro still use DOMContentLoaded -- should be migrated in 04-02~~ RESOLVED: Hero.astro script removed entirely (GSAP handles from BaseLayout); Lightbox.astro remains as-is (separate concern)
 
 ## Session Continuity
 
-Last session: 2026-03-05T19:55:36Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-05T20:05:04Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
