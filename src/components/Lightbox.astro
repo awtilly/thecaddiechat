@@ -1,6 +1,6 @@
 ---
-// Lightbox.astro - Image lightbox for course pages
-// Automatically collects clickable images from the page
+// Lightbox.astro - Image lightbox for pages with data-lightbox images
+// Automatically collects clickable images from the page (course-body or full document)
 ---
 <div class="lightbox" id="lightbox">
   <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
@@ -101,9 +101,8 @@
     const lightboxCaption = document.getElementById('lightbox-caption');
     if (!lightbox || !lightboxImg || !lightboxCaption) return;
 
-    // Collect all clickable images from course-body
-    const courseBody = document.querySelector('.course-body');
-    if (!courseBody) return;
+    // Collect all clickable images -- prefer course-body scope, fall back to full document
+    const scope = document.querySelector('.course-body') || document;
 
     interface LightboxImage {
       src: string;
@@ -111,7 +110,8 @@
     }
 
     const images: LightboxImage[] = [];
-    const clickableImages = courseBody.querySelectorAll('img[data-lightbox]');
+    const clickableImages = scope.querySelectorAll('img[data-lightbox]');
+    if (clickableImages.length === 0) return;
 
     clickableImages.forEach((img) => {
       const imgEl = img as HTMLImageElement;
@@ -120,10 +120,12 @@
       images.push({ src: imgEl.src, caption });
     });
 
-    // Also collect from hero image
-    const heroImg = document.querySelector('.course-hero-image img') as HTMLImageElement | null;
-    if (heroImg) {
-      images.push({ src: heroImg.src, caption: heroImg.alt || '' });
+    // Also collect from hero image (course pages only)
+    if (document.querySelector('.course-body')) {
+      const heroImg = document.querySelector('.course-hero-image img') as HTMLImageElement | null;
+      if (heroImg) {
+        images.push({ src: heroImg.src, caption: heroImg.alt || '' });
+      }
     }
 
     let currentIndex = 0;

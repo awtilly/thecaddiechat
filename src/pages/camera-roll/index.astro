@@ -1,6 +1,38 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
+import { Image } from 'astro:assets';
 import CtaBanner from '../../components/CtaBanner.astro';
+import Lightbox from '../../components/Lightbox.astro';
+
+// Glob import all camera roll images
+const allImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/camera-roll/*.jpg',
+  { eager: true }
+);
+
+// Group by film roll prefix (first 9 digits of filename)
+const rollMap = new Map<string, { src: ImageMetadata; filename: string }[]>();
+for (const [path, module] of Object.entries(allImages)) {
+  const filename = path.split('/').pop()!.replace('.jpg', '');
+  const rollId = filename.substring(0, 9);
+  if (!rollMap.has(rollId)) rollMap.set(rollId, []);
+  rollMap.get(rollId)!.push({ src: module.default, filename });
+}
+
+// Sort each roll's images by filename
+for (const images of rollMap.values()) {
+  images.sort((a, b) => a.filename.localeCompare(b.filename));
+}
+
+// Convert to array and sort rolls by their ID
+const rolls = [...rollMap.entries()]
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([id, images], index) => ({
+    id,
+    label: `Roll ${index + 1}`,
+    count: images.length,
+    images,
+  }));
 ---
 <PageLayout
   title="Camera Roll | The Caddie Chat"
@@ -11,64 +43,26 @@ import CtaBanner from '../../components/CtaBanner.astro';
 >
   <section class="section-pad-lg">
     <div class="container">
-      <div class="gallery-section reveal">
-        <div class="gallery-section-header">
-          <h2>Film Rolls</h2>
-          <span>3 Collections</span>
+      {rolls.map((roll) => (
+        <div class="gallery-section reveal">
+          <div class="gallery-section-header">
+            <h2>{roll.label}</h2>
+            <span>{roll.count} Frames</span>
+          </div>
+          <div class="roll-grid">
+            {roll.images.map((image, i) => (
+              <Image
+                src={image.src}
+                alt={`Film photograph ${i + 1} from ${roll.label}`}
+                widths={[400, 800, 1200]}
+                sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                loading="lazy"
+                data-lightbox
+              />
+            ))}
+          </div>
         </div>
-        <div class="collection-grid">
-          <a href="#ireland" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1590089415225-401ed6f9db8e?w=700&q=80" alt="Ireland">
-            <div class="collection-card-overlay"><h3>Ireland</h3><p>Emerald greens and ancient stone</p></div>
-          </a>
-          <a href="#scotland" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="Scotland">
-            <div class="collection-card-overlay"><h3>Scotland</h3><p>Links land and highland skies</p></div>
-          </a>
-          <a href="#italy" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=700&q=80" alt="Italy">
-            <div class="collection-card-overlay"><h3>Italy</h3><p>Light, color, and la dolce vita</p></div>
-          </a>
-        </div>
-      </div>
-
-      <div class="gallery-section reveal">
-        <div class="gallery-section-header">
-          <h2>Cities</h2>
-          <span>4 Collections</span>
-        </div>
-        <div class="collection-grid">
-          <a href="#chicago" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=700&q=80" alt="Chicago">
-            <div class="collection-card-overlay"><h3>Chicago</h3><p>The city that raised me</p></div>
-          </a>
-          <a href="#new-york" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=700&q=80" alt="New York">
-            <div class="collection-card-overlay"><h3>New York</h3><p>Concrete canyons and quiet corners</p></div>
-          </a>
-          <a href="#nashville" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1545419913-775e3e1643c1?w=700&q=80" alt="Nashville">
-            <div class="collection-card-overlay"><h3>Nashville</h3><p>Music, murals, and southern light</p></div>
-          </a>
-          <a href="#stlouis" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1568515045052-f9a854d70bfd?w=700&q=80" alt="Saint Louis">
-            <div class="collection-card-overlay"><h3>Saint Louis</h3><p>The Gateway and beyond</p></div>
-          </a>
-        </div>
-      </div>
-
-      <div class="gallery-section reveal">
-        <div class="gallery-section-header">
-          <h2>Tournaments</h2>
-          <span>1 Collection</span>
-        </div>
-        <div class="collection-grid">
-          <a href="#bmw" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=700&q=80" alt="BMW Championship">
-            <div class="collection-card-overlay"><h3>BMW Championship 2024</h3><p>Inside the ropes at a FedEx Cup playoff</p></div>
-          </a>
-        </div>
-      </div>
+      ))}
     </div>
   </section>
 
@@ -79,4 +73,34 @@ import CtaBanner from '../../components/CtaBanner.astro';
     buttonHref="https://instagram.com/thecaddiechat"
     buttonExternal={true}
   />
+
+  <Lightbox />
 </PageLayout>
+
+<style>
+  .roll-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  .roll-grid img {
+    width: 100%;
+    aspect-ratio: 3/2;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  .roll-grid img:hover {
+    opacity: 0.85;
+  }
+  @media (max-width: 1280px) {
+    .roll-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  @media (max-width: 768px) {
+    .roll-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
