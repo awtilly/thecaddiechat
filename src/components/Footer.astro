@@ -59,15 +59,35 @@
     list-style: none;
   }
   .footer-links a {
+    position: relative;
     font-size: 0.78rem;
     font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--color-text-secondary);
-    transition: color 0.3s ease;
+    transition: var(--transition-color);
+  }
+  .footer-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--duration-normal) var(--ease-out);
   }
   .footer-links a:hover {
     color: var(--color-accent);
+  }
+  .footer-links a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .footer-links :global(.nav-stoek::after) {
+    display: none;
   }
   .footer-links :global(.nav-stoek) {
     text-transform: none;
@@ -93,7 +113,7 @@
   }
   .footer-social a {
     color: var(--color-text-muted);
-    transition: color 0.3s;
+    transition: var(--transition-color);
   }
   .footer-social a:hover {
     color: var(--color-accent);

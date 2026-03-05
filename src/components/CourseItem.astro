@@ -34,17 +34,18 @@ const { title, architect, courseNumber, href, image } = Astro.props;
     gap: var(--space-md);
     padding: var(--space-md) 0;
     border-bottom: 1px solid var(--color-border);
-    transition: background 0.3s ease, padding 0.3s ease;
+    border-left: 3px solid transparent;
+    transition: background var(--duration-fast) var(--ease-out), border-left-color var(--duration-fast) var(--ease-out);
     text-decoration: none;
     color: inherit;
+    cursor: pointer;
   }
   .course-item:first-child {
     border-top: 1px solid var(--color-border);
   }
   .course-item:hover {
     background: var(--color-bg-elevated);
-    padding-left: var(--space-sm);
-    padding-right: var(--space-sm);
+    border-left-color: var(--color-accent);
   }
   .course-num {
     font-family: var(--font-display);
@@ -68,7 +69,7 @@ const { title, architect, courseNumber, href, image } = Astro.props;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.5s ease;
+    transition: var(--transition-image);
   }
   .course-item:hover .course-thumb img {
     transform: scale(1.08);
@@ -87,7 +88,7 @@ const { title, architect, courseNumber, href, image } = Astro.props;
   .course-arrow {
     font-size: 1.2rem;
     color: var(--color-text-muted);
-    transition: color 0.3s ease, transform 0.3s ease;
+    transition: color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
   }
   .course-item:hover .course-arrow {
     color: var(--color-accent);

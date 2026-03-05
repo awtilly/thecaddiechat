@@ -31,6 +31,7 @@ const { title, description, href, image, label } = Astro.props;
     align-items: center;
     margin-bottom: var(--space-xl);
     color: inherit;
+    cursor: pointer;
   }
   .featured-post-image {
     aspect-ratio: 16/10;
@@ -41,7 +42,7 @@ const { title, description, href, image, label } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s ease;
+    transition: var(--transition-image);
   }
   .featured-post:hover .featured-post-image img {
     transform: scale(1.04);
