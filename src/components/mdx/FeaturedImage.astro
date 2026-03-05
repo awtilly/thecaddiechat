@@ -29,7 +29,7 @@ const { src, alt, caption } = Astro.props;
     border-radius: 2px;
     display: block;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--duration-fast) var(--ease-out);
   }
   .featured-image:hover :global(img) {
     opacity: 0.92;

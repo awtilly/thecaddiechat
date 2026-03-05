@@ -29,7 +29,7 @@ const { src, alt, caption } = Astro.props;
     object-position: center 50%;
     display: block;
     cursor: pointer;
-    transition: transform 0.8s ease;
+    transition: var(--transition-image);
   }
   .full-bleed-image:hover :global(img) {
     transform: scale(1.015);
