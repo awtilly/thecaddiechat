@@ -43,10 +43,12 @@ Plans:
   1. Images serve responsive srcset with WebP/AVIF formats and blur-up placeholders -- no full-resolution JPEG served to mobile
   2. Fonts are self-hosted and load without visible flash of unstyled text or layout shift
   3. Lighthouse performance score is 90+ on a representative course page and chronicle page
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Validation script, Fontsource font self-hosting, Astro responsive image config
+- [ ] 02-02-PLAN.md — Migrate all components and pages from raw img tags to Astro Image/Picture
+- [ ] 02-03-PLAN.md — Rewrite Camera Roll page with local photography and film roll gallery
 
 ### Phase 3: Design Language
 **Goal**: The site has a distinctive editorial voice through typography and a defined motion vocabulary that all future animations follow
@@ -98,7 +100,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Astro Migration | 2/2 | Complete   | 2026-03-04 |
-| 2. Image & Font Performance | 0/1 | Not started | - |
+| 2. Image & Font Performance | 0/3 | Not started | - |
 | 3. Design Language | 0/1 | Not started | - |
 | 4. Cinematic Animation | 0/2 | Not started | - |
 | 5. Visual Polish & Cohesion | 0/1 | Not started | - |
