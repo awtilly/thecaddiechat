@@ -74,11 +74,11 @@ Plans:
   3. Homepage hero has parallax depth layers with cinematic entrance animation using GSAP
   4. Chronicle and course pages have scroll-driven storytelling sequences where images and text animate in relationship to scroll position
   5. Navigating between pages uses View Transitions with smooth crossfade -- no hard page loads
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Install GSAP + Lenis, add ClientRouter for View Transitions, initialize smooth scroll and global scroll-reveal system, migrate all component scripts to astro:page-load lifecycle
+- [ ] 04-02-PLAN.md — Replace Hero CSS animations with GSAP timeline + ScrollTrigger parallax, add scroll-driven storytelling animations to article page images and pull quotes
 
 ### Phase 5: Visual Polish & Cohesion
 **Goal**: Every interaction feels premium, and the animation language is consistent from homepage to deepest course page
