@@ -9,7 +9,7 @@ interface Props {
 
 const { src, alt, caption } = Astro.props;
 ---
-<figure class="featured-image">
+<figure class="featured-image" data-scroll-reveal>
   <Image src={src} alt={alt} loading="lazy" layout="constrained" data-lightbox />
   {caption && (
     <div class="featured-caption">

@@ -141,6 +141,14 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     font-size: var(--font-size-md);
     color: var(--color-text-primary);
     line-height: var(--leading-relaxed);
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .article-body blockquote {
+      opacity: 1;
+      transform: none;
+    }
   }
   .article-body .pull-quote {
     text-align: center;

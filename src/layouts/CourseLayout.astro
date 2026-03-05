@@ -225,4 +225,14 @@ const firstPart = titleParts.join(' ');
     border-top: 1.5px solid var(--color-border-strong);
     border-bottom: 1.5px solid var(--color-border-strong);
   }
+  .course-body blockquote {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .course-body blockquote {
+      opacity: 1;
+      transform: none;
+    }
+  }
 </style>
