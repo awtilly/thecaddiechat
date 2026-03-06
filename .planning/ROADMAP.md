@@ -89,11 +89,12 @@ Plans:
   1. Cards, links, and navigation elements all have polished hover states with smooth transitions
   2. A visitor browsing from homepage through chronicles to courses to camera roll experiences a unified animation style -- no jarring inconsistencies
   3. Navigation transitions feel smooth and intentional, with visual feedback on interaction
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
 - [x] 05-01-PLAN.md — Migrate 6 UI components to motion tokens, add cursor:pointer to cards, fix CourseItem hover, add Footer underline animation, global focus-visible rule, article body link styles
-- [ ] 05-02-PLAN.md — Migrate 5 MDX image components and 4 page files to motion tokens, verify zero hard-coded transitions remain
+- [x] 05-02-PLAN.md — Migrate 5 MDX image components and 4 page files to motion tokens, verify zero hard-coded transitions remain
+- [ ] 05-03-PLAN.md — Gap closure: replace last 2 hard-coded transitions in Breadcrumb.astro and ArticleNav.astro with motion tokens
 
 ## Progress
 
@@ -106,4 +107,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Image & Font Performance | 3/3 | Complete | 2026-03-05 |
 | 3. Design Language | 2/2 | Complete   | 2026-03-05 |
 | 4. Cinematic Animation | 3/3 | Complete | 2026-03-05 |
-| 5. Visual Polish & Cohesion | 1/2 | In Progress | - |
+| 5. Visual Polish & Cohesion | 2/3 | In Progress | - |
