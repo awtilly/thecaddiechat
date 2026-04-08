@@ -8,8 +8,11 @@ const chronicles = defineCollection({
       title: z.string(),
       description: z.string(),
       date: z.coerce.date(),
-      heroImage: image(),
+      heroImage: image().optional(),
       meta: z.string(),
+      draft: z.boolean().default(false),
+      sourceUrl: z.string().optional(),
+      sourcesConsidered: z.array(z.string()).optional(),
       prev: z
         .object({
           slug: z.string(),

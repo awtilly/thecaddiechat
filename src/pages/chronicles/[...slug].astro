@@ -9,7 +9,11 @@ import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const chronicles = await getCollection('chronicles');
-  return chronicles.map((entry) => ({
+  // Exclude drafts from the production build; they remain accessible in dev
+  const entries = import.meta.env.PROD
+    ? chronicles.filter((e) => !e.data.draft)
+    : chronicles;
+  return entries.map((entry) => ({
     params: { slug: entry.id },
     props: { entry },
   }));

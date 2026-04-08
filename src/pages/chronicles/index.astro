@@ -5,9 +5,11 @@ import PostCard from '../../components/PostCard.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import { getCollection } from 'astro:content';
 
-const chronicles = await getCollection('chronicles');
-// Sort by date descending
-chronicles.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allChronicles = await getCollection('chronicles');
+// Drafts are never shown in the main listing — review them at /admin/drafts
+const chronicles = allChronicles
+  .filter((e) => !e.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 // Featured = first (most recent), rest go in grid
 const featured = chronicles[0];
@@ -26,7 +28,7 @@ const rest = chronicles.slice(1);
         title={featured.data.title}
         description={featured.data.description}
         href={`/chronicles/${featured.id}/`}
-        image={featured.data.heroImage}
+        image={featured.data.heroImage!}
         label="Featured"
       />
 
@@ -36,7 +38,7 @@ const rest = chronicles.slice(1);
             title={chronicle.data.title}
             description={chronicle.data.description}
             href={`/chronicles/${chronicle.id}/`}
-            image={chronicle.data.heroImage}
+            image={chronicle.data.heroImage!}
           />
         ))}
       </div>
