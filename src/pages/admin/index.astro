@@ -646,12 +646,8 @@
             statusEl.textContent = `Error: ${msg}`;
             statusEl.className = 'card-status error';
           }
-          if (res.status === 401) {
-            showToast('Wrong password — please re-enter.', 'error');
-            setTimeout(showGate, 1500);
-          } else {
-            buttons?.forEach((b) => { b.disabled = false; });
-          }
+          showToast(msg, 'error');
+          buttons?.forEach((b) => { b.disabled = false; });
         }
       } catch (err) {
         if (statusEl) {

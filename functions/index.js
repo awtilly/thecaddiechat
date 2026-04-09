@@ -59,12 +59,25 @@ exports.publishDraft = functions.https.onRequest(async (req, res) => {
   const hash = process.env.ADMIN_PASSWORD_HASH;
   if (!hash) {
     functions.logger.error('ADMIN_PASSWORD_HASH env var not set');
-    res.status(500).json({ error: 'Server not configured — set ADMIN_PASSWORD_HASH' });
+    res.status(500).json({ error: 'Server not configured — ADMIN_PASSWORD_HASH missing' });
     return;
   }
 
-  const valid = await bcrypt.compare(password, hash);
+  // Trim whitespace defensively — a trailing space or newline in functions/.env
+  // causes bcrypt.compare to always return false.
+  const trimmedHash = hash.trim();
+  if (!trimmedHash.startsWith('$2')) {
+    functions.logger.error('ADMIN_PASSWORD_HASH does not look like a bcrypt hash', {
+      length: hash.length,
+      prefix: hash.slice(0, 4),
+    });
+    res.status(500).json({ error: 'Server not configured — ADMIN_PASSWORD_HASH is not a valid bcrypt hash' });
+    return;
+  }
+
+  const valid = await bcrypt.compare(password, trimmedHash);
   if (!valid) {
+    functions.logger.warn('Password mismatch', { hashPrefix: trimmedHash.slice(0, 7) });
     res.status(401).json({ error: 'Invalid password' });
     return;
   }
