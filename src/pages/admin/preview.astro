@@ -4,7 +4,7 @@
 // Renders a draft chronicle in the actual site layout (BaseLayout + Nav + Footer)
 // so the user gets a true preview of what the published article will look like.
 //
-// Gate: if no admin password is in sessionStorage, redirects to /admin/.
+// Gate: if no admin password is in localStorage, redirects to /admin/.
 // Content: fetched client-side from the GitHub Contents API, rendered with marked.js.
 //
 // URL format: /admin/preview/?slug=my-draft-slug
@@ -203,7 +203,7 @@ import Footer from '../../components/Footer.astro';
     var GITHUB_REPO = 'awtilly/thecaddiechat';
 
     // Gate: redirect to /admin/ if not authenticated
-    var pw = sessionStorage.getItem(SESSION_KEY);
+    var pw = localStorage.getItem(SESSION_KEY);
     if (!pw) {
       window.location.href = '/admin/';
       return;

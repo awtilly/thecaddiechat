@@ -406,10 +406,10 @@
     const toastEl     = document.getElementById('toast');
 
     // ── Auth ──────────────────────────────────────────────
-    let password = sessionStorage.getItem(SESSION_KEY) || '';
+    let password = localStorage.getItem(SESSION_KEY) || '';
 
     function showGate() {
-      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(SESSION_KEY);
       password = '';
       gateEl.hidden = false;
       appEl.hidden = true;
@@ -420,7 +420,7 @@
 
     function showApp(pw) {
       password = pw;
-      sessionStorage.setItem(SESSION_KEY, pw);
+      localStorage.setItem(SESSION_KEY, pw);
       gateEl.hidden = true;
       appEl.hidden = false;
       loadDrafts();
@@ -672,8 +672,8 @@
     }
 
     // ── Init ──────────────────────────────────────────────
-    // If a password is already in sessionStorage (same browser session),
-    // skip the gate and go straight to drafts.
+    // If a password is already in localStorage, skip the gate.
+    // localStorage persists across tabs so Preview links (target=_blank) work.
     if (password) {
       gateEl.hidden = true;
       appEl.hidden = false;
