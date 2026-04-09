@@ -6,7 +6,7 @@
 // verifying the admin password — nothing sensitive is embedded here.
 //
 // Required setup (one-time, see functions/README.md):
-//   1. Deploy functions/index.js to Firebase (project: greendoor-2da47)
+//   1. Deploy functions/index.js to Firebase (project: thecaddiechat-178de)
 //   2. Set ADMIN_PASSWORD_HASH and GITHUB_TOKEN env vars on the function
 //   3. Create a PUBLISH_PAT repo secret in awtilly/thecaddiechat
 //   4. Update FUNCTION_URL below if your Firebase region differs from us-central1
@@ -382,10 +382,10 @@
 
   <script>
     // ── Config ────────────────────────────────────────────
-    // Firebase function URL — based on project greendoor-2da47, region us-central1.
-    // Update this if you deploy to a different project or region.
+    // Firebase function URL — based on project thecaddiechat-178de, region us-central1.
+    // Update this if you deploy to a different region.
     const FUNCTION_URL =
-      'https://us-central1-greendoor-2da47.cloudfunctions.net/publishDraft';
+      'https://us-central1-thecaddiechat-178de.cloudfunctions.net/publishDraft';
 
     const GITHUB_REPO = 'awtilly/thecaddiechat';
     const CHRONICLES_API =

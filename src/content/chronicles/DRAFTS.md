@@ -58,7 +58,7 @@ No local dev server needed. Works from phone, tablet, or any browser.
 ### What happens after Publish / Discard
 
 The admin page calls a Firebase Cloud Function (`publishDraft` on project
-`greendoor-2da47`), which:
+`thecaddiechat-178de`), which:
 
 1. Verifies the admin password (bcrypt hash stored in Firebase env)
 2. Calls GitHub's `workflow_dispatch` API to run `.github/workflows/publish-draft.yml`

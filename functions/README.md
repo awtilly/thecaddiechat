@@ -1,20 +1,5 @@
 # The Caddie Chat — Firebase Admin Function
 
-## TODO: Confirm Firebase project before deploying
-
-> **Check before running `firebase deploy`:** This function is configured to deploy
-> to the **greendoor-2da47** project (from `../.firebaserc`). That project belongs
-> to the stoekmedia Greendoor app. If you'd rather keep thecaddiechat isolated,
-> create a new Firebase project called `thecaddiechat-admin` and update
-> `.firebaserc` with its project ID. Then update `FUNCTION_URL` in
-> `src/pages/admin/index.astro` to match the new project ID.
->
-> If you're comfortable sharing `greendoor-2da47`, proceed as-is — the
-> `publishDraft` function will be added alongside the existing Greendoor functions
-> and `firebase deploy --only functions:publishDraft` will NOT touch them.
-
----
-
 ## What this does
 
 `publishDraft` is an HTTPS Firebase Cloud Function that:
@@ -77,7 +62,7 @@ Copy the `$2b$...` hash string.
 firebase functions:config:set \
   admin.password_hash='$2b$12$YOUR_HASH_HERE' \
   admin.github_token='github_pat_YOUR_TOKEN_HERE' \
-  --project greendoor-2da47
+  --project thecaddiechat-178de
 ```
 
 Then update `functions/index.js` to read from Firebase config, **OR** use the
@@ -108,13 +93,13 @@ do not re-trigger other workflows — using a PAT does.)
 
 ```bash
 # From the repo root
-firebase deploy --only functions:publishDraft --project greendoor-2da47
+firebase deploy --only functions:publishDraft --project thecaddiechat-178de
 ```
 
 The function URL will be printed after deploy:
 
 ```
-Function URL (publishDraft): https://us-central1-greendoor-2da47.cloudfunctions.net/publishDraft
+Function URL (publishDraft): https://us-central1-thecaddiechat-178de.cloudfunctions.net/publishDraft
 ```
 
 This URL is already set in `src/pages/admin/index.astro`. If your region differs
@@ -129,11 +114,11 @@ You can test the function without deploying using the Firebase emulator:
 
 ```bash
 cd functions && npm install
-firebase emulators:start --only functions --project greendoor-2da47
+firebase emulators:start --only functions --project thecaddiechat-178de
 ```
 
 The emulator URL will be something like:
-`http://localhost:5001/greendoor-2da47/us-central1/publishDraft`
+`http://localhost:5001/thecaddiechat-178de/us-central1/publishDraft`
 
 Temporarily swap `FUNCTION_URL` in `src/pages/admin/index.astro` while testing,
 then restore before committing.
