@@ -1,15 +1,7 @@
 ---
 // /admin/ — cloud-based draft review for The Caddie Chat.
-//
-// This is a fully static Astro page deployed to GitHub Pages.
-// All logic runs client-side. Security relies on the Firebase function
-// verifying the admin password — nothing sensitive is embedded here.
-//
-// Required setup (one-time, see functions/README.md):
-//   1. Deploy functions/index.js to Firebase (project: thecaddiechat-178de)
-//   2. Set ADMIN_PASSWORD_HASH and GITHUB_TOKEN env vars on the function
-//   3. Create a PUBLISH_PAT repo secret in awtilly/thecaddiechat
-//   4. Update FUNCTION_URL below if your Firebase region differs from us-central1
+// Static Astro page — all logic is client-side.
+// Security: password verified by the Firebase function (functions/index.js).
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -18,12 +10,153 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Admin — The Caddie Chat</title>
+
+  <!--
+    is:global — fixes the HTML `hidden` attribute being overridden by the
+    author stylesheet (Astro scoped CSS gains higher specificity than the
+    UA `[hidden] { display: none }`).
+  -->
+  <style is:global>
+    [hidden] { display: none !important; }
+
+    /*
+      Card styles are global because the cards are injected via innerHTML
+      and therefore lack the Astro data-cid attribute needed for scoped CSS.
+    */
+    .loading-state,
+    .empty-state,
+    .error-msg {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 3rem 1rem;
+    }
+    .error-msg { color: var(--danger); }
+
+    .draft-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-header {
+      background: #fafaf9;
+      border-bottom: 1px solid #eee;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem 0.75rem;
+    }
+
+    .draft-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #f0c040;
+      color: #5a3e00;
+      padding: 0.2em 0.5em;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      flex: 1;
+      min-width: 180px;
+      margin: 0;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .card-body { padding: 0.9rem 1.1rem; }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: #444;
+      margin: 0 0 0.7rem;
+    }
+
+    .card-preview {
+      font-size: 0.78rem;
+      font-family: 'Courier New', monospace;
+      color: #555;
+      background: #f8f8f7;
+      border-left: 3px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0 0 0.7rem;
+    }
+
+    .card-source {
+      font-size: 0.78rem;
+      color: var(--muted);
+      word-break: break-all;
+      margin: 0;
+    }
+    .card-source a { color: #2d5a3f; }
+
+    .card-actions {
+      padding: 0.7rem 1.1rem;
+      border-top: 1px solid #eee;
+      background: #fafaf9;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .admin-btn {
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+      line-height: 1.4;
+    }
+    .admin-btn:hover { opacity: 0.85; }
+    .admin-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-preview  { background: #e8f0eb; color: #2d5a3f; }
+    .btn-publish  { background: #2d5a3f; color: #fff; }
+    .btn-discard  { background: #fee; color: #c00; }
+
+    .card-status {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+    .card-status.success { color: #2d5a3f; }
+    .card-status.error   { color: #c00; }
+
+    @media (max-width: 500px) {
+      .card-header, .card-body { padding: 0.75rem 0.9rem; }
+      .card-actions { padding: 0.6rem 0.9rem; }
+      .card-title { font-size: 0.95rem; }
+      .admin-btn { padding: 0.5rem 0.85rem; }
+    }
+  </style>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --green: #2d5a3f;
-      --green-light: #e8f0eb;
       --cream: #f5f4f2;
       --border: #ddd;
       --text: #1a1a1a;
@@ -72,7 +205,6 @@
     .gate-card h1 {
       font-size: 1.3rem;
       font-weight: 600;
-      color: var(--text);
       margin-bottom: 1.5rem;
     }
 
@@ -97,7 +229,6 @@
       transition: border-color 0.15s;
       margin-bottom: 0.9rem;
     }
-
     .gate-input:focus { border-color: var(--green); }
 
     .gate-btn {
@@ -113,7 +244,6 @@
       cursor: pointer;
       transition: opacity 0.15s;
     }
-
     .gate-btn:hover { opacity: 0.88; }
     .gate-btn:active { opacity: 0.75; }
 
@@ -164,7 +294,6 @@
       transition: border-color 0.15s, color 0.15s;
       white-space: nowrap;
     }
-
     .lock-btn:hover { border-color: #aaa; color: var(--text); }
 
     .app-subtitle {
@@ -174,7 +303,6 @@
       margin: 0.3rem auto 0;
     }
 
-    /* ── Main content ───────────────────────────────────── */
     .app-main {
       flex: 1;
       padding: 1.5rem 1.25rem;
@@ -183,159 +311,32 @@
       margin: 0 auto;
     }
 
-    .loading-state,
-    .empty-state,
-    .error-msg {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.95rem;
-      padding: 3rem 1rem;
-    }
-
-    .error-msg { color: var(--danger); }
-
-    /* ── Draft cards ────────────────────────────────────── */
-    .draft-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 1.25rem;
-    }
-
-    .card-header {
-      background: #fafaf9;
-      border-bottom: 1px solid #eee;
-      padding: 0.9rem 1.1rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 0.5rem 0.75rem;
-    }
-
-    .draft-badge {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: #f0c040;
-      color: #5a3e00;
-      padding: 0.2em 0.5em;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 600;
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .card-meta {
-      font-size: 0.75rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .card-body { padding: 0.9rem 1.1rem; }
-
-    .card-desc {
-      font-size: 0.88rem;
-      color: #444;
-      margin-bottom: 0.7rem;
-    }
-
-    .card-preview {
-      font-size: 0.78rem;
-      font-family: 'Courier New', monospace;
-      color: #555;
-      background: #f8f8f7;
-      border-left: 3px solid var(--border);
-      padding: 0.6rem 0.8rem;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin-bottom: 0.7rem;
-    }
-
-    .card-source {
-      font-size: 0.78rem;
-      color: var(--muted);
-      word-break: break-all;
-    }
-
-    .card-source a { color: var(--green); }
-
-    .card-actions {
-      padding: 0.7rem 1.1rem;
-      border-top: 1px solid #eee;
-      background: #fafaf9;
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 0.45rem 1rem;
-      font-size: 0.82rem;
-      font-weight: 600;
-      font-family: var(--font);
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: opacity 0.15s;
-      white-space: nowrap;
-    }
-
-    .btn:hover { opacity: 0.85; }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-    .btn-publish { background: var(--green); color: #fff; }
-    .btn-discard { background: var(--danger-bg); color: var(--danger); }
-
-    .card-status {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-left: auto;
-    }
-
-    .card-status.success { color: var(--green); }
-    .card-status.error { color: var(--danger); }
-
     /* ── Toast ──────────────────────────────────────────── */
+    /*
+      Use bottom-based show/hide instead of translateY(%) — the % is relative
+      to the element's own height, which made the math unreliable for short
+      empty elements (causing a partial black bar to show at the viewport edge).
+    */
     .toast {
       position: fixed;
-      bottom: 1.5rem;
+      bottom: -5rem;
       left: 50%;
-      transform: translateX(-50%) translateY(120%);
+      transform: translateX(-50%);
       background: #1a1a1a;
       color: #fff;
       padding: 0.65rem 1.25rem;
       border-radius: var(--radius);
       font-size: 0.85rem;
       font-weight: 500;
-      white-space: nowrap;
       max-width: calc(100vw - 2rem);
       white-space: normal;
       text-align: center;
-      transition: transform 0.25s ease;
+      transition: bottom 0.25s ease;
       z-index: 100;
       pointer-events: none;
     }
-
-    .toast.toast--visible { transform: translateX(-50%) translateY(0); }
+    .toast.toast--visible { bottom: 1.5rem; }
     .toast.toast--error { background: var(--danger); }
-
-    /* ── Mobile ─────────────────────────────────────────── */
-    @media (max-width: 500px) {
-      .app-main { padding: 1rem 0.75rem; }
-      .card-header { padding: 0.75rem 0.9rem; }
-      .card-body { padding: 0.75rem 0.9rem; }
-      .card-actions { padding: 0.6rem 0.9rem; }
-      .card-title { font-size: 0.95rem; }
-      .btn { padding: 0.5rem 0.85rem; }
-    }
   </style>
 </head>
 <body>
@@ -361,7 +362,7 @@
     </div>
   </div>
 
-  <!-- ── App (hidden until authenticated) ───────────── -->
+  <!-- ── App (shown only after password submitted) ──── -->
   <div id="app" hidden>
     <header class="app-header">
       <div class="app-header-row">
@@ -382,8 +383,7 @@
 
   <script>
     // ── Config ────────────────────────────────────────────
-    // Firebase function URL — based on project thecaddiechat-178de, region us-central1.
-    // Update this if you deploy to a different region.
+    // Firebase function URL — project thecaddiechat-178de, region us-central1.
     const FUNCTION_URL =
       'https://us-central1-thecaddiechat-178de.cloudfunctions.net/publishDraft';
 
@@ -393,17 +393,17 @@
     const SESSION_KEY = 'tcc-admin-pw';
 
     // ── DOM refs ──────────────────────────────────────────
-    const gateEl      = /** @type {HTMLElement} */ (document.getElementById('gate'));
-    const gateForm    = /** @type {HTMLFormElement} */ (document.getElementById('gate-form'));
-    const pwInput     = /** @type {HTMLInputElement} */ (document.getElementById('pw-input'));
-    const gateErr     = /** @type {HTMLElement} */ (document.getElementById('gate-err'));
-    const appEl       = /** @type {HTMLElement} */ (document.getElementById('app'));
-    const appSubtitle = /** @type {HTMLElement} */ (document.getElementById('app-subtitle'));
-    const lockBtn     = /** @type {HTMLButtonElement} */ (document.getElementById('lock-btn'));
-    const loadingEl   = /** @type {HTMLElement} */ (document.getElementById('loading'));
-    const emptyEl     = /** @type {HTMLElement} */ (document.getElementById('empty'));
-    const draftsEl    = /** @type {HTMLElement} */ (document.getElementById('drafts-list'));
-    const toastEl     = /** @type {HTMLElement} */ (document.getElementById('toast'));
+    const gateEl      = document.getElementById('gate');
+    const gateForm    = document.getElementById('gate-form');
+    const pwInput     = document.getElementById('pw-input');
+    const gateErr     = document.getElementById('gate-err');
+    const appEl       = document.getElementById('app');
+    const appSubtitle = document.getElementById('app-subtitle');
+    const lockBtn     = document.getElementById('lock-btn');
+    const loadingEl   = document.getElementById('loading');
+    const emptyEl     = document.getElementById('empty');
+    const draftsEl    = document.getElementById('drafts-list');
+    const toastEl     = document.getElementById('toast');
 
     // ── Auth ──────────────────────────────────────────────
     let password = sessionStorage.getItem(SESSION_KEY) || '';
@@ -436,46 +436,47 @@
     });
 
     // ── Frontmatter parser ────────────────────────────────
-    /**
-     * Parse MDX frontmatter and return draft fields, or null if not a draft.
-     */
     function parseFrontmatter(raw) {
       const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
       if (!fmMatch) return null;
 
-      const fm = fmMatch[0];
-      const body = raw.slice(fm.length).trim();
+      const fmBlock = fmMatch[1];
+      const body = raw.slice(fmMatch[0].length).trim();
 
       function getField(key) {
         const re = new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm');
-        const m = fmMatch[1].match(re);
+        const m = fmBlock.match(re);
         if (!m) return null;
         let val = m[1].trim();
         if (
           (val.startsWith('"') && val.endsWith('"')) ||
           (val.startsWith("'") && val.endsWith("'"))
-        ) {
-          val = val.slice(1, -1);
-        }
+        ) val = val.slice(1, -1);
         return val;
       }
 
       if (getField('draft') !== 'true') return null;
 
-      // Parse sourcesConsidered YAML list
-      const scMatch = fmMatch[1].match(
-        /^sourcesConsidered:\s*\n((?:[ \t]+-[ \t]+.+\n?)+)/m
-      );
+      const scMatch = fmBlock.match(/^sourcesConsidered:\s*\n((?:[ \t]+-[ \t]+.+\n?)+)/m);
       const sourcesConsidered = scMatch
-        ? (scMatch[1].match(/[ \t]+-[ \t]+(.+)/g) || []).map((l) =>
-            l.replace(/^[ \t]+-[ \t]+/, '').trim()
+        ? (scMatch[1].match(/[ \t]+-[ \t]+(.+)/g) || []).map(
+            (l) => l.replace(/^[ \t]+-[ \t]+/, '').trim()
           )
         : [];
 
-      // Strip markdown headings and HTML tags from preview
+      // Strip markdown/MDX syntax to produce a clean plain-text excerpt
       const preview = body
-        .replace(/^#+\s+/gm, '')
-        .replace(/<[^>]+>/g, '')
+        .replace(/^#+\s+/gm, '')                          // headings
+        .replace(/^>\s*/gm, '')                            // blockquote markers
+        .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')         // images → alt text
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')          // links → link text
+        .replace(/\*\*([^*]+)\*\*/g, '$1')                // bold → text
+        .replace(/\*([^*]+)\*/g, '$1')                    // italic → text
+        .replace(/`([^`]+)`/g, '$1')                      // inline code → text
+        .replace(/<[^>]+>([^<]*)<\/[^>]+>/g, '$1')        // HTML tags with inner text
+        .replace(/<[^>]+>/g, '')                           // remaining HTML tags
+        .replace(/\n{2,}/g, ' ')                           // collapse blank lines
+        .replace(/\n/g, ' ')                               // remaining newlines → spaces
         .trim()
         .slice(0, 300);
 
@@ -503,9 +504,7 @@
         if (!dirRes.ok) throw new Error(`GitHub API ${dirRes.status}`);
 
         const files = await dirRes.json();
-        const mdxFiles = files.filter(
-          (f) => f.type === 'file' && f.name.endsWith('.mdx')
-        );
+        const mdxFiles = files.filter((f) => f.type === 'file' && f.name.endsWith('.mdx'));
 
         if (mdxFiles.length === 0) {
           loadingEl.hidden = true;
@@ -513,7 +512,6 @@
           return;
         }
 
-        // Fetch all file contents in parallel
         const contents = await Promise.all(
           mdxFiles.map((f) =>
             fetch(f.url, { headers: { Accept: 'application/vnd.github+json' } })
@@ -524,16 +522,13 @@
 
         const drafts = [];
         for (const { name, data } of contents) {
-          // GitHub returns base64 content with embedded newlines
           const raw = atob(data.content.replace(/\s/g, ''));
           const slug = name.replace(/\.mdx$/, '');
           const parsed = parseFrontmatter(raw);
           if (parsed) drafts.push({ slug, ...parsed });
         }
 
-        // Sort newest first
         drafts.sort((a, b) => (b.date > a.date ? 1 : -1));
-
         loadingEl.hidden = true;
 
         if (drafts.length === 0) {
@@ -554,16 +549,14 @@
     function updateSubtitle(n) {
       appSubtitle.textContent = n === 0
         ? 'No pending drafts.'
-        : `${n} draft${n === 1 ? '' : 's'} pending review — deploy takes ~1–2 min after action.`;
+        : `${n} draft${n === 1 ? '' : 's'} pending — site rebuilds ~1–2 min after action.`;
     }
 
     // ── Render card ───────────────────────────────────────
     function renderCard(draft) {
       const formattedDate = draft.date
         ? new Date(draft.date + 'T12:00:00Z').toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
+            year: 'numeric', month: 'long', day: 'numeric',
           })
         : '';
 
@@ -587,8 +580,9 @@
     ${sourceHtml}
   </div>
   <footer class="card-actions">
-    <button class="btn btn-publish" data-slug="${slug}" data-action="publish">Publish</button>
-    <button class="btn btn-discard" data-slug="${slug}" data-action="discard">Discard</button>
+    <a href="/admin/preview/?slug=${slug}" target="_blank" class="admin-btn btn-preview">Preview →</a>
+    <button class="admin-btn btn-publish" data-slug="${slug}" data-action="publish">Publish</button>
+    <button class="admin-btn btn-discard" data-slug="${slug}" data-action="discard">Discard</button>
     <span class="card-status" id="status-${slug}"></span>
   </footer>
 </article>`;
@@ -678,6 +672,8 @@
     }
 
     // ── Init ──────────────────────────────────────────────
+    // If a password is already in sessionStorage (same browser session),
+    // skip the gate and go straight to drafts.
     if (password) {
       gateEl.hidden = true;
       appEl.hidden = false;

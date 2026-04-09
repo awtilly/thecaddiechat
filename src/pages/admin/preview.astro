@@ -1,0 +1,302 @@
+---
+// /admin/preview/?slug=<slug>
+//
+// Renders a draft chronicle in the actual site layout (BaseLayout + Nav + Footer)
+// so the user gets a true preview of what the published article will look like.
+//
+// Gate: if no admin password is in sessionStorage, redirects to /admin/.
+// Content: fetched client-side from the GitHub Contents API, rendered with marked.js.
+//
+// URL format: /admin/preview/?slug=my-draft-slug
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout title="Draft Preview — The Caddie Chat">
+  <Nav />
+
+  <div class="container">
+    <header class="article-header">
+      <div class="breadcrumb">
+        <a href="/admin/">← Admin</a>
+      </div>
+      <p id="preview-badge" class="preview-badge" hidden>Draft Preview</p>
+      <h1 id="preview-title" class="preview-title-placeholder">Loading…</h1>
+      <div class="article-meta" id="preview-meta"></div>
+    </header>
+  </div>
+
+  <div class="divider"></div>
+
+  <section class="section-pad">
+    <div class="article-body" id="preview-body">
+      <p class="preview-fetching">Fetching draft…</p>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<!--
+  Override the blockquote entrance animation from BaseLayout's GSAP script.
+  On real article pages, GSAP animates blockquotes from opacity:0.
+  On the preview page, GSAP's path check won't fire initStorytellingAnimations(),
+  so we reset blockquotes to visible here.
+-->
+<style is:global>
+  #preview-body blockquote {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+</style>
+
+<style>
+  /* Article header — mirrors ArticleLayout.astro */
+  .article-header {
+    padding: calc(var(--nav-height) + var(--space-xl)) 0 var(--space-md);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+  }
+  .breadcrumb a {
+    color: var(--color-accent);
+    transition: var(--transition-color);
+  }
+  .breadcrumb a:hover { color: var(--color-text-primary); }
+
+  .preview-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #f0c040;
+    color: #5a3e00;
+    padding: 0.2em 0.6em;
+    border-radius: 3px;
+    margin-bottom: 0.6rem;
+  }
+
+  .article-header h1 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-2xl);
+    font-weight: 500;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    margin-bottom: var(--space-sm);
+  }
+
+  .preview-title-placeholder { opacity: 0.3; }
+
+  .article-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .preview-fetching {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 4rem 0;
+  }
+</style>
+
+<!--
+  Article body styles — copied from ArticleLayout.astro's is:global block.
+  Required here because ArticleLayout is not used directly; we replicate
+  the shell so content can be injected client-side.
+-->
+<style is:global>
+  .article-body {
+    max-width: var(--measure-wide);
+    margin: 0 auto;
+    padding-bottom: var(--space-2xl);
+  }
+  .article-body p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+    line-height: var(--leading-loose);
+    margin-bottom: 1.5rem;
+  }
+  .article-body a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(45, 90, 63, 0.3);
+    transition: color var(--duration-fast) var(--ease-out),
+                text-decoration-color var(--duration-fast) var(--ease-out);
+  }
+  .article-body a:hover {
+    color: var(--color-accent-light);
+    text-decoration-color: var(--color-accent-light);
+  }
+  .article-body > p:first-child::first-letter {
+    font-family: var(--font-display);
+    font-size: var(--font-size-4xl);
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.08em;
+    margin-top: 0.05em;
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+  .article-body h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    color: var(--color-text-primary);
+  }
+  .article-body h3 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    line-height: var(--leading-snug);
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+    color: var(--color-text-primary);
+  }
+  .article-body blockquote {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-md);
+    margin: var(--space-md) 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--font-size-md);
+    color: var(--color-text-primary);
+    line-height: var(--leading-relaxed);
+  }
+  .article-body .pull-quote {
+    text-align: center;
+    padding: var(--space-lg) var(--space-md);
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-style: italic;
+    color: var(--color-accent);
+    line-height: var(--leading-snug);
+    max-width: none;
+    margin: var(--space-lg) auto;
+    border-top: 1.5px solid var(--color-border-strong);
+    border-bottom: 1.5px solid var(--color-border-strong);
+  }
+  .article-body strong { color: var(--color-text-primary); }
+  .article-body code {
+    font-size: 0.875em;
+    background: var(--color-surface);
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var SESSION_KEY = 'tcc-admin-pw';
+    var GITHUB_REPO = 'awtilly/thecaddiechat';
+
+    // Gate: redirect to /admin/ if not authenticated
+    var pw = sessionStorage.getItem(SESSION_KEY);
+    if (!pw) {
+      window.location.href = '/admin/';
+      return;
+    }
+
+    // Read slug from query string
+    var params = new URLSearchParams(location.search);
+    var slug = params.get('slug');
+    if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+      window.location.href = '/admin/';
+      return;
+    }
+
+    async function loadPreview() {
+      var titleEl  = document.getElementById('preview-title');
+      var metaEl   = document.getElementById('preview-meta');
+      var bodyEl   = document.getElementById('preview-body');
+      var badgeEl  = document.getElementById('preview-badge');
+
+      try {
+        // Fetch file content from GitHub Contents API
+        var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO
+          + '/contents/src/content/chronicles/' + slug + '.mdx';
+        var res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github+json' } });
+        if (!res.ok) throw new Error('GitHub API ' + res.status + ' — file not found for slug: ' + slug);
+
+        var data = await res.json();
+        var raw = atob(data.content.replace(/\s/g, ''));
+
+        // Parse frontmatter
+        var fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+        if (!fmMatch) throw new Error('No frontmatter found in ' + slug + '.mdx');
+
+        var fmBlock = fmMatch[1];
+        var body    = raw.slice(fmMatch[0].length).trim();
+
+        function getField(key) {
+          var re = new RegExp('^' + key + ':\\s*(.+?)\\s*$', 'm');
+          var m = fmBlock.match(re);
+          if (!m) return null;
+          var val = m[1].trim();
+          if ((val[0] === '"' && val[val.length-1] === '"') ||
+              (val[0] === "'" && val[val.length-1] === "'")) {
+            val = val.slice(1, -1);
+          }
+          return val;
+        }
+
+        var title = getField('title') || slug;
+        var meta  = getField('meta')  || '';
+        var date  = getField('date')  || '';
+        var draft = getField('draft');
+
+        // Update page title
+        document.title = 'Preview: ' + title + ' — The Caddie Chat';
+
+        // Update header elements
+        if (titleEl) {
+          titleEl.textContent = title;
+          titleEl.classList.remove('preview-title-placeholder');
+        }
+        if (badgeEl) {
+          badgeEl.hidden = false;
+        }
+        if (metaEl) {
+          var dateStr = date
+            ? new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+              })
+            : '';
+          var parts = [meta, '·', 'The Caddie Chat', dateStr && ('· ' + dateStr)].filter(Boolean);
+          metaEl.textContent = parts.join(' ');
+        }
+
+        // Render markdown body using marked.js from CDN
+        var markedModule = await import('https://cdn.jsdelivr.net/npm/marked@15/marked.esm.min.js');
+        var marked = markedModule.marked;
+        var html = marked.parse(body, { breaks: false, gfm: true });
+
+        if (bodyEl) bodyEl.innerHTML = html;
+
+      } catch (err) {
+        if (titleEl) {
+          titleEl.textContent = 'Error loading draft';
+          titleEl.classList.remove('preview-title-placeholder');
+        }
+        if (bodyEl) {
+          bodyEl.innerHTML = '<p style="color:#c00;text-align:center;padding:4rem 0;">'
+            + 'Error: ' + err.message + '</p>';
+        }
+      }
+    }
+
+    loadPreview();
+  })();
+</script>
