@@ -1,0 +1,688 @@
+---
+// /admin/ — cloud-based draft review for The Caddie Chat.
+//
+// This is a fully static Astro page deployed to GitHub Pages.
+// All logic runs client-side. Security relies on the Firebase function
+// verifying the admin password — nothing sensitive is embedded here.
+//
+// Required setup (one-time, see functions/README.md):
+//   1. Deploy functions/index.js to Firebase (project: greendoor-2da47)
+//   2. Set ADMIN_PASSWORD_HASH and GITHUB_TOKEN env vars on the function
+//   3. Create a PUBLISH_PAT repo secret in awtilly/thecaddiechat
+//   4. Update FUNCTION_URL below if your Firebase region differs from us-central1
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — The Caddie Chat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #2d5a3f;
+      --green-light: #e8f0eb;
+      --cream: #f5f4f2;
+      --border: #ddd;
+      --text: #1a1a1a;
+      --muted: #666;
+      --danger: #c00;
+      --danger-bg: #fee;
+      --radius: 6px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Gate ───────────────────────────────────────────── */
+    #gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .gate-card {
+      width: 100%;
+      max-width: 360px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.75rem;
+    }
+
+    .gate-logo {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.25rem;
+    }
+
+    .gate-card h1 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+
+    .gate-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .gate-input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-size: 1rem;
+      font-family: var(--font);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 0.9rem;
+    }
+
+    .gate-input:focus { border-color: var(--green); }
+
+    .gate-btn {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: var(--font);
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .gate-btn:hover { opacity: 0.88; }
+    .gate-btn:active { opacity: 0.75; }
+
+    .gate-error {
+      margin-top: 0.75rem;
+      font-size: 0.82rem;
+      color: var(--danger);
+      text-align: center;
+    }
+
+    /* ── App shell ──────────────────────────────────────── */
+    #app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .app-header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .app-header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .lock-btn {
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: var(--font);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.3rem 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .lock-btn:hover { border-color: #aaa; color: var(--text); }
+
+    .app-subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 900px;
+      margin: 0.3rem auto 0;
+    }
+
+    /* ── Main content ───────────────────────────────────── */
+    .app-main {
+      flex: 1;
+      padding: 1.5rem 1.25rem;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .loading-state,
+    .empty-state,
+    .error-msg {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 3rem 1rem;
+    }
+
+    .error-msg { color: var(--danger); }
+
+    /* ── Draft cards ────────────────────────────────────── */
+    .draft-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-header {
+      background: #fafaf9;
+      border-bottom: 1px solid #eee;
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem 0.75rem;
+    }
+
+    .draft-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #f0c040;
+      color: #5a3e00;
+      padding: 0.2em 0.5em;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .card-body { padding: 0.9rem 1.1rem; }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: #444;
+      margin-bottom: 0.7rem;
+    }
+
+    .card-preview {
+      font-size: 0.78rem;
+      font-family: 'Courier New', monospace;
+      color: #555;
+      background: #f8f8f7;
+      border-left: 3px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 0.7rem;
+    }
+
+    .card-source {
+      font-size: 0.78rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .card-source a { color: var(--green); }
+
+    .card-actions {
+      padding: 0.7rem 1.1rem;
+      border-top: 1px solid #eee;
+      background: #fafaf9;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: var(--font);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-publish { background: var(--green); color: #fff; }
+    .btn-discard { background: var(--danger-bg); color: var(--danger); }
+
+    .card-status {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .card-status.success { color: var(--green); }
+    .card-status.error { color: var(--danger); }
+
+    /* ── Toast ──────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      max-width: calc(100vw - 2rem);
+      white-space: normal;
+      text-align: center;
+      transition: transform 0.25s ease;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .toast.toast--visible { transform: translateX(-50%) translateY(0); }
+    .toast.toast--error { background: var(--danger); }
+
+    /* ── Mobile ─────────────────────────────────────────── */
+    @media (max-width: 500px) {
+      .app-main { padding: 1rem 0.75rem; }
+      .card-header { padding: 0.75rem 0.9rem; }
+      .card-body { padding: 0.75rem 0.9rem; }
+      .card-actions { padding: 0.6rem 0.9rem; }
+      .card-title { font-size: 0.95rem; }
+      .btn { padding: 0.5rem 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Password gate ───────────────────────────────── -->
+  <div id="gate">
+    <div class="gate-card">
+      <div class="gate-logo">The Caddie Chat</div>
+      <h1>Draft Review</h1>
+      <form id="gate-form" autocomplete="off" novalidate>
+        <label for="pw-input" class="gate-label">Admin Password</label>
+        <input
+          type="password"
+          id="pw-input"
+          class="gate-input"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          autofocus
+        />
+        <button type="submit" class="gate-btn">Unlock →</button>
+        <p id="gate-err" class="gate-error" hidden></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── App (hidden until authenticated) ───────────── -->
+  <div id="app" hidden>
+    <header class="app-header">
+      <div class="app-header-row">
+        <h1>Draft Review</h1>
+        <button id="lock-btn" class="lock-btn">Lock</button>
+      </div>
+      <p id="app-subtitle" class="app-subtitle"></p>
+    </header>
+    <main class="app-main">
+      <div id="loading" class="loading-state">Loading drafts…</div>
+      <div id="empty" class="empty-state" hidden>No pending drafts.</div>
+      <div id="drafts-list"></div>
+    </main>
+  </div>
+
+  <!-- ── Toast notification ─────────────────────────── -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // ── Config ────────────────────────────────────────────
+    // Firebase function URL — based on project greendoor-2da47, region us-central1.
+    // Update this if you deploy to a different project or region.
+    const FUNCTION_URL =
+      'https://us-central1-greendoor-2da47.cloudfunctions.net/publishDraft';
+
+    const GITHUB_REPO = 'awtilly/thecaddiechat';
+    const CHRONICLES_API =
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/chronicles`;
+    const SESSION_KEY = 'tcc-admin-pw';
+
+    // ── DOM refs ──────────────────────────────────────────
+    const gateEl      = /** @type {HTMLElement} */ (document.getElementById('gate'));
+    const gateForm    = /** @type {HTMLFormElement} */ (document.getElementById('gate-form'));
+    const pwInput     = /** @type {HTMLInputElement} */ (document.getElementById('pw-input'));
+    const gateErr     = /** @type {HTMLElement} */ (document.getElementById('gate-err'));
+    const appEl       = /** @type {HTMLElement} */ (document.getElementById('app'));
+    const appSubtitle = /** @type {HTMLElement} */ (document.getElementById('app-subtitle'));
+    const lockBtn     = /** @type {HTMLButtonElement} */ (document.getElementById('lock-btn'));
+    const loadingEl   = /** @type {HTMLElement} */ (document.getElementById('loading'));
+    const emptyEl     = /** @type {HTMLElement} */ (document.getElementById('empty'));
+    const draftsEl    = /** @type {HTMLElement} */ (document.getElementById('drafts-list'));
+    const toastEl     = /** @type {HTMLElement} */ (document.getElementById('toast'));
+
+    // ── Auth ──────────────────────────────────────────────
+    let password = sessionStorage.getItem(SESSION_KEY) || '';
+
+    function showGate() {
+      sessionStorage.removeItem(SESSION_KEY);
+      password = '';
+      gateEl.hidden = false;
+      appEl.hidden = true;
+      pwInput.value = '';
+      gateErr.hidden = true;
+      setTimeout(() => pwInput.focus(), 50);
+    }
+
+    function showApp(pw) {
+      password = pw;
+      sessionStorage.setItem(SESSION_KEY, pw);
+      gateEl.hidden = true;
+      appEl.hidden = false;
+      loadDrafts();
+    }
+
+    lockBtn.addEventListener('click', showGate);
+
+    gateForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const pw = pwInput.value.trim();
+      if (!pw) return;
+      showApp(pw);
+    });
+
+    // ── Frontmatter parser ────────────────────────────────
+    /**
+     * Parse MDX frontmatter and return draft fields, or null if not a draft.
+     */
+    function parseFrontmatter(raw) {
+      const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+      if (!fmMatch) return null;
+
+      const fm = fmMatch[0];
+      const body = raw.slice(fm.length).trim();
+
+      function getField(key) {
+        const re = new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm');
+        const m = fmMatch[1].match(re);
+        if (!m) return null;
+        let val = m[1].trim();
+        if (
+          (val.startsWith('"') && val.endsWith('"')) ||
+          (val.startsWith("'") && val.endsWith("'"))
+        ) {
+          val = val.slice(1, -1);
+        }
+        return val;
+      }
+
+      if (getField('draft') !== 'true') return null;
+
+      // Parse sourcesConsidered YAML list
+      const scMatch = fmMatch[1].match(
+        /^sourcesConsidered:\s*\n((?:[ \t]+-[ \t]+.+\n?)+)/m
+      );
+      const sourcesConsidered = scMatch
+        ? (scMatch[1].match(/[ \t]+-[ \t]+(.+)/g) || []).map((l) =>
+            l.replace(/^[ \t]+-[ \t]+/, '').trim()
+          )
+        : [];
+
+      // Strip markdown headings and HTML tags from preview
+      const preview = body
+        .replace(/^#+\s+/gm, '')
+        .replace(/<[^>]+>/g, '')
+        .trim()
+        .slice(0, 300);
+
+      return {
+        title: getField('title') || '(untitled)',
+        description: getField('description') || '',
+        date: getField('date') || '',
+        sourceUrl: getField('sourceUrl') || null,
+        sourcesConsidered,
+        bodyPreview: preview,
+      };
+    }
+
+    // ── Load drafts from GitHub API ───────────────────────
+    async function loadDrafts() {
+      loadingEl.hidden = false;
+      emptyEl.hidden = true;
+      draftsEl.innerHTML = '';
+      appSubtitle.textContent = '';
+
+      try {
+        const dirRes = await fetch(CHRONICLES_API, {
+          headers: { Accept: 'application/vnd.github+json' },
+        });
+        if (!dirRes.ok) throw new Error(`GitHub API ${dirRes.status}`);
+
+        const files = await dirRes.json();
+        const mdxFiles = files.filter(
+          (f) => f.type === 'file' && f.name.endsWith('.mdx')
+        );
+
+        if (mdxFiles.length === 0) {
+          loadingEl.hidden = true;
+          emptyEl.hidden = false;
+          return;
+        }
+
+        // Fetch all file contents in parallel
+        const contents = await Promise.all(
+          mdxFiles.map((f) =>
+            fetch(f.url, { headers: { Accept: 'application/vnd.github+json' } })
+              .then((r) => r.json())
+              .then((data) => ({ name: f.name, data }))
+          )
+        );
+
+        const drafts = [];
+        for (const { name, data } of contents) {
+          // GitHub returns base64 content with embedded newlines
+          const raw = atob(data.content.replace(/\s/g, ''));
+          const slug = name.replace(/\.mdx$/, '');
+          const parsed = parseFrontmatter(raw);
+          if (parsed) drafts.push({ slug, ...parsed });
+        }
+
+        // Sort newest first
+        drafts.sort((a, b) => (b.date > a.date ? 1 : -1));
+
+        loadingEl.hidden = true;
+
+        if (drafts.length === 0) {
+          emptyEl.hidden = false;
+          appSubtitle.textContent = 'No pending drafts.';
+          return;
+        }
+
+        updateSubtitle(drafts.length);
+        draftsEl.innerHTML = drafts.map(renderCard).join('');
+        attachCardListeners();
+      } catch (err) {
+        loadingEl.hidden = true;
+        draftsEl.innerHTML = `<p class="error-msg">Failed to load drafts: ${escHtml(err.message)}</p>`;
+      }
+    }
+
+    function updateSubtitle(n) {
+      appSubtitle.textContent = n === 0
+        ? 'No pending drafts.'
+        : `${n} draft${n === 1 ? '' : 's'} pending review — deploy takes ~1–2 min after action.`;
+    }
+
+    // ── Render card ───────────────────────────────────────
+    function renderCard(draft) {
+      const formattedDate = draft.date
+        ? new Date(draft.date + 'T12:00:00Z').toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        : '';
+
+      const sourceHtml = draft.sourceUrl
+        ? `<p class="card-source">Source: <a href="${escHtml(draft.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escHtml(draft.sourceUrl)}</a></p>`
+        : '';
+
+      const preview = draft.bodyPreview + (draft.bodyPreview.length >= 300 ? '…' : '');
+      const slug = escHtml(draft.slug);
+
+      return `
+<article class="draft-card" id="card-${slug}">
+  <header class="card-header">
+    <span class="draft-badge">Draft</span>
+    <h2 class="card-title">${escHtml(draft.title)}</h2>
+    <span class="card-meta">${escHtml(formattedDate)} &middot; <code>${slug}</code></span>
+  </header>
+  <div class="card-body">
+    <p class="card-desc">${escHtml(draft.description)}</p>
+    <pre class="card-preview">${escHtml(preview)}</pre>
+    ${sourceHtml}
+  </div>
+  <footer class="card-actions">
+    <button class="btn btn-publish" data-slug="${slug}" data-action="publish">Publish</button>
+    <button class="btn btn-discard" data-slug="${slug}" data-action="discard">Discard</button>
+    <span class="card-status" id="status-${slug}"></span>
+  </footer>
+</article>`;
+    }
+
+    function escHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ── Card action handlers ──────────────────────────────
+    function attachCardListeners() {
+      draftsEl.querySelectorAll('.btn-publish, .btn-discard').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const slug = btn.dataset.slug;
+          const action = btn.dataset.action;
+          if (action === 'discard') {
+            if (!confirm(`Discard "${slug}"?\n\nThis permanently deletes the draft.`)) return;
+          }
+          handleAction(slug, action);
+        });
+      });
+    }
+
+    async function handleAction(slug, action) {
+      const card = document.getElementById(`card-${slug}`);
+      const statusEl = document.getElementById(`status-${slug}`);
+      const buttons = card?.querySelectorAll('.btn-publish, .btn-discard');
+
+      if (statusEl) {
+        statusEl.textContent = action === 'publish' ? 'Publishing…' : 'Discarding…';
+        statusEl.className = 'card-status';
+      }
+      buttons?.forEach((b) => { b.disabled = true; });
+
+      try {
+        const res = await fetch(FUNCTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, action, slug }),
+        });
+
+        let data;
+        try { data = await res.json(); } catch { data = {}; }
+
+        if (data.ok) {
+          showToast(data.message || 'Done', 'success');
+          setTimeout(() => {
+            card?.remove();
+            const remaining = draftsEl.querySelectorAll('.draft-card').length;
+            updateSubtitle(remaining);
+            if (remaining === 0) emptyEl.hidden = false;
+          }, 600);
+        } else {
+          const msg = data.error || `HTTP ${res.status}`;
+          if (statusEl) {
+            statusEl.textContent = `Error: ${msg}`;
+            statusEl.className = 'card-status error';
+          }
+          if (res.status === 401) {
+            showToast('Wrong password — please re-enter.', 'error');
+            setTimeout(showGate, 1500);
+          } else {
+            buttons?.forEach((b) => { b.disabled = false; });
+          }
+        }
+      } catch (err) {
+        if (statusEl) {
+          statusEl.textContent = 'Network error — check connection';
+          statusEl.className = 'card-status error';
+        }
+        buttons?.forEach((b) => { b.disabled = false; });
+      }
+    }
+
+    // ── Toast ─────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+      toastEl.textContent = msg;
+      toastEl.className = `toast toast--visible${type === 'error' ? ' toast--error' : ''}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { toastEl.className = 'toast'; }, 4500);
+    }
+
+    // ── Init ──────────────────────────────────────────────
+    if (password) {
+      gateEl.hidden = true;
+      appEl.hidden = false;
+      loadDrafts();
+    }
+  </script>
+</body>
+</html>

@@ -42,49 +42,58 @@ Every Sunday morning a scheduled task (Cowork) runs three agents in sequence:
 2. **thecaddiechat-story-selector** — scores candidates and picks one
 3. **thecaddiechat-post-drafter** — drafts a full article in the site's voice and writes it as a new `.mdx` file into `src/content/chronicles/` with `draft: true`
 
-### Reviewing a draft
+The drafter commits the new file and pushes to main. The draft appears in the repo
+but is excluded from the live site build (filtered by `draft: true`).
 
-```bash
-# 1. Pull the new draft commit if you haven't already
-git pull
+### Reviewing a draft (from any device)
 
-# 2. Start the dev server
-npm run dev
+1. Go to **[thecaddiechat.com/admin/](https://thecaddiechat.com/admin/)**
+2. Enter the admin password
+3. Review the draft card — title, date, source URL, and body preview
+4. Click **Publish** to flip `draft: false` and trigger a site rebuild (~1–2 min)
+5. Click **Discard** to delete the file and trigger a rebuild
 
-# 3. Open the admin review page
-open http://localhost:4321/admin/drafts/
+No local dev server needed. Works from phone, tablet, or any browser.
 
-# 4. Click "Preview →" to read it rendered in the full site layout
-# 5. Click "Publish" to flip draft: false and commit, or "Discard" to delete and commit
+### What happens after Publish / Discard
 
-# 6. Push when you're ready (Publish does NOT push automatically)
-git push
-```
+The admin page calls a Firebase Cloud Function (`publishDraft` on project
+`greendoor-2da47`), which:
 
-The Publish button commits the file with message `publish(chronicles): <slug>`.
-The Discard button deletes the file and commits with `discard(chronicles): <slug>`.
+1. Verifies the admin password (bcrypt hash stored in Firebase env)
+2. Calls GitHub's `workflow_dispatch` API to run `.github/workflows/publish-draft.yml`
+3. That workflow checks out `main`, edits or deletes the MDX file, commits, and pushes
+4. The push triggers `deploy.yml`, which rebuilds the Astro site to GitHub Pages
+
+Deploy completes in approximately 1–2 minutes after clicking the button.
 
 ---
 
-## Previewing without publishing
+## Previewing a draft without publishing
 
-Because `draft: true` entries are included in `getStaticPaths` in dev mode, you can
-navigate directly to the article URL to see it fully rendered:
+Since the repo is public, you can read the raw MDX on GitHub:
 
 ```
-http://localhost:4321/chronicles/<slug>/
+https://github.com/awtilly/thecaddiechat/blob/main/src/content/chronicles/<slug>.mdx
 ```
 
-Drafts do **not** appear in the `/chronicles/` listing or on the homepage in either
-dev or production — they are only visible via the direct URL (dev) or the admin page.
+To see it rendered, temporarily run locally:
+
+```bash
+git pull
+npm run dev
+# open http://localhost:4321/chronicles/<slug>/
+```
+
+Drafts are included in `getStaticPaths` in dev mode but excluded in prod.
 
 ---
 
 ## Manual draft creation
 
-You can create a draft manually at any time:
+Create a draft at any time:
 
 1. Create `src/content/chronicles/your-slug.mdx` with `draft: true` in frontmatter
-2. It will appear in `/admin/drafts/` on your next `npm run dev`
+2. Commit and push — it will appear on `thecaddiechat.com/admin/` immediately
 
 Slug naming: lowercase, hyphen-separated, matches the URL path (`your-slug` → `/chronicles/your-slug/`).
