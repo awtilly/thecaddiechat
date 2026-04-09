@@ -17,8 +17,11 @@ import Footer from '../../components/Footer.astro';
 
   <div class="container">
     <header class="article-header">
-      <div class="breadcrumb">
-        <a href="/admin/">← Admin</a>
+      <div class="breadcrumb-row">
+        <div class="breadcrumb">
+          <a href="/admin/">← Admin</a>
+        </div>
+        <button id="edit-btn" class="btn-edit" style="display:none">Edit</button>
       </div>
       <p id="preview-badge" class="preview-badge" hidden>Draft Preview</p>
       <h1 id="preview-title" class="preview-title-placeholder">Loading…</h1>
@@ -28,11 +31,35 @@ import Footer from '../../components/Footer.astro';
 
   <div class="divider"></div>
 
-  <section class="section-pad">
+  <section class="section-pad" id="read-section">
     <div class="article-body" id="preview-body">
       <p class="preview-fetching">Fetching draft…</p>
     </div>
   </section>
+
+  <!-- Two-pane editor — hidden until Edit is clicked -->
+  <div id="editor-pane" class="editor-pane" style="display:none">
+    <div class="editor-split">
+      <div class="editor-col">
+        <label class="editor-col-label">Source MDX</label>
+        <textarea id="mdx-editor" class="mdx-textarea" spellcheck="false"></textarea>
+      </div>
+      <div class="editor-col">
+        <label class="editor-col-label">Preview</label>
+        <div id="editor-preview" class="article-body editor-preview-panel"></div>
+      </div>
+    </div>
+    <div class="editor-actions">
+      <span id="dirty-indicator" class="dirty-indicator" style="display:none">&#x25CF; Unsaved changes</span>
+      <div class="editor-action-btns">
+        <button id="cancel-btn" class="btn-secondary">Cancel</button>
+        <button id="save-btn" class="btn-save">Save Changes</button>
+        <button id="save-publish-btn" class="btn-publish-action">Save &amp; Publish</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" style="display:none"></div>
 
   <Footer />
 </BaseLayout>
@@ -44,9 +71,17 @@ import Footer from '../../components/Footer.astro';
   so we reset blockquotes to visible here.
 -->
 <style is:global>
-  #preview-body blockquote {
+  #preview-body blockquote,
+  .editor-preview-panel blockquote {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  /* Let editor preview fill its panel without centering constraints */
+  .editor-preview-panel {
+    max-width: none !important;
+    margin: 0 !important;
+    padding-bottom: var(--space-md) !important;
   }
 </style>
 
@@ -58,18 +93,43 @@ import Footer from '../../components/Footer.astro';
     margin: 0 auto;
   }
 
+  .breadcrumb-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+  }
+
   .breadcrumb {
     font-size: var(--font-size-xs);
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--color-text-muted);
-    margin-bottom: var(--space-md);
   }
   .breadcrumb a {
     color: var(--color-accent);
     transition: var(--transition-color);
   }
   .breadcrumb a:hover { color: var(--color-text-primary); }
+
+  .btn-edit {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-accent);
+    background: transparent;
+    border: 1.5px solid var(--color-accent);
+    border-radius: 3px;
+    padding: 0.3em 0.9em;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+  }
+  .btn-edit:hover {
+    background: var(--color-accent);
+    color: #fff;
+  }
 
   .preview-badge {
     display: inline-block;
@@ -104,6 +164,179 @@ import Footer from '../../components/Footer.astro';
     text-align: center;
     color: var(--color-text-muted);
     padding: 4rem 0;
+  }
+
+  /* ── Editor pane ──────────────────────────────────────── */
+  .editor-pane {
+    padding: 0 var(--space-lg) var(--space-xl);
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .editor-split {
+    display: flex;
+    gap: var(--space-md);
+    height: 70vh;
+    min-height: 400px;
+  }
+
+  .editor-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .editor-col-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+    display: block;
+  }
+
+  .mdx-textarea {
+    flex: 1;
+    font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace;
+    font-size: 0.84rem;
+    line-height: 1.65;
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--space-sm) var(--space-md);
+    resize: none;
+    box-sizing: border-box;
+    width: 100%;
+    transition: border-color var(--duration-fast) var(--ease-out);
+  }
+  .mdx-textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+
+  .editor-preview-panel {
+    flex: 1;
+    overflow-y: auto;
+    border: 1.5px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--space-sm) var(--space-md);
+    box-sizing: border-box;
+  }
+
+  /* ── Editor action bar ───────────────────────────────── */
+  .editor-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-md);
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .dirty-indicator {
+    font-size: var(--font-size-xs);
+    color: #a06500;
+    font-weight: 600;
+  }
+
+  .editor-action-btns {
+    display: flex;
+    gap: var(--space-sm);
+    margin-left: auto;
+  }
+
+  .btn-secondary,
+  .btn-save,
+  .btn-publish-action {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.5em 1.1em;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                opacity var(--duration-fast) var(--ease-out);
+  }
+  .btn-secondary:disabled,
+  .btn-save:disabled,
+  .btn-publish-action:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1.5px solid var(--color-border-strong);
+    color: var(--color-text-muted);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-text-primary);
+    color: var(--color-text-primary);
+  }
+
+  .btn-save {
+    background: transparent;
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+  }
+  .btn-save:hover:not(:disabled) {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .btn-publish-action {
+    background: var(--color-accent);
+    border: 1.5px solid var(--color-accent);
+    color: #fff;
+  }
+  .btn-publish-action:hover:not(:disabled) {
+    opacity: 0.82;
+  }
+
+  /* ── Toast ───────────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: var(--space-lg);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.6em 1.5em;
+    border-radius: 4px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast-success {
+    background: var(--color-accent);
+    color: #fff;
+  }
+  .toast-error {
+    background: #b0271a;
+    color: #fff;
+  }
+
+  /* ── Responsive: stack panes on narrow screens ───────── */
+  @media (max-width: 768px) {
+    .editor-split {
+      flex-direction: column;
+      height: auto;
+    }
+    .editor-col {
+      height: 40vh;
+    }
+    .editor-pane {
+      padding: var(--space-sm);
+    }
+    .editor-action-btns {
+      margin-left: 0;
+    }
   }
 </style>
 
@@ -195,29 +428,145 @@ import Footer from '../../components/Footer.astro';
     padding: 0.15em 0.4em;
     border-radius: 3px;
   }
+  .sources-section {
+    max-width: var(--measure-wide);
+    margin: 0 auto var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+  .sources-heading {
+    font-family: var(--font-display);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+  }
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .sources-item {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  .sources-item a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(45, 90, 63, 0.3);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .sources-item a:hover { color: var(--color-accent-light); }
+  .sources-meta {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
 </style>
 
 <script>
   import { marked } from 'marked';
 
-  const SESSION_KEY = 'tcc-admin-pw';
-  const GITHUB_REPO = 'awtilly/thecaddiechat';
+  const SESSION_KEY   = 'tcc-admin-pw';
+  const GITHUB_REPO   = 'awtilly/thecaddiechat';
+  const FUNCTION_URL  =
+    'https://us-central1-thecaddiechat-178de.cloudfunctions.net/publishDraft';
 
-  // Gate: redirect to /admin/ if not authenticated
+  // ── Mutable state ─────────────────────────────────────────────────────────
+  let currentRaw  = '';   // full MDX string as loaded / last saved
+  let currentSha  = '';   // file blob sha for GitHub Contents API
+  let currentSlug = '';   // slug from query string
+  let isDirty     = false;
+  let debounceTimer: ReturnType<typeof setTimeout>;
+  let toastTimer:   ReturnType<typeof setTimeout>;
+
+  // ── DOM refs ──────────────────────────────────────────────────────────────
+  const editBtn        = document.getElementById('edit-btn')         as HTMLButtonElement;
+  const readSection    = document.getElementById('read-section')     as HTMLElement;
+  const editorPane     = document.getElementById('editor-pane')      as HTMLDivElement;
+  const mdxEditor      = document.getElementById('mdx-editor')       as HTMLTextAreaElement;
+  const editorPreview  = document.getElementById('editor-preview')   as HTMLDivElement;
+  const dirtyIndicator = document.getElementById('dirty-indicator')  as HTMLSpanElement;
+  const cancelBtn      = document.getElementById('cancel-btn')       as HTMLButtonElement;
+  const saveBtn        = document.getElementById('save-btn')         as HTMLButtonElement;
+  const savePublishBtn = document.getElementById('save-publish-btn') as HTMLButtonElement;
+  const toastEl        = document.getElementById('toast')            as HTMLDivElement;
+
+  // ── Auth gate ─────────────────────────────────────────────────────────────
   const pw = localStorage.getItem(SESSION_KEY);
   if (!pw) {
     window.location.href = '/admin/';
   } else {
-    // Read slug from query string
     const params = new URLSearchParams(location.search);
     const slug = params.get('slug');
     if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
       window.location.href = '/admin/';
     } else {
+      currentSlug = slug;
       loadPreview(slug);
     }
   }
 
+  // ── Sources parser (inline YAML list, no deps) ────────────────────────────
+  function parseSources(fm: string) {
+    interface Source { title: string; url: string; publisher?: string; publishedAt?: string; }
+    const sources: Source[] = [];
+    const lines = fm.split('\n');
+    let inSources = false;
+    let current: Partial<Source> | null = null;
+
+    function stripQuotes(v: string) {
+      const t = v.trim();
+      if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
+        return t.slice(1, -1);
+      return t;
+    }
+
+    for (const line of lines) {
+      if (/^sources:\s*$/.test(line)) { inSources = true; continue; }
+      if (inSources) {
+        if (/^\S/.test(line) && line.trim() !== '') { inSources = false; if (current) { sources.push(current as Source); current = null; } continue; }
+        if (/^\s+-/.test(line)) {
+          if (current) sources.push(current as Source);
+          current = {};
+          const inline = line.match(/^\s+-\s+(\w+):\s*(.+)/);
+          if (inline) current[inline[1] as keyof Source] = stripQuotes(inline[2]);
+        } else if (current !== null) {
+          const kv = line.match(/^\s+(\w+):\s*(.+)/);
+          if (kv) current[kv[1] as keyof Source] = stripQuotes(kv[2]);
+        }
+      }
+    }
+    if (current) sources.push(current as Source);
+    return sources.filter((s) => s.url);
+  }
+
+  function buildSourcesHTML(sources: { title: string; url: string; publisher?: string; publishedAt?: string }[]) {
+    if (sources.length === 0) return '';
+    function esc(s: string) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    const items = sources.map((s) => {
+      const meta = [s.publisher, s.publishedAt].filter(Boolean).join(', ');
+      return `<li class="sources-item">
+        <a href="${esc(s.url || '#')}" target="_blank" rel="noopener nofollow">${esc(s.title || s.url || '')}</a>
+        ${meta ? `<span class="sources-meta">${esc(meta)}</span>` : ''}
+      </li>`;
+    }).join('');
+    return `<aside class="sources-section">
+      <h2 class="sources-heading">Sources</h2>
+      <ul class="sources-list">${items}</ul>
+    </aside>`;
+  }
+
+  // ── Load read-only preview ────────────────────────────────────────────────
   async function loadPreview(slug: string) {
     const titleEl = document.getElementById('preview-title');
     const metaEl  = document.getElementById('preview-meta');
@@ -225,13 +574,16 @@ import Footer from '../../components/Footer.astro';
     const badgeEl = document.getElementById('preview-badge');
 
     try {
-      // Fetch file content from GitHub Contents API
       const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/chronicles/${slug}.mdx`;
       const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github+json' } });
       if (!res.ok) throw new Error(`GitHub API ${res.status} — file not found for slug: ${slug}`);
 
-      const data = await res.json();
-      const raw = atob(data.content.replace(/\s/g, ''));
+      const data  = await res.json();
+      currentSha  = data.sha;
+      const b64   = data.content.replace(/\s/g, '');
+      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const raw   = new TextDecoder('utf-8').decode(bytes);
+      currentRaw  = raw;
 
       // Parse frontmatter
       const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -256,10 +608,8 @@ import Footer from '../../components/Footer.astro';
       const meta  = getField('meta')  || '';
       const date  = getField('date')  || '';
 
-      // Update page title
       document.title = `Preview: ${title} — The Caddie Chat`;
 
-      // Update header elements
       if (titleEl) {
         titleEl.textContent = title;
         titleEl.classList.remove('preview-title-placeholder');
@@ -275,18 +625,133 @@ import Footer from '../../components/Footer.astro';
         metaEl.textContent = parts.join(' ');
       }
 
-      // Render markdown body — marked is bundled by Vite, no CDN call
       const html = marked.parse(body, { breaks: false, gfm: true });
       if (bodyEl) bodyEl.innerHTML = html as string;
 
+      // Parse and render sources from frontmatter
+      const sources = parseSources(fmBlock);
+      const sourcesHTML = buildSourcesHTML(sources);
+      if (sourcesHTML && bodyEl) {
+        bodyEl.insertAdjacentHTML('afterend', sourcesHTML);
+      }
+
+      // Reveal Edit button now that we have the sha
+      editBtn.style.display = '';
+
     } catch (err) {
       if (titleEl) {
-          titleEl.textContent = 'Error loading draft';
-          titleEl.classList.remove('preview-title-placeholder');
-        }
+        titleEl.textContent = 'Error loading draft';
+        titleEl.classList.remove('preview-title-placeholder');
+      }
       if (bodyEl) {
         bodyEl.innerHTML = `<p style="color:#c00;text-align:center;padding:4rem 0;">Error: ${(err as Error).message}</p>`;
       }
     }
   }
+
+  // ── Edit mode ─────────────────────────────────────────────────────────────
+  function enterEditMode() {
+    readSection.style.display = 'none';
+    editorPane.style.display  = '';
+    mdxEditor.value = currentRaw;
+    isDirty = false;
+    syncDirtyIndicator();
+    renderEditorPreview();
+    mdxEditor.focus();
+  }
+
+  function exitEditMode() {
+    editorPane.style.display  = 'none';
+    readSection.style.display = '';
+    isDirty = false;
+    syncDirtyIndicator();
+  }
+
+  function renderEditorPreview() {
+    const val     = mdxEditor.value;
+    const fmMatch = val.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    const fmBlock = fmMatch ? fmMatch[1] : '';
+    const body    = fmMatch ? val.slice(fmMatch[0].length).trim() : val;
+    const html    = marked.parse(body, { breaks: false, gfm: true }) as string;
+    const sources = parseSources(fmBlock);
+    editorPreview.innerHTML = html + buildSourcesHTML(sources);
+  }
+
+  function syncDirtyIndicator() {
+    dirtyIndicator.style.display = isDirty ? '' : 'none';
+  }
+
+  // ── Save ──────────────────────────────────────────────────────────────────
+  async function doSave(alsoPublish: boolean) {
+    const storedPw = localStorage.getItem(SESSION_KEY);
+    if (!storedPw) { window.location.href = '/admin/'; return; }
+
+    saveBtn.disabled        = true;
+    savePublishBtn.disabled = true;
+    cancelBtn.disabled      = true;
+
+    try {
+      const res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password:     storedPw,
+          action:       'save',
+          slug:         currentSlug,
+          content:      mdxEditor.value,
+          sha:          currentSha,
+          alsoPublish,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+      // Update file blob sha and stored raw so subsequent saves work
+      currentSha = data.sha;
+      currentRaw = mdxEditor.value;
+      isDirty    = false;
+      syncDirtyIndicator();
+
+      if (alsoPublish) {
+        showToast('Saved and published! Redirecting…');
+        setTimeout(() => { window.location.href = '/admin/'; }, 1500);
+      } else {
+        showToast('Saved!');
+      }
+    } catch (err) {
+      showToast(`Error: ${(err as Error).message}`, true);
+    } finally {
+      saveBtn.disabled        = false;
+      savePublishBtn.disabled = false;
+      cancelBtn.disabled      = false;
+    }
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function showToast(msg: string, isError = false) {
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.className   = 'toast ' + (isError ? 'toast-error' : 'toast-success');
+    toastEl.style.display = '';
+    toastTimer = setTimeout(() => { toastEl.style.display = 'none'; }, 3000);
+  }
+
+  // ── Event listeners ───────────────────────────────────────────────────────
+  editBtn.addEventListener('click', enterEditMode);
+
+  cancelBtn.addEventListener('click', () => {
+    if (isDirty && !confirm('Discard unsaved changes?')) return;
+    exitEditMode();
+  });
+
+  mdxEditor.addEventListener('input', () => {
+    isDirty = true;
+    syncDirtyIndicator();
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(renderEditorPreview, 300);
+  });
+
+  saveBtn.addEventListener('click',        () => doSave(false));
+  savePublishBtn.addEventListener('click', () => doSave(true));
 </script>
