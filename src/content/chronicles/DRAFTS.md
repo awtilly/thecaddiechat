@@ -18,10 +18,15 @@ description: "One or two sentence summary used in listings."
 date: 2026-04-06          # ISO date; use the date the AI drafted it
 meta: "Golf Course Development"   # Short topic label shown in article header
 draft: true               # Required for drafts. Flip to false when publishing.
-sourceUrl: "https://..."  # Primary source the AI used for this story
-sourcesConsidered:        # All sources the scanner surfaced (optional)
+sourceUrl: "https://..."  # Primary source the AI used for this story (legacy, prefer sources below)
+sourcesConsidered:        # All sources the scanner surfaced (legacy flat list)
   - "https://..."
   - "https://..."
+sources:                  # Structured sources — rendered at bottom of article + NewsArticle JSON-LD
+  - title: "Article headline from the source"
+    url: "https://..."
+    publisher: "Publication Name"   # optional
+    publishedAt: "2026-04-01"       # optional, ISO date string
 # heroImage is intentionally omitted for AI drafts.
 # Add one manually before publishing if you want the full article layout.
 ---
@@ -30,7 +35,8 @@ sourcesConsidered:        # All sources the scanner surfaced (optional)
 Fields required for publishing (flip `draft: false` and confirm these exist):
 - `title`, `description`, `date`, `meta` — always set by the AI drafter
 - `heroImage` — optional but strongly recommended before publishing; omit to publish text-only
-- `sourceUrl`, `sourcesConsidered` — can stay as-is for attribution or be removed
+- `sources` — structured source list rendered at the bottom of the article and included in JSON-LD; strongly recommended for any AI-drafted post
+- `sourceUrl`, `sourcesConsidered` — legacy flat fields; kept for backwards compatibility but prefer `sources`
 
 ---
 

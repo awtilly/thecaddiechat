@@ -3,7 +3,14 @@ import BaseLayout from './BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ArticleNav from '../components/ArticleNav.astro';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
+
+interface Source {
+  title: string;
+  url: string;
+  publisher?: string;
+  publishedAt?: string;
+}
 
 interface Props {
   title: string;
@@ -11,13 +18,48 @@ interface Props {
   date?: Date;
   heroImage?: ImageMetadata;
   meta?: string;
+  slug?: string;
+  sources?: Source[];
   prev?: { slug: string; title: string };
   next?: { slug: string; title: string };
 }
 
-const { title, description, date, heroImage, meta, prev, next } = Astro.props;
+const { title, description, date, heroImage, meta, slug, sources, prev, next } = Astro.props;
+
+const SITE = 'https://thecaddiechat.com';
+
+const processedHero = heroImage ? await getImage({ src: heroImage, width: 1200 }) : null;
+const heroImageUrl = processedHero ? `${SITE}${processedHero.src}` : undefined;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: title,
+  ...(description && { description }),
+  ...(date && { datePublished: date.toISOString() }),
+  ...(heroImageUrl && { image: heroImageUrl }),
+  author: { '@type': 'Organization', name: 'The Caddie Chat', url: SITE },
+  publisher: {
+    '@type': 'Organization',
+    name: 'The Caddie Chat',
+    url: SITE,
+    logo: { '@type': 'ImageObject', url: `${SITE}/favicon.svg` },
+  },
+  ...(slug && {
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE}/chronicles/${slug}/` },
+  }),
+  ...(sources?.length && {
+    citation: sources.map((s) => ({
+      '@type': 'WebPage',
+      name: s.title,
+      url: s.url,
+      ...(s.publisher && { publisher: { '@type': 'Organization', name: s.publisher } }),
+    })),
+  }),
+};
 ---
 <BaseLayout title={`${title} | The Caddie Chat`} description={description}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <Nav />
   <div class="container">
     <header class="article-header">
@@ -42,6 +84,21 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     <div class="article-body">
       <slot />
     </div>
+    {sources && sources.length > 0 && (
+      <aside class="article-sources">
+        <h2 class="sources-heading">Sources</h2>
+        <ul class="sources-list">
+          {sources.map((s) => (
+            <li class="sources-item">
+              <a href={s.url} target="_blank" rel="noopener noreferrer" class="sources-link">
+                {s.publisher ? <><span class="sources-publisher">{s.publisher}</span>: {s.title}</> : s.title}
+              </a>
+              {s.publishedAt && <span class="sources-date">&nbsp;&middot;&nbsp;{s.publishedAt}</span>}
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
     <ArticleNav prev={prev} next={next} basePath="/chronicles/" />
   </section>
   <Footer />
@@ -88,6 +145,54 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     width: 100%;
     height: auto;
     display: block;
+  }
+  .article-sources {
+    max-width: var(--measure-wide);
+    margin: 0 auto var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+  .sources-heading {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+  }
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .sources-item {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-snug);
+  }
+  .sources-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(45, 90, 63, 0.3);
+    transition: color var(--duration-fast) var(--ease-out),
+                text-decoration-color var(--duration-fast) var(--ease-out);
+  }
+  .sources-link:hover {
+    color: var(--color-accent-light);
+    text-decoration-color: var(--color-accent-light);
+  }
+  .sources-publisher {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  .sources-date {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
   }
 </style>
 

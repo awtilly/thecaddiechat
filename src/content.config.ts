@@ -13,6 +13,12 @@ const chronicles = defineCollection({
       draft: z.boolean().default(false),
       sourceUrl: z.string().optional(),
       sourcesConsidered: z.array(z.string()).optional(),
+      sources: z.array(z.object({
+        title: z.string(),
+        url: z.string().url(),
+        publisher: z.string().optional(),
+        publishedAt: z.string().optional(),
+      })).optional(),
       prev: z
         .object({
           slug: z.string(),
