@@ -174,11 +174,10 @@ import Footer from '../../components/Footer.astro';
     box-sizing: border-box;
   }
 
+  /* Split row — height determined by pane children */
   .editor-split {
     display: flex;
     gap: var(--space-md);
-    height: 70vh;
-    min-height: 400px;
   }
 
   .editor-col {
@@ -198,8 +197,12 @@ import Footer from '../../components/Footer.astro';
     display: block;
   }
 
+  /* Textarea: fixed viewport-relative height, scrolls internally */
   .mdx-textarea {
-    flex: 1;
+    height: calc(100vh - 300px);
+    min-height: 400px;
+    max-height: 900px;
+    overflow-y: auto;
     font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace;
     font-size: 0.84rem;
     line-height: 1.65;
@@ -218,8 +221,11 @@ import Footer from '../../components/Footer.astro';
     border-color: var(--color-accent);
   }
 
+  /* Preview panel: same height as the textarea so both panes are flush */
   .editor-preview-panel {
-    flex: 1;
+    height: calc(100vh - 300px);
+    min-height: 400px;
+    max-height: 900px;
     overflow-y: auto;
     border: 1.5px solid var(--color-border);
     border-radius: 4px;
@@ -228,13 +234,18 @@ import Footer from '../../components/Footer.astro';
   }
 
   /* ── Editor action bar ───────────────────────────────── */
+  /* Sticky so it stays visible below the panes at any viewport size */
   .editor-actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: var(--space-md);
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
     gap: var(--space-sm);
     flex-wrap: wrap;
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg);
   }
 
   .dirty-indicator {
@@ -326,10 +337,13 @@ import Footer from '../../components/Footer.astro';
   @media (max-width: 768px) {
     .editor-split {
       flex-direction: column;
-      height: auto;
     }
-    .editor-col {
-      height: 40vh;
+    /* Each stacked pane gets ~45vh so both fit without full-page scroll */
+    .mdx-textarea,
+    .editor-preview-panel {
+      height: 45vh;
+      min-height: 180px;
+      max-height: none;
     }
     .editor-pane {
       padding: var(--space-sm);
@@ -750,6 +764,13 @@ import Footer from '../../components/Footer.astro';
     syncDirtyIndicator();
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(renderEditorPreview, 300);
+  });
+
+  // Proportional scroll sync: textarea position drives preview position.
+  // Only wired on the textarea so there's no echo from the programmatic preview scroll.
+  mdxEditor.addEventListener('scroll', () => {
+    const ratio = mdxEditor.scrollTop / (mdxEditor.scrollHeight - mdxEditor.clientHeight);
+    editorPreview.scrollTop = ratio * (editorPreview.scrollHeight - editorPreview.clientHeight);
   });
 
   saveBtn.addEventListener('click',        () => doSave(false));
