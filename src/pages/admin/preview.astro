@@ -197,106 +197,96 @@ import Footer from '../../components/Footer.astro';
   }
 </style>
 
-<script is:inline>
-  (function () {
-    var SESSION_KEY = 'tcc-admin-pw';
-    var GITHUB_REPO = 'awtilly/thecaddiechat';
+<script>
+  import { marked } from 'marked';
 
-    // Gate: redirect to /admin/ if not authenticated
-    var pw = localStorage.getItem(SESSION_KEY);
-    if (!pw) {
-      window.location.href = '/admin/';
-      return;
-    }
+  const SESSION_KEY = 'tcc-admin-pw';
+  const GITHUB_REPO = 'awtilly/thecaddiechat';
 
+  // Gate: redirect to /admin/ if not authenticated
+  const pw = localStorage.getItem(SESSION_KEY);
+  if (!pw) {
+    window.location.href = '/admin/';
+  } else {
     // Read slug from query string
-    var params = new URLSearchParams(location.search);
-    var slug = params.get('slug');
+    const params = new URLSearchParams(location.search);
+    const slug = params.get('slug');
     if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
       window.location.href = '/admin/';
-      return;
+    } else {
+      loadPreview(slug);
     }
+  }
 
-    async function loadPreview() {
-      var titleEl  = document.getElementById('preview-title');
-      var metaEl   = document.getElementById('preview-meta');
-      var bodyEl   = document.getElementById('preview-body');
-      var badgeEl  = document.getElementById('preview-badge');
+  async function loadPreview(slug: string) {
+    const titleEl = document.getElementById('preview-title');
+    const metaEl  = document.getElementById('preview-meta');
+    const bodyEl  = document.getElementById('preview-body');
+    const badgeEl = document.getElementById('preview-badge');
 
-      try {
-        // Fetch file content from GitHub Contents API
-        var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO
-          + '/contents/src/content/chronicles/' + slug + '.mdx';
-        var res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github+json' } });
-        if (!res.ok) throw new Error('GitHub API ' + res.status + ' — file not found for slug: ' + slug);
+    try {
+      // Fetch file content from GitHub Contents API
+      const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/chronicles/${slug}.mdx`;
+      const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github+json' } });
+      if (!res.ok) throw new Error(`GitHub API ${res.status} — file not found for slug: ${slug}`);
 
-        var data = await res.json();
-        var raw = atob(data.content.replace(/\s/g, ''));
+      const data = await res.json();
+      const raw = atob(data.content.replace(/\s/g, ''));
 
-        // Parse frontmatter
-        var fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-        if (!fmMatch) throw new Error('No frontmatter found in ' + slug + '.mdx');
+      // Parse frontmatter
+      const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+      if (!fmMatch) throw new Error(`No frontmatter found in ${slug}.mdx`);
 
-        var fmBlock = fmMatch[1];
-        var body    = raw.slice(fmMatch[0].length).trim();
+      const fmBlock = fmMatch[1];
+      const body    = raw.slice(fmMatch[0].length).trim();
 
-        function getField(key) {
-          var re = new RegExp('^' + key + ':\\s*(.+?)\\s*$', 'm');
-          var m = fmBlock.match(re);
-          if (!m) return null;
-          var val = m[1].trim();
-          if ((val[0] === '"' && val[val.length-1] === '"') ||
-              (val[0] === "'" && val[val.length-1] === "'")) {
-            val = val.slice(1, -1);
-          }
-          return val;
+      function getField(key: string) {
+        const re = new RegExp(`^${key}:\\s*(.+?)\\s*$`, 'm');
+        const m = fmBlock.match(re);
+        if (!m) return null;
+        let val = m[1].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) ||
+            (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
         }
+        return val;
+      }
 
-        var title = getField('title') || slug;
-        var meta  = getField('meta')  || '';
-        var date  = getField('date')  || '';
-        var draft = getField('draft');
+      const title = getField('title') || slug;
+      const meta  = getField('meta')  || '';
+      const date  = getField('date')  || '';
 
-        // Update page title
-        document.title = 'Preview: ' + title + ' — The Caddie Chat';
+      // Update page title
+      document.title = `Preview: ${title} — The Caddie Chat`;
 
-        // Update header elements
-        if (titleEl) {
-          titleEl.textContent = title;
-          titleEl.classList.remove('preview-title-placeholder');
-        }
-        if (badgeEl) {
-          badgeEl.hidden = false;
-        }
-        if (metaEl) {
-          var dateStr = date
-            ? new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', {
-                year: 'numeric', month: 'long', day: 'numeric'
-              })
-            : '';
-          var parts = [meta, '·', 'The Caddie Chat', dateStr && ('· ' + dateStr)].filter(Boolean);
-          metaEl.textContent = parts.join(' ');
-        }
+      // Update header elements
+      if (titleEl) {
+        titleEl.textContent = title;
+        titleEl.classList.remove('preview-title-placeholder');
+      }
+      if (badgeEl) badgeEl.hidden = false;
+      if (metaEl) {
+        const dateStr = date
+          ? new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', {
+              year: 'numeric', month: 'long', day: 'numeric',
+            })
+          : '';
+        const parts = [meta, '·', 'The Caddie Chat', dateStr ? `· ${dateStr}` : ''].filter(Boolean);
+        metaEl.textContent = parts.join(' ');
+      }
 
-        // Render markdown body using marked.js from CDN
-        var markedModule = await import('https://cdn.jsdelivr.net/npm/marked@15/marked.esm.min.js');
-        var marked = markedModule.marked;
-        var html = marked.parse(body, { breaks: false, gfm: true });
+      // Render markdown body — marked is bundled by Vite, no CDN call
+      const html = marked.parse(body, { breaks: false, gfm: true });
+      if (bodyEl) bodyEl.innerHTML = html as string;
 
-        if (bodyEl) bodyEl.innerHTML = html;
-
-      } catch (err) {
-        if (titleEl) {
+    } catch (err) {
+      if (titleEl) {
           titleEl.textContent = 'Error loading draft';
           titleEl.classList.remove('preview-title-placeholder');
         }
-        if (bodyEl) {
-          bodyEl.innerHTML = '<p style="color:#c00;text-align:center;padding:4rem 0;">'
-            + 'Error: ' + err.message + '</p>';
-        }
+      if (bodyEl) {
+        bodyEl.innerHTML = `<p style="color:#c00;text-align:center;padding:4rem 0;">Error: ${(err as Error).message}</p>`;
       }
     }
-
-    loadPreview();
-  })();
+  }
 </script>
