@@ -195,6 +195,47 @@ import Footer from '../../components/Footer.astro';
     padding: 0.15em 0.4em;
     border-radius: 3px;
   }
+  .sources-section {
+    max-width: var(--measure-wide);
+    margin: 0 auto var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+  .sources-heading {
+    font-family: var(--font-display);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+  }
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .sources-item {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  .sources-item a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(45, 90, 63, 0.3);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .sources-item a:hover { color: var(--color-accent-light); }
+  .sources-meta {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
 </style>
 
 <script>
@@ -218,6 +259,39 @@ import Footer from '../../components/Footer.astro';
     }
   }
 
+  function parseSources(fm: string) {
+    interface Source { title: string; url: string; publisher?: string; publishedAt?: string; }
+    const sources: Source[] = [];
+    const lines = fm.split('\n');
+    let inSources = false;
+    let current: Partial<Source> | null = null;
+
+    function stripQuotes(v: string) {
+      const t = v.trim();
+      if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'")))
+        return t.slice(1, -1);
+      return t;
+    }
+
+    for (const line of lines) {
+      if (/^sources:\s*$/.test(line)) { inSources = true; continue; }
+      if (inSources) {
+        if (/^\S/.test(line) && line.trim() !== '') { inSources = false; if (current) { sources.push(current as Source); current = null; } continue; }
+        if (/^\s+-/.test(line)) {
+          if (current) sources.push(current as Source);
+          current = {};
+          const inline = line.match(/^\s+-\s+(\w+):\s*(.+)/);
+          if (inline) current[inline[1] as keyof Source] = stripQuotes(inline[2]);
+        } else if (current !== null) {
+          const kv = line.match(/^\s+(\w+):\s*(.+)/);
+          if (kv) current[kv[1] as keyof Source] = stripQuotes(kv[2]);
+        }
+      }
+    }
+    if (current) sources.push(current as Source);
+    return sources.filter((s) => s.url);
+  }
+
   async function loadPreview(slug: string) {
     const titleEl = document.getElementById('preview-title');
     const metaEl  = document.getElementById('preview-meta');
@@ -231,7 +305,9 @@ import Footer from '../../components/Footer.astro';
       if (!res.ok) throw new Error(`GitHub API ${res.status} — file not found for slug: ${slug}`);
 
       const data = await res.json();
-      const raw = atob(data.content.replace(/\s/g, ''));
+      const b64   = data.content.replace(/\s/g, '');
+      const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+      const raw   = new TextDecoder('utf-8').decode(bytes);
 
       // Parse frontmatter
       const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -278,6 +354,26 @@ import Footer from '../../components/Footer.astro';
       // Render markdown body — marked is bundled by Vite, no CDN call
       const html = marked.parse(body, { breaks: false, gfm: true });
       if (bodyEl) bodyEl.innerHTML = html as string;
+
+      // Parse and render sources from frontmatter
+      const sources = parseSources(fmBlock);
+      if (sources.length > 0 && bodyEl) {
+        function esc(s: string) {
+          return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        const items = sources.map((s) => {
+          const meta = [s.publisher, s.publishedAt].filter(Boolean).join(', ');
+          return `<li class="sources-item">
+            <a href="${esc(s.url || '#')}" target="_blank" rel="noopener nofollow">${esc(s.title || s.url || '')}</a>
+            ${meta ? `<span class="sources-meta">${esc(meta)}</span>` : ''}
+          </li>`;
+        }).join('');
+        const aside = `<aside class="sources-section">
+          <h2 class="sources-heading">Sources</h2>
+          <ul class="sources-list">${items}</ul>
+        </aside>`;
+        bodyEl.insertAdjacentHTML('afterend', aside);
+      }
 
     } catch (err) {
       if (titleEl) {
