@@ -20,6 +20,7 @@ import '@fontsource-variable/dm-sans';
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <slot name="head" />
   <ClientRouter />
 </head>
 <body>

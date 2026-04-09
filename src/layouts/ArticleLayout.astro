@@ -5,6 +5,13 @@ import Footer from '../components/Footer.astro';
 import ArticleNav from '../components/ArticleNav.astro';
 import { Image } from 'astro:assets';
 
+interface Source {
+  title: string;
+  url: string;
+  publisher?: string;
+  publishedAt?: string;
+}
+
 interface Props {
   title: string;
   description?: string;
@@ -13,11 +20,34 @@ interface Props {
   meta?: string;
   prev?: { slug: string; title: string };
   next?: { slug: string; title: string };
+  sources?: Source[];
 }
 
-const { title, description, date, heroImage, meta, prev, next } = Astro.props;
+const { title, description, date, heroImage, meta, prev, next, sources } = Astro.props;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": title,
+  ...(description && { "description": description }),
+  ...(date && { "datePublished": date.toISOString() }),
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Caddie Chat"
+  },
+  ...(sources && sources.length > 0 && {
+    "citation": sources.map((s) => ({
+      "@type": "CreativeWork",
+      "name": s.title,
+      "url": s.url,
+      ...(s.publisher && { "publisher": { "@type": "Organization", "name": s.publisher } }),
+      ...(s.publishedAt && { "datePublished": s.publishedAt }),
+    }))
+  })
+};
 ---
 <BaseLayout title={`${title} | The Caddie Chat`} description={description}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <Nav />
   <div class="container">
     <header class="article-header">
@@ -42,6 +72,23 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     <div class="article-body">
       <slot />
     </div>
+    {sources && sources.length > 0 && (
+      <aside class="sources-section">
+        <h2 class="sources-heading">Sources</h2>
+        <ul class="sources-list">
+          {sources.map((s) => (
+            <li class="sources-item">
+              <a href={s.url} target="_blank" rel="noopener noreferrer">{s.title}</a>
+              {(s.publisher || s.publishedAt) && (
+                <span class="sources-meta">
+                  {s.publisher}{s.publisher && s.publishedAt && ', '}{s.publishedAt}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
     <ArticleNav prev={prev} next={next} basePath="/chronicles/" />
   </section>
   <Footer />
@@ -88,6 +135,49 @@ const { title, description, date, heroImage, meta, prev, next } = Astro.props;
     width: 100%;
     height: auto;
     display: block;
+  }
+  .sources-section {
+    max-width: var(--measure-wide);
+    margin: 0 auto var(--space-xl);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+  .sources-heading {
+    font-family: var(--font-display);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-sm);
+  }
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .sources-item {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+  .sources-item a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(45, 90, 63, 0.3);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+  .sources-item a:hover {
+    color: var(--color-accent-light);
+  }
+  .sources-meta {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: 2px;
   }
 </style>
 
