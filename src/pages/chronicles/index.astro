@@ -11,9 +11,13 @@ const chronicles = allChronicles
   .filter((e) => !e.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-// Featured = first (most recent), rest go in grid
-const featured = chronicles[0];
-const rest = chronicles.slice(1);
+// Split: posts with heroImage go in the visual grid, those without get a text list
+const withImage = chronicles.filter((e) => !!e.data.heroImage);
+const withoutImage = chronicles.filter((e) => !e.data.heroImage);
+
+// Featured = first (most recent) post with an image, rest go in grid
+const featured = withImage[0];
+const rest = withImage.slice(1);
 ---
 <PageLayout
   title="Chronicles | The Caddie Chat"
@@ -24,13 +28,15 @@ const rest = chronicles.slice(1);
 >
   <section class="section-pad-lg">
     <div class="container">
-      <FeaturedPost
-        title={featured.data.title}
-        description={featured.data.description}
-        href={`/chronicles/${featured.id}/`}
-        image={featured.data.heroImage!}
-        label="Featured"
-      />
+      {featured && (
+        <FeaturedPost
+          title={featured.data.title}
+          description={featured.data.description}
+          href={`/chronicles/${featured.id}/`}
+          image={featured.data.heroImage!}
+          label="Featured"
+        />
+      )}
 
       <div class="post-grid">
         {rest.map((chronicle) => (
@@ -42,6 +48,21 @@ const rest = chronicles.slice(1);
           />
         ))}
       </div>
+
+      {withoutImage.length > 0 && (
+        <div class="text-posts">
+          {withoutImage.map((chronicle) => (
+            <a href={`/chronicles/${chronicle.id}/`} class="text-post">
+              <div>
+                <span class="text-post-meta">{chronicle.data.meta}</span>
+                <h3>{chronicle.data.title}</h3>
+                <p>{chronicle.data.description}</p>
+              </div>
+              <span class="read-more">Read More &rarr;</span>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   </section>
 
@@ -64,5 +85,53 @@ const rest = chronicles.slice(1);
     .post-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  .text-posts {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .text-post {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-top: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .text-post:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .text-post-meta {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .text-post h3 {
+    margin: 0 0 0.25rem;
+    font-size: var(--text-lg);
+  }
+
+  .text-post p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .text-post .read-more {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
   }
 </style>
