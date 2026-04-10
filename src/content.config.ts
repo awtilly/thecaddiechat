@@ -61,4 +61,37 @@ const courses = defineCollection({
     }),
 });
 
-export const collections = { chronicles, courses };
+const fieldNotes = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/field-notes' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      date: z.coerce.date(),
+      heroImage: image().optional(),
+      meta: z.string(),
+      draft: z.boolean().default(false),
+      sourceUrl: z.string().optional(),
+      sourcesConsidered: z.array(z.string()).optional(),
+      sources: z.array(z.object({
+        title: z.string(),
+        url: z.string().url(),
+        publisher: z.string().optional(),
+        publishedAt: z.string().optional(),
+      })).optional(),
+      prev: z
+        .object({
+          slug: z.string(),
+          title: z.string(),
+        })
+        .optional(),
+      next: z
+        .object({
+          slug: z.string(),
+          title: z.string(),
+        })
+        .optional(),
+    }),
+});
+
+export const collections = { chronicles, courses, fieldNotes };

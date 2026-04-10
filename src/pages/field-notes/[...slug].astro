@@ -1,0 +1,39 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import InlineImage from '../../components/mdx/InlineImage.astro';
+import FeaturedImage from '../../components/mdx/FeaturedImage.astro';
+import FullBleed from '../../components/mdx/FullBleed.astro';
+import ImagePair from '../../components/mdx/ImagePair.astro';
+import Memorabilia from '../../components/mdx/Memorabilia.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const fieldNotes = await getCollection('fieldNotes');
+  // Exclude drafts from the production build; they remain accessible in dev
+  const entries = import.meta.env.PROD
+    ? fieldNotes.filter((e) => !e.data.draft)
+    : fieldNotes;
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, date, heroImage, meta, prev, next, sources } = entry.data;
+---
+<ArticleLayout
+  title={title}
+  description={description}
+  date={date}
+  heroImage={heroImage}
+  meta={meta}
+  prev={prev}
+  next={next}
+  sources={sources}
+  collectionLabel="Field Notes"
+  collectionPath="/field-notes/"
+>
+  <Content components={{ InlineImage, FeaturedImage, FullBleed, ImagePair, Memorabilia }} />
+</ArticleLayout>

@@ -1,0 +1,137 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import FeaturedPost from '../../components/FeaturedPost.astro';
+import PostCard from '../../components/PostCard.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import { getCollection } from 'astro:content';
+
+const allFieldNotes = await getCollection('fieldNotes');
+// Drafts are never shown in the main listing
+const fieldNotes = allFieldNotes
+  .filter((e) => !e.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Split: posts with heroImage go in the visual grid, those without get a text list
+const withImage = fieldNotes.filter((e) => !!e.data.heroImage);
+const withoutImage = fieldNotes.filter((e) => !e.data.heroImage);
+
+// Featured = first (most recent) post with an image, rest go in grid
+const featured = withImage[0];
+const rest = withImage.slice(1);
+---
+<PageLayout
+  title="Field Notes | The Caddie Chat"
+  description="Technical insights from the dirt, drainage, and design of golf course construction."
+  pageTitle="Field Notes"
+  pageSubtitle="Technical insights from the dirt, drainage, and design of golf course construction."
+  sectionLabel="Construction & Design"
+>
+  <section class="section-pad-lg">
+    <div class="container">
+      {featured && (
+        <FeaturedPost
+          title={featured.data.title}
+          description={featured.data.description}
+          href={`/field-notes/${featured.id}/`}
+          image={featured.data.heroImage!}
+          label="Featured"
+        />
+      )}
+
+      <div class="post-grid">
+        {rest.map((note) => (
+          <PostCard
+            title={note.data.title}
+            description={note.data.description}
+            href={`/field-notes/${note.id}/`}
+            image={note.data.heroImage!}
+          />
+        ))}
+      </div>
+
+      {withoutImage.length > 0 && (
+        <div class="text-posts">
+          {withoutImage.map((note) => (
+            <a href={`/field-notes/${note.id}/`} class="text-post">
+              <div>
+                <span class="text-post-meta">{note.data.meta}</span>
+                <h3>{note.data.title}</h3>
+                <p>{note.data.description}</p>
+              </div>
+              <span class="read-more">Read More &rarr;</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <CtaBanner
+    heading='More notes <em>coming.</em>'
+    description="New field notes drop as projects progress. Follow along for construction insights from the course."
+    buttonText="Follow on Instagram"
+    buttonHref="https://instagram.com/thecaddiechat"
+    buttonExternal={true}
+  />
+</PageLayout>
+
+<style>
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+  @media (max-width: 700px) {
+    .post-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .text-posts {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .text-post {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-top: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .text-post:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .text-post-meta {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .text-post h3 {
+    margin: 0 0 0.25rem;
+    font-size: var(--text-lg);
+  }
+
+  .text-post p {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .text-post .read-more {
+    flex-shrink: 0;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+  }
+</style>

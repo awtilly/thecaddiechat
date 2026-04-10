@@ -21,9 +21,11 @@ interface Props {
   prev?: { slug: string; title: string };
   next?: { slug: string; title: string };
   sources?: Source[];
+  collectionLabel?: string;
+  collectionPath?: string;
 }
 
-const { title, description, date, heroImage, meta, prev, next, sources } = Astro.props;
+const { title, description, date, heroImage, meta, prev, next, sources, collectionLabel = 'Chronicles', collectionPath = '/chronicles/' } = Astro.props;
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -52,7 +54,7 @@ const jsonLd = {
   <div class="container">
     <header class="article-header">
       <div class="breadcrumb">
-        <a href="/chronicles/">Chronicles</a> &nbsp;/&nbsp; {title.length > 50 ? title.substring(0, 47) + '...' : title}
+        <a href={collectionPath}>{collectionLabel}</a> &nbsp;/&nbsp; {title.length > 50 ? title.substring(0, 47) + '...' : title}
       </div>
       <h1>{title}</h1>
       <div class="article-meta">
@@ -89,7 +91,7 @@ const jsonLd = {
         </ul>
       </aside>
     )}
-    <ArticleNav prev={prev} next={next} basePath="/chronicles/" />
+    <ArticleNav prev={prev} next={next} basePath={collectionPath} />
   </section>
   <Footer />
 </BaseLayout>
