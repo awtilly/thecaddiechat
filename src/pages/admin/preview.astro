@@ -83,6 +83,28 @@ import Footer from '../../components/Footer.astro';
     margin: 0 !important;
     padding-bottom: var(--space-md) !important;
   }
+
+  /* Lock page scroll while editor is open */
+  body.editing-mode {
+    overflow: hidden;
+  }
+
+  /* Fix editor pane to viewport so it's the scroll root */
+  body.editing-mode .editor-pane {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    z-index: 5;
+    box-sizing: border-box;
+  }
 </style>
 
 <style>
@@ -178,6 +200,8 @@ import Footer from '../../components/Footer.astro';
   .editor-split {
     display: flex;
     gap: var(--space-md);
+    flex: 1;
+    min-height: 0;
   }
 
   .editor-col {
@@ -185,6 +209,7 @@ import Footer from '../../components/Footer.astro';
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
   }
 
   .editor-col-label {
@@ -197,11 +222,10 @@ import Footer from '../../components/Footer.astro';
     display: block;
   }
 
-  /* Textarea: fixed viewport-relative height, scrolls internally */
+  /* Textarea: fills available flex height, scrolls internally */
   .mdx-textarea {
-    height: calc(100vh - 300px);
-    min-height: 400px;
-    max-height: 900px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     font-family: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace;
     font-size: 0.84rem;
@@ -221,11 +245,10 @@ import Footer from '../../components/Footer.astro';
     border-color: var(--color-accent);
   }
 
-  /* Preview panel: same height as the textarea so both panes are flush */
+  /* Preview panel: fills available flex height, scrolls internally */
   .editor-preview-panel {
-    height: calc(100vh - 300px);
-    min-height: 400px;
-    max-height: 900px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     border: 1.5px solid var(--color-border);
     border-radius: 4px;
@@ -234,7 +257,6 @@ import Footer from '../../components/Footer.astro';
   }
 
   /* ── Editor action bar ───────────────────────────────── */
-  /* Sticky so it stays visible below the panes at any viewport size */
   .editor-actions {
     display: flex;
     align-items: center;
@@ -243,8 +265,7 @@ import Footer from '../../components/Footer.astro';
     padding-top: var(--space-sm);
     gap: var(--space-sm);
     flex-wrap: wrap;
-    position: sticky;
-    bottom: 0;
+    flex-shrink: 0;
     background: var(--color-bg);
   }
 
@@ -337,13 +358,6 @@ import Footer from '../../components/Footer.astro';
   @media (max-width: 768px) {
     .editor-split {
       flex-direction: column;
-    }
-    /* Each stacked pane gets ~45vh so both fit without full-page scroll */
-    .mdx-textarea,
-    .editor-preview-panel {
-      height: 45vh;
-      min-height: 180px;
-      max-height: none;
     }
     .editor-pane {
       padding: var(--space-sm);
@@ -667,6 +681,7 @@ import Footer from '../../components/Footer.astro';
   function enterEditMode() {
     readSection.style.display = 'none';
     editorPane.style.display  = '';
+    document.body.classList.add('editing-mode');
     mdxEditor.value = currentRaw;
     isDirty = false;
     syncDirtyIndicator();
@@ -676,6 +691,7 @@ import Footer from '../../components/Footer.astro';
 
   function exitEditMode() {
     editorPane.style.display  = 'none';
+    document.body.classList.remove('editing-mode');
     readSection.style.display = '';
     isDirty = false;
     syncDirtyIndicator();
