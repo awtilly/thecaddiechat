@@ -1,0 +1,56 @@
+name: Flight Tracker
+
+on:
+  schedule:
+    # Twice daily: 6 AM and 6 PM UTC (2 AM / 2 PM Eastern)
+    - cron: '0 6,18 * * *'
+  workflow_dispatch: # Manual trigger from Actions tab
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  scan-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Scrape AA award prices
+        run: python scripts/flight-tracker/scrape.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "Flight Tracker"
+          git config user.email "actions@github.com"
+          git add public/data/flight-tracker.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update flight tracker data"
+            git push
+          else
+            echo "No data changes to commit"
+          fi
+
+      - name: Build site
+        uses: withastro/action@v5
+
+  deploy:
+    needs: scan-and-deploy
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

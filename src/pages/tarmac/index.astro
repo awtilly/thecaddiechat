@@ -1,0 +1,575 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Tarmac">
+  <div class="tracker" id="tracker">
+    <header class="tracker-header">
+      <h1 class="tracker-title">Tarmac</h1>
+      <p class="tracker-sub">CLT &harr; Ireland &middot; AA Award Tracker</p>
+      <p class="last-updated" id="lastUpdated">Loading&hellip;</p>
+    </header>
+
+    <nav class="route-tabs" id="routeTabs">
+      <button class="route-tab active" data-dest="DUB">Dublin (DUB)</button>
+      <button class="route-tab" data-dest="SNN">Shannon (SNN)</button>
+    </nav>
+
+    <section class="section" id="bestDeals">
+      <h2 class="section-title">Best Round Trips</h2>
+      <p class="section-sub">Cheapest combos &middot; 7&ndash;14 day trips</p>
+      <div class="deals-grid" id="dealsGrid">
+        <p class="muted">Loading&hellip;</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Outbound &middot; CLT &rarr; <span id="outDest">DUB</span></h2>
+      <div class="calendars" id="outCalendars"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Return &middot; <span id="retOrigin">DUB</span> &rarr; CLT</h2>
+      <div class="calendars" id="retCalendars"></div>
+    </section>
+
+    <section class="section" id="trendSection" style="display:none">
+      <h2 class="section-title" id="trendTitle">Price Trend</h2>
+      <p class="section-sub">Click any date above to see its history</p>
+      <div class="chart-wrap">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </section>
+
+    <footer class="tracker-footer">
+      <div class="legend">
+        <span class="legend-item"><span class="swatch" style="background:#2d5a3f"></span>&lt; 30k</span>
+        <span class="legend-item"><span class="swatch" style="background:#4a8c64"></span>30&ndash;45k</span>
+        <span class="legend-item"><span class="swatch" style="background:#8ab89a"></span>45&ndash;60k</span>
+        <span class="legend-item"><span class="swatch" style="background:#c9a96a"></span>60&ndash;80k</span>
+        <span class="legend-item"><span class="swatch" style="background:#c45b4a"></span>&gt; 80k</span>
+        <span class="legend-item"><span class="swatch" style="background:#e5e1db"></span>No data</span>
+      </div>
+      <p class="muted">Data refreshes twice daily via GitHub Actions.</p>
+    </footer>
+  </div>
+
+<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+
+<script is:inline>
+(function () {
+  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const DAY_NAMES = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+
+  let allData = [];
+  let dest = 'DUB';
+  let chart = null;
+
+  // ── Data helpers ──────────────────────────────────────
+
+  function latestByDate(route) {
+    const map = {};
+    for (const d of allData) {
+      if (d.route !== route) continue;
+      if (!map[d.date] || d.ts > map[d.date].ts) map[d.date] = d;
+    }
+    return map;
+  }
+
+  function milesColor(m) {
+    if (m < 30000) return '#2d5a3f';
+    if (m < 45000) return '#4a8c64';
+    if (m < 60000) return '#8ab89a';
+    if (m < 80000) return '#c9a96a';
+    return '#c45b4a';
+  }
+
+  function milesText(m) {
+    return m < 45000 ? '#fff' : '#1c1c1c';
+  }
+
+  function fmtDate(s) {
+    const d = new Date(s + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function fmtK(n) { return Math.round(n / 1000) + 'k'; }
+
+  // ── Calendar grid ─────────────────────────────────────
+
+  function monthGrid(year, month, data, routeKey) {
+    const first = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    const offset = (first + 6) % 7; // Monday start
+
+    let h = '<div class="month">';
+    h += '<h3 class="month-name">' + MONTH_NAMES[month] + ' ' + year + '</h3>';
+    h += '<div class="month-grid">';
+
+    for (const dn of DAY_NAMES) {
+      h += '<div class="dh">' + dn + '</div>';
+    }
+
+    for (let i = 0; i < offset; i++) h += '<div class="cd empty"></div>';
+
+    for (let day = 1; day <= days; day++) {
+      const ds = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+      const e = data[ds];
+      const m = e ? e.miles : null;
+      const bg = m ? milesColor(m) : '#e5e1db';
+      const fg = m ? milesText(m) : '#9a948c';
+      const label = m ? fmtK(m) : '\u2014';
+      const tip = m ? ds + ': ' + m.toLocaleString() + ' miles' : ds + ': no data';
+      const stops = e ? e.stops : '';
+
+      h += '<div class="cd" data-date="' + ds + '" data-route="' + routeKey + '" '
+        + 'style="background:' + bg + ';color:' + fg + '" title="' + tip + '">'
+        + '<span class="dn">' + day + '</span>'
+        + '<span class="dm">' + label + '</span>'
+        + (m && stops !== '' ? '<span class="ds">' + stops + 'st</span>' : '')
+        + '</div>';
+    }
+
+    h += '</div></div>';
+    return h;
+  }
+
+  // ── Render functions ──────────────────────────────────
+
+  function render() {
+    updateTimestamp();
+    renderCalendars();
+    renderDeals();
+    bindCalendarClicks();
+  }
+
+  function updateTimestamp() {
+    if (!allData.length) return;
+    let latest = allData[0].ts;
+    for (const d of allData) { if (d.ts > latest) latest = d.ts; }
+    document.getElementById('lastUpdated').textContent =
+      'Last scan: ' + new Date(latest).toLocaleString();
+  }
+
+  function renderCalendars() {
+    const outRoute = 'CLT-' + dest;
+    const retRoute = dest + '-CLT';
+    const outData = latestByDate(outRoute);
+    const retData = latestByDate(retRoute);
+
+    // June (month 5) and July (month 6) 2026
+    document.getElementById('outCalendars').innerHTML =
+      monthGrid(2026, 5, outData, outRoute) + monthGrid(2026, 6, outData, outRoute);
+    document.getElementById('retCalendars').innerHTML =
+      monthGrid(2026, 5, retData, retRoute) + monthGrid(2026, 6, retData, retRoute);
+
+    document.getElementById('outDest').textContent = dest;
+    document.getElementById('retOrigin').textContent = dest;
+  }
+
+  function renderDeals() {
+    const outData = latestByDate('CLT-' + dest);
+    const retData = latestByDate(dest + '-CLT');
+    const combos = [];
+
+    for (const [od, ov] of Object.entries(outData)) {
+      for (const [rd, rv] of Object.entries(retData)) {
+        const diff = (new Date(rd) - new Date(od)) / 86400000;
+        if (diff >= 7 && diff <= 14) {
+          combos.push({
+            od, rd, days: diff,
+            om: ov.miles, rm: rv.miles,
+            total: ov.miles + rv.miles,
+            os: ov.stops, rs: rv.stops,
+          });
+        }
+      }
+    }
+
+    combos.sort((a, b) => a.total - b.total);
+    const top = combos.slice(0, 5);
+    const grid = document.getElementById('dealsGrid');
+
+    if (!top.length) {
+      grid.innerHTML = '<p class="muted">Not enough data yet for round-trip combos.</p>';
+      return;
+    }
+
+    grid.innerHTML = top.map(function (c, i) {
+      return '<div class="deal">'
+        + '<div class="deal-rank">#' + (i + 1) + '</div>'
+        + '<div class="deal-body">'
+        + '<div class="deal-miles">' + fmtK(c.total) + ' miles total</div>'
+        + '<div class="deal-dates">' + fmtDate(c.od) + ' &rarr; ' + fmtDate(c.rd)
+        + ' <span class="deal-days">' + c.days + ' days</span></div>'
+        + '<div class="deal-split">Out ' + fmtK(c.om) + ' (' + c.os + 'stop'
+        + (c.os !== 1 ? 's' : '') + ') &middot; Ret ' + fmtK(c.rm) + ' (' + c.rs + 'stop'
+        + (c.rs !== 1 ? 's' : '') + ')</div>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  function bindCalendarClicks() {
+    document.querySelectorAll('.cd[data-date]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var route = el.getAttribute('data-route');
+        var date = el.getAttribute('data-date');
+        if (route && date) showTrend(route, date);
+      });
+    });
+  }
+
+  function showTrend(route, date) {
+    var entries = allData.filter(function (d) { return d.route === route && d.date === date; });
+    entries.sort(function (a, b) { return a.ts < b.ts ? -1 : 1; });
+
+    var section = document.getElementById('trendSection');
+
+    if (entries.length < 2) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = '';
+    document.getElementById('trendTitle').textContent =
+      'Price Trend: ' + route + ' on ' + fmtDate(date);
+
+    var ctx = document.getElementById('trendChart');
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: entries.map(function (e) { return new Date(e.ts).toLocaleDateString(); }),
+        datasets: [{
+          label: 'Miles',
+          data: entries.map(function (e) { return e.miles; }),
+          borderColor: '#2d5a3f',
+          backgroundColor: 'rgba(45,90,63,0.1)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: '#2d5a3f',
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            title: { display: true, text: 'Miles', font: { family: 'DM Sans Variable, sans-serif' } },
+            ticks: { callback: function (v) { return (v / 1000) + 'k'; } },
+          },
+          x: {
+            ticks: { font: { family: 'DM Sans Variable, sans-serif', size: 11 } },
+          },
+        },
+      },
+    });
+  }
+
+  function showEmpty() {
+    document.getElementById('lastUpdated').textContent = '';
+    document.getElementById('dealsGrid').innerHTML =
+      '<p class="muted">No data yet. The tracker runs twice daily — check back soon.</p>';
+    document.getElementById('outCalendars').innerHTML =
+      '<p class="muted">Waiting for first scan&hellip;</p>';
+    document.getElementById('retCalendars').innerHTML =
+      '<p class="muted">Waiting for first scan&hellip;</p>';
+  }
+
+  // ── Init ──────────────────────────────────────────────
+
+  function init() {
+    // Tab handlers
+    document.querySelectorAll('.route-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        document.querySelectorAll('.route-tab').forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        dest = tab.getAttribute('data-dest');
+        render();
+      });
+    });
+
+    // Fetch data
+    fetch('/data/flight-tracker.json')
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        allData = d;
+        if (!allData.length) { showEmpty(); return; }
+        render();
+      })
+      .catch(function () { showEmpty(); });
+  }
+
+  // Support Astro view transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</BaseLayout>
+
+<style>
+  .tracker {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--space-lg) var(--space-sm) var(--space-xl);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .tracker-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+  }
+  .tracker-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem;
+  }
+  .tracker-sub {
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    margin: 0 0 0.5rem;
+  }
+  .last-updated {
+    font-family: var(--font-body);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  /* Route tabs */
+  .route-tabs {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: var(--space-lg);
+  }
+  .route-tab {
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border: 1.5px solid var(--color-border-strong);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .route-tab:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+  .route-tab.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-white);
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: var(--space-lg);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem;
+  }
+  .section-sub {
+    font-family: var(--font-body);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin: 0 0 1rem;
+  }
+
+  /* Deals grid */
+  .deals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  :global(.deal) {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    transition: box-shadow 0.2s;
+  }
+  :global(.deal:hover) {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+  :global(.deal-rank) {
+    font-family: var(--font-display);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  :global(.deal-miles) {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+  :global(.deal-dates) {
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-top: 0.15rem;
+  }
+  :global(.deal-days) {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    background: var(--color-accent-dim);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-left: 0.25rem;
+  }
+  :global(.deal-split) {
+    font-family: var(--font-body);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+  }
+
+  /* Calendar */
+  .calendars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  @media (max-width: 600px) {
+    .calendars { grid-template-columns: 1fr; }
+  }
+  :global(.month) {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  :global(.month-name) {
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+    color: var(--color-text-primary);
+  }
+  :global(.month-grid) {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+  }
+  :global(.dh) {
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.35rem;
+  }
+  :global(.cd) {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    line-height: 1.1;
+    gap: 1px;
+  }
+  :global(.cd:not(.empty):hover) {
+    transform: scale(1.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+  }
+  :global(.cd.empty) {
+    cursor: default;
+    background: transparent !important;
+  }
+  :global(.dn) {
+    font-family: var(--font-body);
+    font-size: 0.6rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+  :global(.dm) {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  :global(.ds) {
+    font-family: var(--font-body);
+    font-size: 0.5rem;
+    opacity: 0.7;
+  }
+
+  /* Chart */
+  .chart-wrap {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 1rem;
+    height: 280px;
+  }
+
+  /* Legend */
+  .tracker-footer {
+    text-align: center;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+  .legend {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  .legend-item {
+    font-family: var(--font-body);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+  }
+  .swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 5px;
+    flex-shrink: 0;
+  }
+
+  /* Utilities */
+  .muted {
+    font-family: var(--font-body);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+</style>
