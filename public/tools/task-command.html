@@ -483,6 +483,15 @@ var view = "board";
 var editId = null;
 var syncStatus = "syncing";
 
+// Snapshot of localStorage data BEFORE Firebase can touch it (for migration)
+var _localBackup = {
+  tasks: tasks.slice(),
+  projects: projects.slice(),
+  people: people.slice(),
+  aliases: Object.assign({}, aliases),
+  config: Object.assign({}, config)
+};
+
 /* ============================================================
    UTILITIES
    ============================================================ */
@@ -626,35 +635,36 @@ function startSync() {
   });
 }
 
+// Returns a promise — must complete BEFORE attaching onSnapshot listeners
 function migrateIfNeeded() {
-  if (!db) return;
-  db.collection("tasks").limit(1).get().then(function(snapshot) {
-    if (snapshot.empty && tasks.length > 0) {
-      // Migrate existing localStorage data to Firestore
-      showToast("Syncing existing tasks to cloud...", "info");
+  if (!db) return Promise.resolve();
+  return db.collection("tasks").limit(1).get().then(function(snapshot) {
+    // Use _localBackup (captured before Firebase could overwrite)
+    if (snapshot.empty && _localBackup.tasks.length > 0) {
+      showToast("Syncing " + _localBackup.tasks.length + " tasks to cloud...", "info");
       var batch = db.batch();
-      var count = 0;
-      tasks.forEach(function(task) {
+      _localBackup.tasks.forEach(function(task) {
         batch.set(db.collection("tasks").doc(task.id), task);
-        count++;
       });
-      batch.set(db.collection("meta").doc("projects"), { items: projects });
-      batch.set(db.collection("meta").doc("people"), { items: people });
-      batch.set(db.collection("meta").doc("aliases"), { map: aliases });
-      batch.set(db.collection("meta").doc("config"), { apiKey: config.apiKey || "", parseMode: config.parseMode || "smart" });
-      batch.commit().then(function() {
-        showToast(count + " tasks synced to cloud!", "success");
-      }).catch(function(err) {
-        console.error("Migration error:", err);
-        showToast("Sync error — tasks saved locally", "error");
+      batch.set(db.collection("meta").doc("projects"), { items: _localBackup.projects });
+      batch.set(db.collection("meta").doc("people"), { items: _localBackup.people });
+      batch.set(db.collection("meta").doc("aliases"), { map: _localBackup.aliases });
+      batch.set(db.collection("meta").doc("config"), { apiKey: _localBackup.config.apiKey || "", parseMode: _localBackup.config.parseMode || "smart" });
+      return batch.commit().then(function() {
+        showToast(_localBackup.tasks.length + " tasks synced to cloud!", "success");
       });
-    } else if (snapshot.empty && tasks.length === 0) {
+    } else if (snapshot.empty) {
       // First-time use, seed defaults
-      db.collection("meta").doc("projects").set({ items: DEF_PROJECTS });
-      db.collection("meta").doc("people").set({ items: DEF_PEOPLE });
-      db.collection("meta").doc("aliases").set({ map: {} });
-      db.collection("meta").doc("config").set({ apiKey: "", parseMode: "smart" });
+      return Promise.all([
+        db.collection("meta").doc("projects").set({ items: DEF_PROJECTS }),
+        db.collection("meta").doc("people").set({ items: DEF_PEOPLE }),
+        db.collection("meta").doc("aliases").set({ map: {} }),
+        db.collection("meta").doc("config").set({ apiKey: "", parseMode: "smart" })
+      ]);
     }
+  }).catch(function(err) {
+    console.error("Migration error:", err);
+    showToast("Sync error — tasks saved locally", "error");
   });
 }
 
@@ -1709,13 +1719,16 @@ if (config.parseMode === "ai") {
 // Initial render from localStorage (fast first paint)
 render();
 
-// Firebase auth + sync
+// Firebase auth + sync (migrate FIRST, then attach listeners)
 if (auth) {
   auth.signInAnonymously().then(function() {
     firebaseReady = true;
-    startSync();
-    migrateIfNeeded();
     updateSyncBadge();
+    // Migration must finish before onSnapshot listeners attach,
+    // otherwise empty Firestore overwrites localStorage data
+    return migrateIfNeeded();
+  }).then(function() {
+    startSync();
   }).catch(function(err) {
     console.error("Auth error:", err);
     syncStatus = "error";
