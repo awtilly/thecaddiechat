@@ -346,7 +346,113 @@ input, select, textarea, button { font-family:inherit; }
 
   #toasts { right:10px; left:10px; }
   .alert-bar { font-size:13px; padding:8px 12px; }
+
+  /* === MOBILE PWA ENHANCEMENTS === */
+
+  /* Hide desktop toolbar extras on mobile — replaced by bottom tabs + FAB */
+  .tright { display:none !important; }
+
+  /* Compact the input row */
+  .inp-wrap { border-radius:var(--r); margin-bottom:6px; }
+  #parseMode { display:none; }
+
+  /* Add breathing room for fixed bottom bar */
+  .app { padding-bottom:calc(80px + env(safe-area-inset-bottom)) !important; }
+
+  /* Bottom Tab Bar */
+  .btabs {
+    display:flex !important;
+    position:fixed;
+    bottom:0; left:0; right:0;
+    z-index:100;
+    background:var(--bg-2);
+    border-top:1px solid var(--border);
+    padding:4px 0 calc(4px + env(safe-area-inset-bottom));
+    box-shadow:0 -1px 10px rgba(0,0,0,0.06);
+  }
+  .btab {
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; gap:1px;
+    background:none; border:none;
+    color:var(--tx-4);
+    font-family:inherit; font-size:10px; font-weight:600;
+    padding:6px 0 2px;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    transition:color 0.15s;
+  }
+  .btab.act { color:var(--blue); }
+  .btab:active { opacity:0.6; }
+  .btab-icon { font-size:22px; line-height:1; }
+  .btab-label { font-size:10px; letter-spacing:0.3px; }
+
+  /* FAB — Floating Action Button */
+  .fab {
+    display:flex !important;
+    position:fixed;
+    bottom:calc(68px + env(safe-area-inset-bottom));
+    right:16px;
+    z-index:101;
+    width:56px; height:56px;
+    border-radius:50%;
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    font-size:30px; font-weight:300; line-height:1;
+    align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(74,108,247,0.4);
+    -webkit-tap-highlight-color:transparent;
+    transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .fab:active { transform:scale(0.88); box-shadow:0 2px 8px rgba(74,108,247,0.3); }
+
+  /* Notification bell in mobile header */
+  .mob-notif { display:inline-flex !important; }
+
+  /* Swipe-to-complete feedback */
+  .card { position:relative; overflow:hidden; will-change:transform; }
+  .card .swipe-hint {
+    position:absolute; top:0; bottom:0; left:0; width:0;
+    background:var(--green);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-size:22px; font-weight:700;
+    border-radius:var(--r) 0 0 var(--r);
+    pointer-events:none;
+    transition:width 0.05s linear;
+  }
+  .card.swipe-done {
+    transition:transform 0.3s ease, opacity 0.3s ease;
+    transform:translateX(110%);
+    opacity:0;
+  }
+
+  /* Filters row — horizontal scroll */
+  .toolbar { gap:4px; margin-bottom:10px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+  .toolbar select { flex:none; min-width:0; font-size:13px; padding:8px 10px; min-height:40px; }
+
+  /* Tighter cards for more density */
+  .card { padding:12px 14px; margin-bottom:6px; }
+  .ctop { gap:10px; }
+  .ctitle { font-size:15px; }
+  .cmeta { gap:4px; margin-top:6px; }
+  .tg { font-size:12px; padding:3px 8px; }
+  .cnotes { font-size:13px; margin-top:6px; }
+
+  /* Column headers tighter */
+  .col-hdr { padding:8px 4px; margin-bottom:4px; }
+
+  /* Modal slides up from bottom */
+  .modal { border-radius:var(--r-xl) var(--r-xl) 0 0; height:auto; max-height:92vh; }
+
+  /* Compact greeting */
+  .hdr .greet { font-size:13px; }
 }
+
+/* === DESKTOP-ONLY: hide mobile elements === */
+.btabs { display:none; }
+.fab { display:none; }
+.mob-notif { display:none; }
 </style>
 </head>
 <body>
@@ -362,6 +468,7 @@ input, select, textarea, button { font-family:inherit; }
     <div class="hdr-right">
       <div id="stats"></div>
       <div id="syncBadge"><span class="sync-dot syncing"></span><span>Connecting...</span></div>
+      <button class="mob-notif notif-btn" onclick="handleNotifClick()" title="Notifications" style="background:var(--bg-2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:14px;cursor:pointer;">&#128276;<span class="notif-badge" id="notifBadgeMob" style="display:none">0</span></button>
     </div>
   </div>
 
@@ -422,6 +529,29 @@ input, select, textarea, button { font-family:inherit; }
     <span class="ex">Order sand, Call vendor about pricing; Email client update</span>
   </div>
 </div>
+
+<!-- Mobile Bottom Tab Bar -->
+<div class="btabs" id="btabs">
+  <button class="btab act" data-view="board" onclick="setView('board')">
+    <span class="btab-icon">&#9638;</span>
+    <span class="btab-label">Board</span>
+  </button>
+  <button class="btab" data-view="list" onclick="setView('list')">
+    <span class="btab-icon">&#9776;</span>
+    <span class="btab-label">List</span>
+  </button>
+  <button class="btab" data-view="table" onclick="setView('table')">
+    <span class="btab-icon">&#9636;</span>
+    <span class="btab-label">Table</span>
+  </button>
+  <button class="btab" onclick="showSettings()">
+    <span class="btab-icon">&#9881;</span>
+    <span class="btab-label">Settings</span>
+  </button>
+</div>
+
+<!-- Mobile FAB -->
+<button class="fab" id="fab" onclick="showQuickAdd()">+</button>
 
 <div id="mc"></div>
 
@@ -544,15 +674,14 @@ function updateAlerts() {
   }
   el.innerHTML = html;
 
-  // Update notification badge
-  var badge = document.getElementById("notifBadge");
+  // Update notification badges (desktop + mobile)
   var total = overdue.length;
-  if (total > 0) {
-    badge.textContent = total;
-    badge.style.display = "flex";
-  } else {
-    badge.style.display = "none";
-  }
+  ["notifBadge", "notifBadgeMob"].forEach(function(id) {
+    var badge = document.getElementById(id);
+    if (!badge) return;
+    if (total > 0) { badge.textContent = total; badge.style.display = "flex"; }
+    else { badge.style.display = "none"; }
+  });
 }
 
 /* ============================================================
@@ -1286,9 +1415,14 @@ function del(id) {
 
 function setView(v) {
   view = v;
+  // Desktop toolbar
   document.getElementById("vBoard").classList.toggle("act", v === "board");
   document.getElementById("vList").classList.toggle("act", v === "list");
   document.getElementById("vTable").classList.toggle("act", v === "table");
+  // Mobile bottom tabs
+  document.querySelectorAll(".btab[data-view]").forEach(function(b) {
+    b.classList.toggle("act", b.dataset.view === v);
+  });
   render();
 }
 
@@ -1527,59 +1661,116 @@ function drop(e) {
   render();
 }
 
-// Touch drag support for mobile
-var touchDragEl = null;
+// === TOUCH: Swipe-to-complete (mobile) + Drag-to-column (desktop) ===
+var touchEl = null;
 var touchClone = null;
-var touchStartX = 0;
-var touchStartY = 0;
-var touchMoved = false;
+var touchSX = 0;
+var touchSY = 0;
+var touchMode = null; // null | 'swipe' | 'drag' | 'scroll'
+var swipeDX = 0;
+var SWIPE_THRESHOLD = 90;
+
+function isMobile() { return window.innerWidth <= 768; }
 
 document.addEventListener('touchstart', function(e) {
   var card = e.target.closest('.card[draggable]');
   if (!card || e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
-  touchDragEl = card;
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-  touchMoved = false;
+  touchEl = card;
+  touchSX = e.touches[0].clientX;
+  touchSY = e.touches[0].clientY;
+  touchMode = null;
+  swipeDX = 0;
 }, { passive: true });
 
 document.addEventListener('touchmove', function(e) {
-  if (!touchDragEl) return;
-  var dx = e.touches[0].clientX - touchStartX;
-  var dy = e.touches[0].clientY - touchStartY;
-  if (!touchMoved && Math.abs(dx) + Math.abs(dy) < 10) return;
-  touchMoved = true;
+  if (!touchEl) return;
+  var dx = e.touches[0].clientX - touchSX;
+  var dy = e.touches[0].clientY - touchSY;
+
+  // Determine mode on first significant move
+  if (!touchMode) {
+    if (Math.abs(dx) + Math.abs(dy) < 10) return;
+    if (isMobile()) {
+      // Mobile: horizontal = swipe, vertical = scroll
+      touchMode = Math.abs(dx) > Math.abs(dy) && dx > 0 ? 'swipe' : 'scroll';
+    } else {
+      // Desktop: any direction = drag to column
+      touchMode = 'drag';
+    }
+  }
+
+  if (touchMode === 'scroll') return;
+
   e.preventDefault();
 
-  if (!touchClone) {
-    touchClone = touchDragEl.cloneNode(true);
-    touchClone.style.cssText = 'position:fixed;z-index:2000;width:' + touchDragEl.offsetWidth + 'px;opacity:0.85;pointer-events:none;transform:rotate(2deg);box-shadow:0 8px 24px rgba(0,0,0,0.15);';
-    document.body.appendChild(touchClone);
-    touchDragEl.classList.add('dragging');
+  // === SWIPE MODE (mobile) ===
+  if (touchMode === 'swipe') {
+    swipeDX = Math.max(0, dx);
+    var progress = Math.min(swipeDX / SWIPE_THRESHOLD, 1);
+    touchEl.style.transform = 'translateX(' + Math.min(swipeDX, SWIPE_THRESHOLD + 30) + 'px)';
+    touchEl.style.transition = 'none';
+    // Green hint behind card
+    var hint = touchEl.querySelector('.swipe-hint');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.className = 'swipe-hint';
+      hint.textContent = '\u2713';
+      touchEl.insertBefore(hint, touchEl.firstChild);
+    }
+    hint.style.width = Math.min(swipeDX, SWIPE_THRESHOLD + 30) + 'px';
+    hint.style.opacity = String(progress);
+    return;
   }
-  touchClone.style.left = (e.touches[0].clientX - touchDragEl.offsetWidth / 2) + 'px';
-  touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
 
+  // === DRAG MODE (desktop/tablet) ===
+  if (!touchClone) {
+    touchClone = touchEl.cloneNode(true);
+    touchClone.style.cssText = 'position:fixed;z-index:2000;width:' + touchEl.offsetWidth + 'px;opacity:0.85;pointer-events:none;transform:rotate(2deg);box-shadow:0 8px 24px rgba(0,0,0,0.15);';
+    document.body.appendChild(touchClone);
+    touchEl.classList.add('dragging');
+  }
+  touchClone.style.left = (e.touches[0].clientX - touchEl.offsetWidth / 2) + 'px';
+  touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
   document.querySelectorAll('.board-col').forEach(function(c) {
     var r = c.getBoundingClientRect();
-    if (e.touches[0].clientX >= r.left && e.touches[0].clientX <= r.right && e.touches[0].clientY >= r.top && e.touches[0].clientY <= r.bottom) {
+    if (e.touches[0].clientX >= r.left && e.touches[0].clientX <= r.right &&
+        e.touches[0].clientY >= r.top && e.touches[0].clientY <= r.bottom) {
       c.classList.add('drag-over');
-    } else {
-      c.classList.remove('drag-over');
-    }
+    } else { c.classList.remove('drag-over'); }
   });
 }, { passive: false });
 
 document.addEventListener('touchend', function(e) {
-  if (!touchDragEl) return;
+  if (!touchEl) return;
+
+  // === SWIPE END ===
+  if (touchMode === 'swipe') {
+    if (swipeDX >= SWIPE_THRESHOLD) {
+      // Animate off screen then toggle
+      touchEl.classList.add('swipe-done');
+      var taskId = touchEl.dataset.taskId;
+      setTimeout(function() { tog(taskId); }, 300);
+    } else {
+      // Snap back
+      touchEl.style.transition = 'transform 0.2s ease';
+      touchEl.style.transform = '';
+      var hint = touchEl.querySelector('.swipe-hint');
+      if (hint) hint.remove();
+    }
+    touchEl = null; touchMode = null; swipeDX = 0;
+    return;
+  }
+
+  // === DRAG END ===
   if (touchClone) {
     var touch = e.changedTouches[0];
     var dropped = false;
     document.querySelectorAll('.board-col').forEach(function(c) {
       var r = c.getBoundingClientRect();
-      if (touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom) {
+      if (touch.clientX >= r.left && touch.clientX <= r.right &&
+          touch.clientY >= r.top && touch.clientY <= r.bottom) {
         var newStatus = c.dataset.status;
-        var taskId = touchDragEl.dataset.taskId;
+        var taskId = touchEl.dataset.taskId;
         var task = tasks.find(function(t) { return t.id === taskId; });
         if (task && task.status !== newStatus) {
           task.status = newStatus;
@@ -1596,9 +1787,8 @@ document.addEventListener('touchend', function(e) {
     touchClone = null;
     if (dropped) render();
   }
-  touchDragEl.classList.remove('dragging');
-  touchDragEl = null;
-  touchMoved = false;
+  if (touchEl) touchEl.classList.remove('dragging');
+  touchEl = null; touchMode = null;
 });
 
 /* ============================================================
