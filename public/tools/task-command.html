@@ -2,9 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Task Command</title>
+
+<!-- PWA -->
+<link rel="manifest" href="/tools/manifest.json">
+<meta name="theme-color" content="#4a6cf7">
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Task Command">
+<link rel="apple-touch-icon" href="/tools/icon-180.png">
+
+<meta name="format-detection" content="telephone=no">
+
+<!-- Firebase SDK (compat for inline script compatibility) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -36,37 +54,51 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { height:100%; }
-body { font-family:'Outfit',system-ui,sans-serif; background:var(--bg-0); color:var(--tx-1); min-height:100%; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; font-size:16px; }
+body { font-family:'Outfit',system-ui,sans-serif; background:var(--bg-0); color:var(--tx-1); min-height:100%; display:flex; flex-direction:column; -webkit-font-smoothing:antialiased; font-size:16px; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 ::selection { background:var(--blue); color:#fff; }
 input, select, textarea, button { font-family:inherit; }
 @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
-
-/* PASSWORD GATE */
-#gate { position:fixed; inset:0; background:var(--bg-0); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px; }
-#gate.hidden { display:none; }
-#gate h2 { font-size:26px; font-weight:600; color:var(--tx-2); }
-#gate .sub { font-size:15px; color:var(--tx-3); margin-top:-12px; }
-#gate input { width:300px; padding:14px 18px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); color:var(--tx-1); font-size:16px; outline:none; text-align:center; letter-spacing:2px; }
-#gate input:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-g); }
-#gate .err { color:var(--red); font-size:14px; min-height:18px; }
-#gate button { padding:12px 36px; background:var(--blue); color:#fff; border:none; border-radius:var(--r); cursor:pointer; font-weight:600; font-size:16px; }
-#gate button:hover { opacity:0.9; }
-#gate .hint { font-size:13px; color:var(--tx-4); max-width:300px; text-align:center; line-height:1.5; }
+@keyframes fadeOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-10px); } }
 
 /* APP */
-.app { display:none; max-width:1400px; margin:0 auto; padding:24px 32px 40px; flex:1; width:100%; }
-.app.visible { display:flex; flex-direction:column; }
+.app { max-width:1400px; margin:0 auto; padding:24px 32px 40px; flex:1; width:100%; display:flex; flex-direction:column; }
 
 /* HEADER */
 .hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
 .hdr h1 { font-size:28px; font-weight:700; color:var(--tx-1); }
 .hdr h1 span { color:var(--blue); font-weight:400; }
 .hdr .greet { font-size:15px; color:var(--tx-3); margin-top:2px; }
+.hdr-right { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
 #stats { display:flex; gap:6px; flex-wrap:wrap; }
 .stat { padding:5px 12px; border-radius:20px; font-size:13px; font-weight:600; background:var(--bg-2); color:var(--tx-2); border:1px solid var(--border); white-space:nowrap; }
 .stat.urg { background:#fef2f2; color:#dc2626; border-color:#fecaca; }
 .stat.grn { background:#f0fdf4; color:#16a34a; border-color:#bbf7d0; }
+
+/* SYNC BADGE */
+#syncBadge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:12px; color:var(--tx-3); background:var(--bg-2); border:1px solid var(--border); }
+.sync-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.sync-dot.online { background:var(--green); }
+.sync-dot.offline { background:var(--amber); }
+.sync-dot.syncing { background:var(--blue); animation:pulse 1s infinite; }
+.sync-dot.error { background:var(--red); }
+
+/* ALERT BANNER */
+.alert-bar { padding:10px 16px; border-radius:var(--r); margin-bottom:12px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; animation:fadeUp 0.2s ease; }
+.alert-bar.warn { background:#fffbeb; border:1px solid #fde68a; color:#92400e; }
+.alert-bar.danger { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; }
+.alert-bar.info { background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; }
+.alert-dismiss { background:none; border:none; cursor:pointer; margin-left:auto; font-size:18px; opacity:0.5; color:inherit; padding:4px; }
+.alert-dismiss:hover { opacity:1; }
+
+/* TOAST NOTIFICATIONS */
+#toasts { position:fixed; top:calc(20px + env(safe-area-inset-top)); right:16px; left:16px; z-index:2000; display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none; }
+.toast { pointer-events:auto; padding:12px 16px; border-radius:var(--r); font-size:14px; font-weight:500; animation:fadeUp 0.3s ease; box-shadow:0 4px 12px rgba(0,0,0,0.1); max-width:400px; width:100%; text-align:center; }
+.toast.removing { animation:fadeOut 0.3s ease forwards; }
+.toast.info { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+.toast.warning { background:#fffbeb; color:#92400e; border:1px solid #fde68a; }
+.toast.success { background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; }
+.toast.error { background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
 
 /* INPUT SECTION */
 .inp-wrap { background:var(--bg-2); border-radius:var(--r-lg); border:1px solid var(--border); padding:4px; margin-bottom:4px; transition:border-color 0.15s, box-shadow 0.15s; }
@@ -115,6 +147,10 @@ input, select, textarea, button { font-family:inherit; }
 .toolbar button.act { background:var(--bg-3); color:var(--tx-1); }
 .tright { margin-left:auto; display:flex; gap:4px; }
 
+/* NOTIFICATION BELL */
+.notif-btn { position:relative; }
+.notif-badge { position:absolute; top:-4px; right:-4px; min-width:16px; height:16px; border-radius:50%; background:var(--red); color:#fff; font-size:10px; display:flex; align-items:center; justify-content:center; font-weight:700; padding:0 3px; }
+
 /* BOARD VIEW */
 #content { flex:1; }
 .board { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
@@ -152,8 +188,9 @@ input, select, textarea, button { font-family:inherit; }
 .tg.due { background:var(--bg-3); color:var(--tx-2); }
 .tg.due.od { background:#fef2f2; color:#dc2626; }
 .cnotes { font-size:13px; color:var(--tx-3); margin-top:5px; font-style:italic; word-break:break-word; }
-.cacts { opacity:0; transition:opacity 0.15s; display:flex; gap:2px; flex-shrink:0; }
+.cacts { opacity:0.5; transition:opacity 0.15s; display:flex; gap:2px; flex-shrink:0; }
 .card:hover .cacts { opacity:1; }
+@media (hover:none) { .cacts { opacity:1; } }
 .cacts button { background:transparent; border:none; color:var(--tx-4); cursor:pointer; font-size:14px; padding:2px 4px; border-radius:3px; }
 .cacts button:hover { color:var(--tx-2); background:var(--bg-3); }
 
@@ -224,29 +261,97 @@ input, select, textarea, button { font-family:inherit; }
 #tips h3 { font-size:16px; margin:8px 0; color:var(--tx-4); }
 #tips .ex { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r); padding:8px 14px; margin:4px; color:var(--tx-3); }
 
-/* RESPONSIVE */
-@media (max-width:640px) {
-  .board { grid-template-columns:1fr; }
-  .hdr { flex-direction:column; }
-  .tright { margin-left:0; width:100%; overflow-x:auto; }
-  .mgrid { grid-template-columns:1fr; }
-  .sfooter { flex-direction:column; }
-  .sfooter button { width:100%; }
-  .toolbar { gap:4px; }
-  .app { padding:16px 14px 32px; }
+/* DESKTOP ENHANCEMENT */
+@media (min-width:1200px) {
+  .app { padding:32px 48px 48px; }
+  .board { gap:20px; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }
+  .card { padding:16px 20px; }
+  .hdr { margin-bottom:24px; }
+  .inp-wrap { margin-bottom:8px; }
+  .toolbar { margin-bottom:20px; gap:8px; }
+}
+
+/* STANDALONE PWA MODE */
+@media (display-mode:standalone) {
+  body { padding-top:env(safe-area-inset-top); }
+  .app { padding-top:20px; }
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width:768px) {
+  .app { padding:16px 14px calc(32px + env(safe-area-inset-bottom)); }
+  .hdr { flex-direction:column; gap:8px; }
+  .hdr h1 { font-size:24px; }
+  .hdr-right { align-items:flex-start; }
+
+  #stats { gap:4px; }
+  .stat { font-size:12px; padding:4px 10px; }
+
+  .inp-wrap { margin-bottom:8px; }
+  #mainForm { flex-wrap:wrap; }
+  .inp-main { width:100%; font-size:16px; padding:16px 12px; }
+  .inp-btn { flex:1; padding:14px 16px; min-height:48px; font-size:16px; }
+  .mic-btn { width:48px; height:48px; font-size:22px; }
+
+  #parseMode { flex-wrap:wrap; gap:6px; }
+  #parseMode button { flex:1; min-width:0; padding:10px 8px; font-size:13px; }
+  #syntaxHelp { font-size:12px; line-height:1.6; padding:12px; }
+
+  .toolbar { gap:6px; flex-wrap:wrap; }
+  .toolbar select, .toolbar button { padding:10px 12px; font-size:14px; min-height:44px; }
+  .toolbar select { flex:1; min-width:0; }
+  .tright { margin-left:0; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; gap:6px; }
+  .tright button { flex:1; min-height:44px; white-space:nowrap; }
+
+  .board { grid-template-columns:1fr; gap:12px; }
+
+  .card { padding:16px; margin-bottom:10px; }
+  .ctop { gap:12px; }
+  .ctitle { font-size:16px; }
+  .cmeta { gap:6px; margin-top:8px; }
+  .tg { font-size:13px; padding:4px 10px; }
+  .cnotes { font-size:14px; margin-top:8px; }
+
+  .ck { min-width:44px; min-height:44px; width:28px; height:28px; }
+  .cacts button { min-width:44px; min-height:44px; padding:8px; font-size:16px; }
+  .cacts { gap:4px; }
+
+  .epan { grid-template-columns:1fr; gap:10px; }
+  .epan select, .epan input { padding:12px; font-size:16px; min-height:44px; }
+
+  .mover { padding:0; align-items:stretch; }
+  .modal { max-width:100%; max-height:100%; height:100%; border-radius:0; padding:20px 16px calc(20px + env(safe-area-inset-bottom)); overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .modal h3 { font-size:18px; margin-bottom:12px; }
+  .modal input, .modal select { font-size:16px; padding:14px; min-height:48px; }
+  .mgrid { grid-template-columns:1fr; gap:10px; }
+  .bpri { padding:16px; font-size:17px; min-height:52px; }
+
+  .modal.settings { max-width:100%; }
+  .sbox { padding:12px; margin-bottom:12px; }
+  .sbox h4 { font-size:14px; }
+  .srow { gap:8px; }
+  .srow input, .srow select { font-size:16px; padding:12px; min-height:44px; }
+  .srow button { padding:12px 16px; min-height:44px; font-size:14px; }
+  .sfooter { flex-direction:column; gap:8px; }
+  .sfooter button { width:100%; min-height:48px; font-size:15px; }
+
+  .tbl { font-size:13px; }
+  .tbl th, .tbl td { padding:12px 10px; }
+  .tbl select { min-height:40px; font-size:14px; padding:8px; }
+  .tbl .tck { min-width:44px; min-height:44px; }
+  .tbl .del-btn { min-width:44px; min-height:44px; }
+
+  #tips .big { font-size:36px; }
+  #tips .ex { font-size:12px; padding:6px 10px; }
+
+  #toasts { right:10px; left:10px; }
+  .alert-bar { font-size:13px; padding:8px 12px; }
 }
 </style>
 </head>
 <body>
 
-<div id="gate">
-  <h2>&#128274; Task Command</h2>
-  <p class="sub">Enter access code</p>
-  <input type="password" id="gateInput" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="off">
-  <div class="err" id="gateErr"></div>
-  <button onclick="tryLogin()">Enter</button>
-  <p class="hint">First time? Default code: golf2026 — Change it in Settings after login.</p>
-</div>
+<div id="toasts"></div>
 
 <div class="app" id="app">
   <div class="hdr">
@@ -254,8 +359,13 @@ input, select, textarea, button { font-family:inherit; }
       <h1>Task <span>Command</span></h1>
       <p class="greet" id="greeting"></p>
     </div>
-    <div id="stats"></div>
+    <div class="hdr-right">
+      <div id="stats"></div>
+      <div id="syncBadge"><span class="sync-dot syncing"></span><span>Connecting...</span></div>
+    </div>
   </div>
+
+  <div id="alerts"></div>
 
   <div class="inp-wrap">
     <form id="mainForm">
@@ -296,6 +406,7 @@ input, select, textarea, button { font-family:inherit; }
       <button id="vList" onclick="setView('list')">&#9776; List</button>
       <button id="vTable" onclick="setView('table')">&#9636; Table</button>
       <button onclick="showQuickAdd()">+ Add</button>
+      <button class="notif-btn" id="notifBtn" onclick="handleNotifClick()" title="Notifications">&#128276;<span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
       <button onclick="showSettings()">&#9881;</button>
     </div>
   </div>
@@ -315,65 +426,326 @@ input, select, textarea, button { font-family:inherit; }
 <div id="mc"></div>
 
 <script>
-/* === HELPERS === */
-const LS = key => JSON.parse(localStorage.getItem(key) || "null");
-const SS = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+/* ============================================================
+   FIREBASE SETUP
+   ============================================================ */
+var firebaseConfig = {
+  apiKey: "AIzaSyBitQmzrsevmplA1r3KP2-57iDiuwinv3M",
+  authDomain: "todolist-6ca86.firebaseapp.com",
+  projectId: "todolist-6ca86",
+  storageBucket: "todolist-6ca86.firebasestorage.app",
+  messagingSenderId: "1044938139787",
+  appId: "1:1044938139787:web:411cab7ab2e8fbe209cc8e"
+};
 
-/* === DEFAULTS === */
-const DEF_PROJECTS = ["Crown Colony","Headwaters","Linville GC","Naples National","The Caddie Chat","Personal","General / Office"];
-const DEF_PEOPLE = ["Self","Dave","Architect","Owner / Client","Vendor"];
-const STATUSES = {
+var db = null;
+var auth = null;
+var firebaseReady = false;
+
+if (typeof firebase !== 'undefined') {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    db.enablePersistence({ synchronizeTabs: true }).catch(function(err) {
+      console.log('Persistence:', err.code);
+    });
+  } catch (e) {
+    console.error('Firebase init error:', e);
+  }
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+var LS = function(key) { return JSON.parse(localStorage.getItem(key) || "null"); };
+var SS = function(key, val) { localStorage.setItem(key, JSON.stringify(val)); };
+
+/* ============================================================
+   DEFAULTS & STATE
+   ============================================================ */
+var DEF_PROJECTS = ["Crown Colony","Headwaters","Linville GC","Naples National","The Caddie Chat","Personal","General / Office"];
+var DEF_PEOPLE = ["Self","Dave","Architect","Owner / Client","Vendor"];
+var STATUSES = {
   todo:        { label:"To Do",       color:"#94a3b8" },
   in_progress: { label:"In Progress", color:"#60a5fa" },
   waiting:     { label:"Waiting On",  color:"#c084fc" },
   done:        { label:"Done",        color:"#34d399" }
 };
 
-/* === STATE === */
-let tasks = LS("tc-tasks") || [];
-let projects = LS("tc-projects") || [...DEF_PROJECTS];
-let people = LS("tc-people") || [...DEF_PEOPLE];
-let aliases = LS("tc-aliases") || {};
-let config = LS("tc-config") || { password:"golf2026", apiKey:"", parseMode:"smart" };
-let view = "board";
-let editId = null;
+// Load from localStorage for instant first render
+var tasks = LS("tc-tasks") || [];
+var projects = LS("tc-projects") || DEF_PROJECTS.slice();
+var people = LS("tc-people") || DEF_PEOPLE.slice();
+var aliases = LS("tc-aliases") || {};
+var config = LS("tc-config") || { apiKey:"", parseMode:"smart" };
+var view = "board";
+var editId = null;
+var syncStatus = "syncing";
 
-function save() {
-  SS("tc-tasks", tasks);
-  SS("tc-projects", projects);
-  SS("tc-people", people);
-  SS("tc-aliases", aliases);
-  SS("tc-config", config);
-}
-
-/* === UTILITIES === */
+/* ============================================================
+   UTILITIES
+   ============================================================ */
 function iso(d) { return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function fmtD(d) { if(!d) return ""; return new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
 function escRx(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+function esc(s) { var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 
 function isOverdue(task) {
   if (!task.due_date || task.status === "done") return false;
   return new Date(task.due_date) < new Date(new Date().toDateString());
 }
 
-/* === PASSWORD GATE === */
-function tryLogin() {
-  const v = document.getElementById("gateInput").value;
-  if (v === config.password) {
-    document.getElementById("gate").classList.add("hidden");
-    document.getElementById("app").classList.add("visible");
-    sessionStorage.setItem("tc-auth", "1");
-    render();
+/* ============================================================
+   TOAST & ALERT SYSTEM
+   ============================================================ */
+function showToast(message, type) {
+  type = type || "info";
+  var el = document.createElement("div");
+  el.className = "toast " + type;
+  el.textContent = message;
+  document.getElementById("toasts").appendChild(el);
+  setTimeout(function() {
+    el.classList.add("removing");
+    setTimeout(function() { el.remove(); }, 300);
+  }, 3500);
+}
+
+var alertsDismissed = {};
+function updateAlerts() {
+  var el = document.getElementById("alerts");
+  if (!el) return;
+  var today = iso(new Date());
+  var overdue = tasks.filter(function(t) { return isOverdue(t); });
+  var dueToday = tasks.filter(function(t) { return t.status !== "done" && t.due_date === today; });
+  var html = "";
+
+  if (overdue.length > 0 && !alertsDismissed.overdue) {
+    html += '<div class="alert-bar danger">' +
+      '<span>&#9888;&#65039; ' + overdue.length + ' overdue task' + (overdue.length > 1 ? 's' : '') +
+      ': ' + overdue.slice(0, 3).map(function(t) { return '<strong>' + esc(t.title) + '</strong>'; }).join(', ') +
+      (overdue.length > 3 ? ' +' + (overdue.length - 3) + ' more' : '') +
+      '</span><button class="alert-dismiss" onclick="alertsDismissed.overdue=true;updateAlerts()">&times;</button></div>';
+  }
+  if (dueToday.length > 0 && !alertsDismissed.dueToday) {
+    html += '<div class="alert-bar warn">' +
+      '<span>&#128197; ' + dueToday.length + ' task' + (dueToday.length > 1 ? 's' : '') + ' due today' +
+      '</span><button class="alert-dismiss" onclick="alertsDismissed.dueToday=true;updateAlerts()">&times;</button></div>';
+  }
+  el.innerHTML = html;
+
+  // Update notification badge
+  var badge = document.getElementById("notifBadge");
+  var total = overdue.length;
+  if (total > 0) {
+    badge.textContent = total;
+    badge.style.display = "flex";
   } else {
-    document.getElementById("gateErr").textContent = "Wrong code";
+    badge.style.display = "none";
   }
 }
 
-/* === SMART PARSER === */
+/* ============================================================
+   SYNC ENGINE
+   ============================================================ */
+function updateSyncBadge() {
+  var el = document.getElementById("syncBadge");
+  if (!el) return;
+  if (!navigator.onLine) {
+    el.innerHTML = '<span class="sync-dot offline"></span><span>Offline</span>';
+  } else if (syncStatus === "synced") {
+    el.innerHTML = '<span class="sync-dot online"></span><span>Synced</span>';
+  } else if (syncStatus === "error") {
+    el.innerHTML = '<span class="sync-dot error"></span><span>Sync error</span>';
+  } else {
+    el.innerHTML = '<span class="sync-dot syncing"></span><span>Syncing...</span>';
+  }
+}
+
+window.addEventListener("online", function() { updateSyncBadge(); });
+window.addEventListener("offline", function() { syncStatus = "offline"; updateSyncBadge(); });
+
+function startSync() {
+  if (!db) return;
+
+  // Listen to tasks collection
+  db.collection("tasks").onSnapshot(function(snapshot) {
+    var firestoreTasks = [];
+    snapshot.forEach(function(doc) {
+      var data = doc.data();
+      data.id = doc.id;
+      firestoreTasks.push(data);
+    });
+    firestoreTasks.sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+    tasks = firestoreTasks;
+    SS("tc-tasks", tasks);
+    syncStatus = snapshot.metadata.fromCache ? "offline" : "synced";
+    updateSyncBadge();
+    render();
+  }, function(err) {
+    console.error("Tasks listener error:", err);
+    syncStatus = "error";
+    updateSyncBadge();
+  });
+
+  // Listen to meta/projects
+  db.collection("meta").doc("projects").onSnapshot(function(doc) {
+    if (doc.exists && doc.data().items) {
+      projects = doc.data().items;
+      SS("tc-projects", projects);
+      render();
+    }
+  });
+
+  // Listen to meta/people
+  db.collection("meta").doc("people").onSnapshot(function(doc) {
+    if (doc.exists && doc.data().items) {
+      people = doc.data().items;
+      SS("tc-people", people);
+      render();
+    }
+  });
+
+  // Listen to meta/aliases
+  db.collection("meta").doc("aliases").onSnapshot(function(doc) {
+    if (doc.exists && doc.data().map) {
+      aliases = doc.data().map;
+      SS("tc-aliases", aliases);
+    }
+  });
+
+  // Listen to meta/config
+  db.collection("meta").doc("config").onSnapshot(function(doc) {
+    if (doc.exists) {
+      var d = doc.data();
+      config.apiKey = d.apiKey || "";
+      config.parseMode = d.parseMode || "smart";
+      SS("tc-config", config);
+    }
+  });
+}
+
+function migrateIfNeeded() {
+  if (!db) return;
+  db.collection("tasks").limit(1).get().then(function(snapshot) {
+    if (snapshot.empty && tasks.length > 0) {
+      // Migrate existing localStorage data to Firestore
+      showToast("Syncing existing tasks to cloud...", "info");
+      var batch = db.batch();
+      var count = 0;
+      tasks.forEach(function(task) {
+        batch.set(db.collection("tasks").doc(task.id), task);
+        count++;
+      });
+      batch.set(db.collection("meta").doc("projects"), { items: projects });
+      batch.set(db.collection("meta").doc("people"), { items: people });
+      batch.set(db.collection("meta").doc("aliases"), { map: aliases });
+      batch.set(db.collection("meta").doc("config"), { apiKey: config.apiKey || "", parseMode: config.parseMode || "smart" });
+      batch.commit().then(function() {
+        showToast(count + " tasks synced to cloud!", "success");
+      }).catch(function(err) {
+        console.error("Migration error:", err);
+        showToast("Sync error — tasks saved locally", "error");
+      });
+    } else if (snapshot.empty && tasks.length === 0) {
+      // First-time use, seed defaults
+      db.collection("meta").doc("projects").set({ items: DEF_PROJECTS });
+      db.collection("meta").doc("people").set({ items: DEF_PEOPLE });
+      db.collection("meta").doc("aliases").set({ map: {} });
+      db.collection("meta").doc("config").set({ apiKey: "", parseMode: "smart" });
+    }
+  });
+}
+
+// Write helpers
+function saveTaskToCloud(task) {
+  if (db) db.collection("tasks").doc(task.id).set(task).catch(function(e) { console.error("Save task:", e); });
+}
+
+function updateTaskInCloud(id, updates) {
+  if (db) db.collection("tasks").doc(id).update(updates).catch(function(e) { console.error("Update task:", e); });
+}
+
+function deleteTaskFromCloud(id) {
+  if (db) db.collection("tasks").doc(id).delete().catch(function(e) { console.error("Delete task:", e); });
+}
+
+function saveMeta() {
+  SS("tc-projects", projects);
+  SS("tc-people", people);
+  SS("tc-aliases", aliases);
+  SS("tc-config", config);
+  if (db) {
+    db.collection("meta").doc("projects").set({ items: projects });
+    db.collection("meta").doc("people").set({ items: people });
+    db.collection("meta").doc("aliases").set({ map: aliases });
+    db.collection("meta").doc("config").set({ apiKey: config.apiKey || "", parseMode: config.parseMode || "smart" });
+  }
+}
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+var notifPermission = typeof Notification !== "undefined" ? Notification.permission : "denied";
+var lastNotifCheck = 0;
+
+function handleNotifClick() {
+  if (notifPermission === "granted") {
+    showToast("Notifications are enabled", "success");
+    checkDueNotifications(true);
+    return;
+  }
+  if (notifPermission === "denied") {
+    showToast("Notifications blocked — check browser settings", "warning");
+    return;
+  }
+  // Ask for permission
+  Notification.requestPermission().then(function(result) {
+    notifPermission = result;
+    if (result === "granted") {
+      showToast("Notifications enabled!", "success");
+      checkDueNotifications(true);
+    } else {
+      showToast("Notifications not enabled", "warning");
+    }
+  });
+}
+
+function checkDueNotifications(force) {
+  if (notifPermission !== "granted") return;
+  var now = Date.now();
+  if (!force && now - lastNotifCheck < 1800000) return; // 30 min throttle
+  lastNotifCheck = now;
+
+  var today = iso(new Date());
+  var overdue = tasks.filter(function(t) { return isOverdue(t); });
+  var dueToday = tasks.filter(function(t) { return t.status !== "done" && t.due_date === today; });
+
+  if (overdue.length > 0) {
+    new Notification("Task Command", {
+      body: overdue.length + " overdue: " + overdue.slice(0, 3).map(function(t) { return t.title; }).join(", "),
+      icon: "/tools/icon-192.png",
+      tag: "tc-overdue",
+      renotify: true
+    });
+  } else if (dueToday.length > 0) {
+    new Notification("Task Command", {
+      body: dueToday.length + " task" + (dueToday.length > 1 ? "s" : "") + " due today",
+      icon: "/tools/icon-192.png",
+      tag: "tc-due-today"
+    });
+  }
+}
+
+// Check notifications periodically while app is open
+setInterval(function() { checkDueNotifications(false); }, 1800000);
+
+/* ============================================================
+   SMART PARSER
+   ============================================================ */
 function getProjectAliases() {
-  const m = {
+  var m = {
     "cc":"Crown Colony","crown colony":"Crown Colony","crown":"Crown Colony",
     "hw":"Headwaters","headwaters":"Headwaters",
     "lgc":"Linville GC","linville":"Linville GC","linville gc":"Linville GC",
@@ -381,68 +753,62 @@ function getProjectAliases() {
     "caddie chat":"The Caddie Chat","tcc":"The Caddie Chat","blog":"The Caddie Chat",
     "personal":"Personal"
   };
-  for (const [k, v] of Object.entries(aliases)) {
-    m[k.toLowerCase()] = v;
-  }
-  for (const p of projects) {
-    const low = p.toLowerCase();
+  Object.entries(aliases).forEach(function(kv) { m[kv[0].toLowerCase()] = kv[1]; });
+  projects.forEach(function(p) {
+    var low = p.toLowerCase();
     if (!m[low]) m[low] = p;
-    const initials = p.split(/\s+/).map(w => w[0]).join("").toLowerCase();
+    var initials = p.split(/\s+/).map(function(w) { return w[0]; }).join("").toLowerCase();
     if (initials.length >= 2 && !m[initials]) m[initials] = p;
-  }
+  });
   return m;
 }
 
 function getPeopleAliases() {
-  const m = {
+  var m = {
     "dave":"Dave","architect":"Architect","arch":"Architect",
     "owner":"Owner / Client","client":"Owner / Client","vendor":"Vendor"
   };
-  for (const p of people) {
-    const low = p.toLowerCase();
+  people.forEach(function(p) {
+    var low = p.toLowerCase();
     if (!m[low]) m[low] = p;
-  }
+  });
   return m;
 }
 
 function parseInput(raw) {
-  return raw.split(/[,;]/).map(s => s.trim()).filter(Boolean).map(parseSingle);
+  return raw.split(/[,;]/).map(function(s) { return s.trim(); }).filter(Boolean).map(parseSingle);
 }
 
 function parseSingle(text) {
-  const PA = getProjectAliases();
-  const PeA = getPeopleAliases();
-  let rem = text, project = null, person = null, priority = "low", dueDate = null, notes = null;
+  var PA = getProjectAliases();
+  var PeA = getPeopleAliases();
+  var rem = text, project = null, person = null, priority = "low", dueDate = null, notes = null;
 
-  // STEP 1: Extract notes
-  const nm = rem.match(/\s*(?:--|—|note:|notes:)\s*(.+)$/i);
+  var nm = rem.match(/\s*(?:--|—|note:|notes:)\s*(.+)$/i);
   if (nm) { notes = nm[1].trim(); rem = rem.slice(0, nm.index); }
 
-  // STEP 2: Extract priority
   if (/#high|#urgent|#crit/i.test(rem)) { priority = "high"; rem = rem.replace(/#(?:high|urgent|crit)\b/gi, ""); }
   else if (/#med|#medium/i.test(rem)) { priority = "medium"; rem = rem.replace(/#(?:med|medium)\b/gi, ""); }
   else if (/#low/i.test(rem)) { priority = "low"; rem = rem.replace(/#low\b/gi, ""); }
   else if (/\b(urgent|asap|critical|emergency|immediately)\b/i.test(rem)) { priority = "high"; rem = rem.replace(/\b(urgent|asap|critical|emergency|immediately)\b/gi, ""); }
   else if (/\b(important|soon|priority)\b/i.test(rem)) { priority = "medium"; rem = rem.replace(/\b(important|soon|priority)\b/gi, ""); }
 
-  // STEP 3: Extract due date
   dueDate = extractDate(rem);
   if (dueDate) rem = stripDate(rem);
 
-  // STEP 4: Extract person
-  const am = rem.match(/@(\w+)/i);
+  var am = rem.match(/@(\w+)/i);
   if (am) {
-    const look = am[1].toLowerCase();
+    var look = am[1].toLowerCase();
     person = PeA[look] || cap(am[1]);
     rem = rem.replace(/@\w+/i, "");
   } else {
-    const fm = rem.match(/\bfrom\s+(\w+)[\s:]/i);
+    var fm = rem.match(/\bfrom\s+(\w+)[\s:]/i);
     if (fm) {
-      const look = fm[1].toLowerCase();
-      person = PeA[look] || cap(fm[1]);
+      var look2 = fm[1].toLowerCase();
+      person = PeA[look2] || cap(fm[1]);
       rem = rem.replace(/\bfrom\s+\w+[\s:]/i, "");
     } else {
-      const sm = rem.match(/^(\w+)\s+(?:needs?|asked?|wants?|requested?|said)\b/i);
+      var sm = rem.match(/^(\w+)\s+(?:needs?|asked?|wants?|requested?|said)\b/i);
       if (sm && PeA[sm[1].toLowerCase()]) {
         person = PeA[sm[1].toLowerCase()];
         rem = rem.replace(/^\w+\s+(?:needs?|asked?|wants?|requested?|said)\s*/i, "");
@@ -452,10 +818,10 @@ function parseSingle(text) {
     }
   }
 
-  // STEP 5: Extract project
-  const paKeys = Object.keys(PA).sort((a, b) => b.length - a.length);
-  for (const alias of paKeys) {
-    const rx = new RegExp("\\b" + escRx(alias) + "\\b", "i");
+  var paKeys = Object.keys(PA).sort(function(a, b) { return b.length - a.length; });
+  for (var i = 0; i < paKeys.length; i++) {
+    var alias = paKeys[i];
+    var rx = new RegExp("\\b" + escRx(alias) + "\\b", "i");
     if (rx.test(rem)) {
       project = PA[alias];
       rem = rem.replace(new RegExp("\\s*(?:for|on|about|at|re:?)?\\s*" + escRx(alias) + "\\b", "i"), " ");
@@ -464,66 +830,52 @@ function parseSingle(text) {
   }
   if (!project) project = "General / Office";
 
-  // STEP 6: Clean title
   rem = rem.replace(/\s+/g, " ").replace(/^[\s\-\u2013\u2014:,;]+/, "").replace(/[\s\-\u2013\u2014:,;]+$/, "").trim();
   if (rem.length > 0) rem = rem[0].toUpperCase() + rem.slice(1);
   if (!rem) rem = text.trim();
 
-  return { title: rem, project, person, priority, due_date: dueDate, notes };
+  return { title: rem, project: project, person: person, priority: priority, due_date: dueDate, notes: notes };
 }
 
 function extractDate(text) {
-  const today = new Date();
-  const low = text.toLowerCase();
+  var today = new Date();
+  var low = text.toLowerCase();
 
-  // Explicit date
-  const ed = text.match(/\b(?:by|due|before)?\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+  var ed = text.match(/\b(?:by|due|before)?\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
   if (ed) {
-    let yr = ed[3] ? (ed[3].length === 2 ? 2000 + parseInt(ed[3]) : parseInt(ed[3])) : today.getFullYear();
+    var yr = ed[3] ? (ed[3].length === 2 ? 2000 + parseInt(ed[3]) : parseInt(ed[3])) : today.getFullYear();
     return iso(new Date(yr, parseInt(ed[1]) - 1, parseInt(ed[2])));
   }
 
-  // Day of week
-  const dw = text.match(/\b(?:by|due|before|on|this|next)\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i);
+  var dw = text.match(/\b(?:by|due|before|on|this|next)\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i);
   if (dw) {
-    const days = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
-    const target = days[dw[1].toLowerCase()];
-    let diff = target - today.getDay();
+    var days = { sunday:0, monday:1, tuesday:2, wednesday:3, thursday:4, friday:5, saturday:6 };
+    var target = days[dw[1].toLowerCase()];
+    var diff = target - today.getDay();
     if (diff <= 0) diff += 7;
     if (/next/i.test(dw[0])) diff += 7;
-    const d = new Date(today); d.setDate(d.getDate() + diff);
+    var d = new Date(today); d.setDate(d.getDate() + diff);
     return iso(d);
   }
 
-  // Today
   if (/\b(today|eod|end of day)\b/i.test(low)) return iso(today);
-
-  // Tomorrow
-  if (/\btomorrow\b/i.test(low)) { const d = new Date(today); d.setDate(d.getDate() + 1); return iso(d); }
-
-  // End of week
+  if (/\btomorrow\b/i.test(low)) { var d2 = new Date(today); d2.setDate(d2.getDate() + 1); return iso(d2); }
   if (/\b(end of week|eow)\b/i.test(low)) {
-    let diff = 5 - today.getDay();
-    if (diff <= 0) diff += 7;
-    const d = new Date(today); d.setDate(d.getDate() + diff);
-    return iso(d);
+    var diff2 = 5 - today.getDay();
+    if (diff2 <= 0) diff2 += 7;
+    var d3 = new Date(today); d3.setDate(d3.getDate() + diff2);
+    return iso(d3);
   }
-
-  // Next week
   if (/\bnext week\b/i.test(low)) {
-    let diff = 8 - today.getDay();
-    const d = new Date(today); d.setDate(d.getDate() + diff);
-    return iso(d);
+    var diff3 = 8 - today.getDay();
+    var d4 = new Date(today); d4.setDate(d4.getDate() + diff3);
+    return iso(d4);
   }
-
-  // End of month
   if (/\b(end of month|eom)\b/i.test(low)) {
     return iso(new Date(today.getFullYear(), today.getMonth() + 1, 0));
   }
-
-  // In X days
-  const xd = text.match(/\bin\s+(\d+)\s+days?\b/i);
-  if (xd) { const d = new Date(today); d.setDate(d.getDate() + parseInt(xd[1])); return iso(d); }
+  var xd = text.match(/\bin\s+(\d+)\s+days?\b/i);
+  if (xd) { var d5 = new Date(today); d5.setDate(d5.getDate() + parseInt(xd[1])); return iso(d5); }
 
   return null;
 }
@@ -537,11 +889,13 @@ function stripDate(text) {
     .replace(/\bin\s+\d+\s+days?\b/gi, "");
 }
 
-/* === AI PARSER === */
+/* ============================================================
+   AI PARSER
+   ============================================================ */
 async function aiParse(text) {
   if (!config.apiKey) throw new Error("No API key");
-  const today = new Date().toISOString().split("T")[0];
-  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+  var today = new Date().toISOString().split("T")[0];
+  var resp = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -552,190 +906,152 @@ async function aiParse(text) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: `You are a task management assistant. Interpret user input and return structured JSON. Today is ${today}.
-
-Known projects: ${projects.join(", ")}
-Known people: ${people.join(", ")}
-
-Return ONLY valid JSON with NO markdown backticks and NO preamble.
-
-Determine the user's INTENT from their input. There are 3 possible intents:
-
-1. "tasks" — They want to create one or more tasks (this is the most common intent — any actionable item)
-   Return: {"intent":"tasks","items":[{"title":"concise task title","project":"exact match from known projects or General / Office","person":"exact match from known people or Self","priority":"high|medium|low","due_date":"YYYY-MM-DD or null","notes":"extracted context or null"}]}
-
-2. "new_projects" — They want to add new project(s) to their list. Triggered when input is clearly a project/job/site name and NOT a task. Examples: "Bear Creek CC", "add Pinehurst to projects", "new project: Sawgrass Renovation"
-   Return: {"intent":"new_projects","items":["Project Name 1","Project Name 2"]}
-
-3. "new_people" — They want to add new person(s) to their people list. Examples: "add Mike to my team", "new person: Sarah the surveyor", "Jim"
-   Return: {"intent":"new_people","items":["Person Name 1"]}
-
-IMPORTANT intent rules:
-- If it sounds like something to DO, it's a task — even if short ("call Dave", "check drainage")
-- If it's just a name of a place, course, company, or job site with no action, it's a new project
-- If it's just a person's name with no action, it's a new person
-- "Add [name] to projects/people" is explicitly creating a project or person, NOT a task
-- When unsure between project and task, default to task
-- For tasks: split multiples separated by commas, semicolons, or "and"
-- For tasks: infer priority from urgency words (urgent/ASAP/critical → high, important/soon → medium)
-- For tasks: infer dates from relative terms (tomorrow, next Friday, end of week, etc.)
-- For tasks: fuzzy match project names and people names
-- For tasks: default project "General / Office", default person "Self", default priority "low"`,
+      system: "You are a task management assistant. Interpret user input and return structured JSON. Today is " + today + ".\n\nKnown projects: " + projects.join(", ") + "\nKnown people: " + people.join(", ") + "\n\nReturn ONLY valid JSON with NO markdown backticks and NO preamble.\n\nDetermine the user's INTENT from their input. There are 3 possible intents:\n\n1. \"tasks\" — They want to create one or more tasks (this is the most common intent — any actionable item)\n   Return: {\"intent\":\"tasks\",\"items\":[{\"title\":\"concise task title\",\"project\":\"exact match from known projects or General / Office\",\"person\":\"exact match from known people or Self\",\"priority\":\"high|medium|low\",\"due_date\":\"YYYY-MM-DD or null\",\"notes\":\"extracted context or null\"}]}\n\n2. \"new_projects\" — They want to add new project(s) to their list.\n   Return: {\"intent\":\"new_projects\",\"items\":[\"Project Name 1\",\"Project Name 2\"]}\n\n3. \"new_people\" — They want to add new person(s) to their people list.\n   Return: {\"intent\":\"new_people\",\"items\":[\"Person Name 1\"]}\n\nIMPORTANT intent rules:\n- If it sounds like something to DO, it's a task — even if short\n- If it's just a name of a place, course, company, or job site with no action, it's a new project\n- If it's just a person's name with no action, it's a new person\n- When unsure between project and task, default to task\n- For tasks: split multiples separated by commas, semicolons, or \"and\"\n- Default project \"General / Office\", default person \"Self\", default priority \"low\"",
       messages: [{ role: "user", content: text }]
     })
   });
-  const data = await resp.json();
+  var data = await resp.json();
   if (data.error) throw new Error(data.error.message);
-  const raw = data.content.filter(b => b.type === "text").map(b => b.text).join("").replace(/```json|```/g, "").trim();
+  var raw = data.content.filter(function(b) { return b.type === "text"; }).map(function(b) { return b.text; }).join("").replace(/```json|```/g, "").trim();
   return JSON.parse(raw);
 }
 
-/* === LIVE PREVIEW === */
+/* ============================================================
+   LIVE PREVIEW
+   ============================================================ */
 function updatePreview() {
-  const v = document.getElementById("mainInput").value.trim();
-  const prev = document.getElementById("preview");
+  var v = document.getElementById("mainInput").value.trim();
+  var prev = document.getElementById("preview");
   if (!v) { prev.innerHTML = ""; return; }
-  // Slash command previews
-  const cmdMatch = v.match(/^\/p(?:roject)?\s+(.+)/i);
+  var cmdMatch = v.match(/^\/p(?:roject)?\s+(.+)/i);
   if (cmdMatch) {
-    const name = cmdMatch[1].trim();
-    const exists = projects.some(p => p.toLowerCase() === name.toLowerCase());
+    var name = cmdMatch[1].trim();
+    var exists = projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); });
     prev.innerHTML = '<span class="pchip proj">' + (exists ? '\u26A0 Already exists: ' : '+ New project: ') + esc(name) + '</span>';
     return;
   }
-  const personCmd = v.match(/^\/person\s+(.+)/i);
+  var personCmd = v.match(/^\/person\s+(.+)/i);
   if (personCmd) {
-    const name = personCmd[1].trim();
-    const exists = people.some(p => p.toLowerCase() === name.toLowerCase());
-    prev.innerHTML = '<span class="pchip pers">' + (exists ? '\u26A0 Already exists: ' : '+ New person: ') + esc(name) + '</span>';
+    var pname = personCmd[1].trim();
+    var pexists = people.some(function(p) { return p.toLowerCase() === pname.toLowerCase(); });
+    prev.innerHTML = '<span class="pchip pers">' + (pexists ? '\u26A0 Already exists: ' : '+ New person: ') + esc(pname) + '</span>';
     return;
   }
-  const parsed = parseInput(v);
-  const chips = [];
+  var parsed = parseInput(v);
+  var chips = [];
   if (parsed.length > 1) chips.push('<span class="pchip cnt">\u{1F4DD} ' + parsed.length + ' tasks</span>');
-  const t = parsed[0];
+  var t = parsed[0];
   if (t.project !== "General / Office") chips.push('<span class="pchip proj">\u{1F4C1} ' + esc(t.project) + '</span>');
   if (t.person !== "Self") chips.push('<span class="pchip pers">\u{1F464} ' + esc(t.person) + '</span>');
-  const pi = { high: ["\u{1F534}", "pri-high"], medium: ["\u{1F7E1}", "pri-medium"], low: ["\u{1F7E2}", "pri-low"] };
-  const [icon, cls] = pi[t.priority] || pi.low;
-  chips.push('<span class="pchip ' + cls + '">' + icon + ' ' + t.priority + '</span>');
+  var pi = { high: ["\u{1F534}", "pri-high"], medium: ["\u{1F7E1}", "pri-medium"], low: ["\u{1F7E2}", "pri-low"] };
+  var iconCls = pi[t.priority] || pi.low;
+  chips.push('<span class="pchip ' + iconCls[1] + '">' + iconCls[0] + ' ' + t.priority + '</span>');
   if (t.due_date) chips.push('<span class="pchip due">\u{1F4C5} ' + fmtD(t.due_date) + '</span>');
   if (config.parseMode === "ai" && config.apiKey) chips.push('<span class="pchip ai">\u{1F9E0} AI</span>');
   prev.innerHTML = chips.join("");
 }
 
-/* === FORM SUBMISSION === */
+/* ============================================================
+   FORM SUBMISSION
+   ============================================================ */
 async function handleSubmit(e) {
   e.preventDefault();
-  const input = document.getElementById("mainInput");
-  const text = input.value.trim();
+  var input = document.getElementById("mainInput");
+  var text = input.value.trim();
   if (!text) return;
 
-  // Slash command fallback (works without AI)
-  const projCmd = text.match(/^\/p(?:roject)?\s+(.+)/i);
+  // Slash commands
+  var projCmd = text.match(/^\/p(?:roject)?\s+(.+)/i);
   if (projCmd) {
-    const name = projCmd[1].trim();
-    if (name && !projects.some(p => p.toLowerCase() === name.toLowerCase())) projects.push(name);
-    input.value = ""; document.getElementById("preview").innerHTML = ""; save(); render(); return;
+    var name = projCmd[1].trim();
+    if (name && !projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) projects.push(name);
+    input.value = ""; document.getElementById("preview").innerHTML = ""; saveMeta(); render(); return;
   }
-  const personCmd = text.match(/^\/person\s+(.+)/i);
-  if (personCmd) {
-    const name = personCmd[1].trim();
-    if (name && !people.some(p => p.toLowerCase() === name.toLowerCase())) people.push(name);
-    input.value = ""; document.getElementById("preview").innerHTML = ""; save(); render(); return;
+  var personCmdMatch = text.match(/^\/person\s+(.+)/i);
+  if (personCmdMatch) {
+    var pname = personCmdMatch[1].trim();
+    if (pname && !people.some(function(p) { return p.toLowerCase() === pname.toLowerCase(); })) people.push(pname);
+    input.value = ""; document.getElementById("preview").innerHTML = ""; saveMeta(); render(); return;
   }
 
-  const btn = document.getElementById("mainBtn");
+  var btn = document.getElementById("mainBtn");
+
+  function createTasks(parsed) {
+    parsed.forEach(function(t) {
+      if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
+      if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
+      var task = {
+        id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
+        priority: t.priority, status: "todo", due_date: t.due_date || null, notes: t.notes || "",
+        created_at: new Date().toISOString(), completed_at: null
+      };
+      tasks.unshift(task);
+      saveTaskToCloud(task);
+    });
+    SS("tc-tasks", tasks);
+    saveMeta();
+    render();
+  }
 
   if (config.parseMode === "ai" && config.apiKey) {
     btn.textContent = "Parsing...";
     btn.classList.add("processing");
     btn.disabled = true;
     try {
-      const result = await aiParse(text);
+      var result = await aiParse(text);
 
-      // Handle intent-based responses
       if (result.intent === "new_projects") {
-        let added = 0;
-        for (const name of result.items) {
-          if (name && !projects.some(p => p.toLowerCase() === name.toLowerCase())) { projects.push(name); added++; }
-        }
-        save(); render();
+        result.items.forEach(function(name) {
+          if (name && !projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) projects.push(name);
+        });
+        saveMeta(); render();
         input.value = ""; document.getElementById("preview").innerHTML = "";
         btn.textContent = "Add \u23CE"; btn.classList.remove("processing"); btn.disabled = false;
         return;
       }
 
       if (result.intent === "new_people") {
-        let added = 0;
-        for (const name of result.items) {
-          if (name && !people.some(p => p.toLowerCase() === name.toLowerCase())) { people.push(name); added++; }
-        }
-        save(); render();
+        result.items.forEach(function(name) {
+          if (name && !people.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) people.push(name);
+        });
+        saveMeta(); render();
         input.value = ""; document.getElementById("preview").innerHTML = "";
         btn.textContent = "Add \u23CE"; btn.classList.remove("processing"); btn.disabled = false;
         return;
       }
 
-      // Default: tasks intent
-      const parsed = (result.items || result.tasks || []).map(t => ({
-        title: t.title || text,
-        project: t.project || "General / Office",
-        person: t.person || "Self",
-        priority: t.priority || "low",
-        due_date: t.due_date || null,
-        notes: t.notes || null
-      }));
-      for (const t of parsed) {
-        if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
-        if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
-        tasks.unshift({
-          id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
-          priority: t.priority, status: "todo", due_date: t.due_date, notes: t.notes || "",
-          created_at: new Date().toISOString(), completed_at: null
-        });
-      }
+      var parsed = (result.items || result.tasks || []).map(function(t) {
+        return {
+          title: t.title || text, project: t.project || "General / Office",
+          person: t.person || "Self", priority: t.priority || "low",
+          due_date: t.due_date || null, notes: t.notes || null
+        };
+      });
+      createTasks(parsed);
     } catch (err) {
       console.error("AI parse failed, falling back:", err);
-      const parsed = parseInput(text);
-      for (const t of parsed) {
-        if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
-        if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
-        tasks.unshift({
-          id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
-          priority: t.priority, status: "todo", due_date: t.due_date, notes: t.notes || "",
-          created_at: new Date().toISOString(), completed_at: null
-        });
-      }
+      createTasks(parseInput(text));
     } finally {
       btn.textContent = "Add \u23CE"; btn.classList.remove("processing"); btn.disabled = false;
     }
   } else {
-    const parsed = parseInput(text);
-    for (const t of parsed) {
-      if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
-      if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
-      tasks.unshift({
-        id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
-        priority: t.priority, status: "todo", due_date: t.due_date, notes: t.notes || "",
-        created_at: new Date().toISOString(), completed_at: null
-      });
-    }
+    createTasks(parseInput(text));
   }
 
   input.value = "";
   document.getElementById("preview").innerHTML = "";
-  save();
-  render();
 }
 
-/* === RENDER SYSTEM === */
+/* ============================================================
+   RENDER SYSTEM
+   ============================================================ */
 function render() {
   updateFilters();
   updateStats();
-  const ft = filtered();
-  const content = document.getElementById("content");
-  const tips = document.getElementById("tips");
+  updateAlerts();
+  var ft = filtered();
+  var content = document.getElementById("content");
+  var tips = document.getElementById("tips");
   tips.style.display = tasks.length === 0 ? "block" : "none";
 
   if (view === "board") renderBoard(ft, content);
@@ -752,8 +1068,8 @@ function getFilters() {
 }
 
 function filtered() {
-  const f = getFilters();
-  return tasks.filter(t => {
+  var f = getFilters();
+  return tasks.filter(function(t) {
     if (f.project !== "All Projects" && t.project !== f.project) return false;
     if (f.person !== "All People" && t.person !== f.person) return false;
     if (f.status === "active" && t.status === "done") return false;
@@ -763,48 +1079,50 @@ function filtered() {
 }
 
 function updateFilters() {
-  const projEl = document.getElementById("fProj");
-  const persEl = document.getElementById("fPers");
-  const allProj = [...new Set([...projects, ...tasks.map(t => t.project)])].sort();
-  const allPers = [...new Set([...people, ...tasks.map(t => t.person)])].sort();
+  var projEl = document.getElementById("fProj");
+  var persEl = document.getElementById("fPers");
+  var allProj = Array.from(new Set(projects.concat(tasks.map(function(t) { return t.project; })))).sort();
+  var allPers = Array.from(new Set(people.concat(tasks.map(function(t) { return t.person; })))).sort();
 
-  const pv = projEl.value;
-  projEl.innerHTML = '<option>All Projects</option>' + allProj.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
-  if ([...projEl.options].some(o => o.value === pv)) projEl.value = pv;
+  var pv = projEl.value;
+  projEl.innerHTML = '<option>All Projects</option>' + allProj.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
+  if (Array.from(projEl.options).some(function(o) { return o.value === pv; })) projEl.value = pv;
 
-  const ev = persEl.value;
-  persEl.innerHTML = '<option>All People</option>' + allPers.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
-  if ([...persEl.options].some(o => o.value === ev)) persEl.value = ev;
+  var ev = persEl.value;
+  persEl.innerHTML = '<option>All People</option>' + allPers.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
+  if (Array.from(persEl.options).some(function(o) { return o.value === ev; })) persEl.value = ev;
 }
 
 function updateStats() {
-  const active = tasks.filter(t => t.status !== "done").length;
-  const urgent = tasks.filter(t => t.priority === "high" && t.status !== "done").length;
-  const overdue = tasks.filter(t => isOverdue(t)).length;
-  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-  const doneWeek = tasks.filter(t => t.status === "done" && t.completed_at && new Date(t.completed_at) >= weekAgo).length;
+  var active = tasks.filter(function(t) { return t.status !== "done"; }).length;
+  var urgent = tasks.filter(function(t) { return t.priority === "high" && t.status !== "done"; }).length;
+  var overdue = tasks.filter(function(t) { return isOverdue(t); }).length;
+  var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  var doneWeek = tasks.filter(function(t) { return t.status === "done" && t.completed_at && new Date(t.completed_at) >= weekAgo; }).length;
 
-  let h = '<span class="stat">' + active + ' active</span>';
+  var h = '<span class="stat">' + active + ' active</span>';
   if (urgent > 0) h += '<span class="stat urg">' + urgent + ' urgent</span>';
   if (overdue > 0) h += '<span class="stat urg">' + overdue + ' overdue</span>';
   h += '<span class="stat grn">' + doneWeek + ' done this week</span>';
   document.getElementById("stats").innerHTML = h;
 }
 
-/* === CARD HTML === */
+/* ============================================================
+   CARD HTML
+   ============================================================ */
 function cardHTML(task) {
-  const done = task.status === "done";
-  const od = isOverdue(task);
-  let cls = "card";
+  var done = task.status === "done";
+  var od = isOverdue(task);
+  var cls = "card";
   if (done) cls += " done";
   if (od) cls += " overdue";
 
-  let editPanel = "";
+  var editPanel = "";
   if (editId === task.id) {
-    const statOpts = Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (task.status === k ? ' selected' : '') + '>' + esc(v.label) + '</option>').join("");
-    const priOpts = [["high","\u{1F534} High"],["medium","\u{1F7E1} Medium"],["low","\u{1F7E2} Low"]].map(([v, l]) => '<option value="' + v + '"' + (task.priority === v ? ' selected' : '') + '>' + l + '</option>').join("");
-    const projOpts = [...new Set([...projects, task.project])].map(p => '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>').join("");
-    const persOpts = [...new Set([...people, task.person])].map(p => '<option value="' + esc(p) + '"' + (task.person === p ? ' selected' : '') + '>' + esc(p) + '</option>').join("");
+    var statOpts = Object.entries(STATUSES).map(function(kv) { return '<option value="' + kv[0] + '"' + (task.status === kv[0] ? ' selected' : '') + '>' + esc(kv[1].label) + '</option>'; }).join("");
+    var priOpts = [["high","\u{1F534} High"],["medium","\u{1F7E1} Medium"],["low","\u{1F7E2} Low"]].map(function(vl) { return '<option value="' + vl[0] + '"' + (task.priority === vl[0] ? ' selected' : '') + '>' + vl[1] + '</option>'; }).join("");
+    var projOpts = Array.from(new Set(projects.concat([task.project]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
+    var persOpts = Array.from(new Set(people.concat([task.person]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.person === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
 
     editPanel = '<div class="epan">' +
       '<div><label>Status</label><select onchange="upd(\'' + task.id + '\',{status:this.value})">' + statOpts + '</select></div>' +
@@ -816,8 +1134,8 @@ function cardHTML(task) {
       '</div>';
   }
 
-  const dateChip = task.due_date ? '<span class="tg due' + (od ? ' od' : '') + '">' + (od ? '\u26A0 ' : '') + fmtD(task.due_date) + '</span>' : '';
-  const notesDiv = task.notes ? '<div class="cnotes">' + esc(task.notes) + '</div>' : '';
+  var dateChip = task.due_date ? '<span class="tg due' + (od ? ' od' : '') + '">' + (od ? '\u26A0 ' : '') + fmtD(task.due_date) + '</span>' : '';
+  var notesDiv = task.notes ? '<div class="cnotes">' + esc(task.notes) + '</div>' : '';
 
   return '<div class="' + cls + '" draggable="true" data-task-id="' + task.id + '" ondragstart="dragStart(event)" ondragend="dragEnd(event)">' +
     '<div class="ctop">' +
@@ -841,19 +1159,21 @@ function cardHTML(task) {
   '</div>';
 }
 
-/* === VIEW RENDERERS === */
+/* ============================================================
+   VIEW RENDERERS
+   ============================================================ */
 function renderBoard(ft, el) {
-  const f = getFilters();
-  let cols;
+  var f = getFilters();
+  var cols;
   if (f.status === "done") cols = ["done"];
   else if (f.status === "all") cols = Object.keys(STATUSES);
   else cols = ["todo", "in_progress", "waiting"];
 
-  const priOrder = { high: 0, medium: 1, low: 2 };
-  let html = '<div class="board">';
-  for (const s of cols) {
-    const st = STATUSES[s];
-    const colTasks = ft.filter(t => t.status === s).sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2));
+  var priOrder = { high: 0, medium: 1, low: 2 };
+  var html = '<div class="board">';
+  cols.forEach(function(s) {
+    var st = STATUSES[s];
+    var colTasks = ft.filter(function(t) { return t.status === s; }).sort(function(a, b) { return (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2); });
     html += '<div class="board-col" data-status="' + s + '" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)">' +
       '<div class="col-hdr" style="border-bottom:2px solid ' + st.color + '40">' +
         '<span class="cdot" style="background:' + st.color + '"></span>' +
@@ -867,14 +1187,14 @@ function renderBoard(ft, el) {
       html += colTasks.map(cardHTML).join("");
     }
     html += '</div></div>';
-  }
+  });
   html += '</div>';
   el.innerHTML = html;
 }
 
 function renderList(ft, el) {
-  const priOrder = { high: 0, medium: 1, low: 2 };
-  const sorted = [...ft].sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at));
+  var priOrder = { high: 0, medium: 1, low: 2 };
+  var sorted = ft.slice().sort(function(a, b) { return (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at); });
   if (sorted.length === 0) {
     el.innerHTML = '<div style="text-align:center;color:var(--tx-4);padding:40px">No tasks match filters.</div>';
     return;
@@ -883,24 +1203,24 @@ function renderList(ft, el) {
 }
 
 function renderTable(ft, el) {
-  const priOrder = { high: 0, medium: 1, low: 2 };
-  const sorted = [...ft].sort((a, b) => (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at));
+  var priOrder = { high: 0, medium: 1, low: 2 };
+  var sorted = ft.slice().sort(function(a, b) { return (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at); });
   if (sorted.length === 0) {
     el.innerHTML = '<div style="text-align:center;color:var(--tx-4);padding:40px">No tasks match filters.</div>';
     return;
   }
 
-  let html = '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
+  var html = '<div class="tbl-wrap"><table class="tbl"><thead><tr>' +
     '<th style="width:30px"></th><th>Task</th><th>Project</th><th>From</th><th>Priority</th><th>Due</th><th>Status</th><th></th>' +
     '</tr></thead><tbody>';
 
-  for (const t of sorted) {
-    const done = t.status === "done";
-    const od = isOverdue(t);
-    const statOpts = Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (t.status === k ? ' selected' : '') + '>' + esc(v.label) + '</option>').join("");
-    const titleHtml = done ? '<s style="color:var(--tx-4)">' + esc(t.title) + '</s>' : esc(t.title);
-    const notesHtml = t.notes ? ' <span class="tn">\u2014 ' + esc(t.notes) + '</span>' : '';
-    const dateHtml = t.due_date ? (od ? '<span style="color:var(--red)">\u26A0 ' + fmtD(t.due_date) + '</span>' : fmtD(t.due_date)) : '';
+  sorted.forEach(function(t) {
+    var done = t.status === "done";
+    var od = isOverdue(t);
+    var statOpts = Object.entries(STATUSES).map(function(kv) { return '<option value="' + kv[0] + '"' + (t.status === kv[0] ? ' selected' : '') + '>' + esc(kv[1].label) + '</option>'; }).join("");
+    var titleHtml = done ? '<s style="color:var(--tx-4)">' + esc(t.title) + '</s>' : esc(t.title);
+    var notesHtml = t.notes ? ' <span class="tn">\u2014 ' + esc(t.notes) + '</span>' : '';
+    var dateHtml = t.due_date ? (od ? '<span style="color:var(--red)">\u26A0 ' + fmtD(t.due_date) + '</span>' : fmtD(t.due_date)) : '';
 
     html += '<tr class="' + (done ? 'done-row' : '') + '">' +
       '<td><button class="tck' + (done ? ' on' : '') + '" onclick="tog(\'' + t.id + '\')">' + (done ? '\u2713' : '') + '</button></td>' +
@@ -912,19 +1232,23 @@ function renderTable(ft, el) {
       '<td><select onchange="upd(\'' + t.id + '\',{status:this.value})">' + statOpts + '</select></td>' +
       '<td><button class="del-btn" onclick="del(\'' + t.id + '\')">\u00D7</button></td>' +
       '</tr>';
-  }
+  });
 
   html += '</tbody></table></div>';
   el.innerHTML = html;
 }
 
-/* === TASK ACTIONS === */
+/* ============================================================
+   TASK ACTIONS
+   ============================================================ */
 function tog(id) {
-  const t = tasks.find(x => x.id === id);
+  var t = tasks.find(function(x) { return x.id === id; });
   if (!t) return;
   if (t.status === "done") { t.status = "todo"; t.completed_at = null; }
   else { t.status = "done"; t.completed_at = new Date().toISOString(); }
-  save(); render();
+  SS("tc-tasks", tasks);
+  saveTaskToCloud(t);
+  render();
 }
 
 function edt(id) {
@@ -933,17 +1257,21 @@ function edt(id) {
 }
 
 function upd(id, updates) {
-  const t = tasks.find(x => x.id === id);
+  var t = tasks.find(function(x) { return x.id === id; });
   if (!t) return;
   Object.assign(t, updates);
   if (updates.status === "done" && !t.completed_at) t.completed_at = new Date().toISOString();
   if (updates.status && updates.status !== "done") t.completed_at = null;
-  save(); render();
+  SS("tc-tasks", tasks);
+  saveTaskToCloud(t);
+  render();
 }
 
 function del(id) {
-  tasks = tasks.filter(t => t.id !== id);
-  save(); render();
+  tasks = tasks.filter(function(t) { return t.id !== id; });
+  SS("tc-tasks", tasks);
+  deleteTaskFromCloud(id);
+  render();
 }
 
 function setView(v) {
@@ -956,15 +1284,17 @@ function setView(v) {
 
 function setParseMode(mode, btn) {
   config.parseMode = mode;
-  save();
-  document.querySelectorAll("#parseMode button[data-mode]").forEach(b => b.classList.remove("active"));
+  saveMeta();
+  document.querySelectorAll("#parseMode button[data-mode]").forEach(function(b) { b.classList.remove("active"); });
   btn.classList.add("active");
 }
 
-/* === QUICK ADD MODAL === */
+/* ============================================================
+   QUICK ADD MODAL
+   ============================================================ */
 function showQuickAdd() {
-  const projOpts = projects.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
-  const persOpts = people.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+  var projOpts = projects.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
+  var persOpts = people.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
 
   document.getElementById("mc").innerHTML =
     '<div class="mover" onclick="if(event.target===this)closeM()">' +
@@ -981,13 +1311,13 @@ function showQuickAdd() {
         '<button class="bpri" onclick="submitQA()">Add Task</button>' +
       '</div>' +
     '</div>';
-  setTimeout(() => { const el = document.getElementById("qaT"); if (el) el.focus(); }, 50);
+  setTimeout(function() { var el = document.getElementById("qaT"); if (el) el.focus(); }, 50);
 }
 
 function submitQA() {
-  const title = document.getElementById("qaT").value.trim();
+  var title = document.getElementById("qaT").value.trim();
   if (!title) return;
-  tasks.unshift({
+  var task = {
     id: crypto.randomUUID(),
     title: title,
     project: document.getElementById("qaP").value,
@@ -998,30 +1328,47 @@ function submitQA() {
     notes: document.getElementById("qaN").value || "",
     created_at: new Date().toISOString(),
     completed_at: null
-  });
-  save(); render(); closeM();
+  };
+  tasks.unshift(task);
+  SS("tc-tasks", tasks);
+  saveTaskToCloud(task);
+  saveMeta();
+  render();
+  closeM();
 }
 
-/* === SETTINGS MODAL === */
+/* ============================================================
+   SETTINGS MODAL
+   ============================================================ */
 function showSettings() {
-  const apiStatus = config.apiKey
+  var apiStatus = config.apiKey
     ? '<span class="api-status" style="color:var(--green)">\u25CF Connected</span>'
     : '<span class="api-status" style="color:var(--tx-4)">\u25CB Not configured</span>';
 
-  const removeBtn = config.apiKey ? '<button class="danger" onclick="config.apiKey=\'\';save();showSettings()">Remove</button>' : '';
+  var removeBtn = config.apiKey ? '<button class="danger" onclick="config.apiKey=\'\';saveMeta();showSettings()">Remove</button>' : '';
 
-  const projTags = projects.map((p, i) => '<span class="stag proj">' + esc(p) + '<button onclick="rmProj(' + i + ')">\u00D7</button></span>').join("");
-  const persTags = people.map((p, i) => '<span class="stag pers">' + esc(p) + '<button onclick="rmPers(' + i + ')">\u00D7</button></span>').join("");
+  var projTags = projects.map(function(p, i) { return '<span class="stag proj">' + esc(p) + '<button onclick="rmProj(' + i + ')">\u00D7</button></span>'; }).join("");
+  var persTags = people.map(function(p, i) { return '<span class="stag pers">' + esc(p) + '<button onclick="rmPers(' + i + ')">\u00D7</button></span>'; }).join("");
 
-  let aliasHTML = "";
-  const aliasEntries = Object.entries(aliases);
+  var aliasHTML = "";
+  var aliasEntries = Object.entries(aliases);
   if (aliasEntries.length > 0) {
-    aliasHTML = aliasEntries.map(([k, v]) => '<span class="stag alias">' + esc(k) + ' \u2192 ' + esc(v) + '<button onclick="rmAlias(\'' + esc(k) + '\')">\u00D7</button></span>').join("");
+    aliasHTML = aliasEntries.map(function(kv) { return '<span class="stag alias">' + esc(kv[0]) + ' \u2192 ' + esc(kv[1]) + '<button onclick="rmAlias(\'' + esc(kv[0]) + '\')">\u00D7</button></span>'; }).join("");
   } else {
     aliasHTML = '<span style="font-size:11px;color:var(--tx-4)">No custom shortcuts yet</span>';
   }
 
-  const projSelectOpts = projects.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join("");
+  var projSelectOpts = projects.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
+
+  // Notification status
+  var notifStatus = notifPermission === "granted"
+    ? '<span style="color:var(--green)">\u25CF Enabled</span>'
+    : notifPermission === "denied"
+    ? '<span style="color:var(--red)">\u25CF Blocked (check browser settings)</span>'
+    : '<span style="color:var(--tx-4)">\u25CB Not enabled</span>';
+  var notifAction = notifPermission === "default"
+    ? '<button onclick="handleNotifClick();showSettings()">Enable</button>'
+    : '';
 
   document.getElementById("mc").innerHTML =
     '<div class="mover" onclick="if(event.target===this)closeM()">' +
@@ -1032,12 +1379,13 @@ function showSettings() {
           '<h4 style="color:var(--purple)">\u{1F9E0} Claude API Key</h4>' +
           '<p>Add your Anthropic API key for AI-powered parsing. Stored locally in your browser only.</p>' +
           '<input type="password" id="apiKeyInput" value="' + esc(config.apiKey) + '" placeholder="sk-ant-..." style="font-family:\'JetBrains Mono\',monospace;font-size:12px;margin-bottom:8px">' +
-          '<div class="srow">' + apiStatus + '<button onclick="config.apiKey=document.getElementById(\'apiKeyInput\').value.trim();save();showSettings()">Save Key</button>' + removeBtn + '</div>' +
+          '<div class="srow">' + apiStatus + '<button onclick="config.apiKey=document.getElementById(\'apiKeyInput\').value.trim();saveMeta();showSettings()">Save Key</button>' + removeBtn + '</div>' +
         '</div>' +
 
         '<div class="sbox">' +
-          '<h4>\u{1F512} Access Code</h4>' +
-          '<div class="srow"><input type="text" id="newPW" value="' + esc(config.password) + '" style="font-family:\'JetBrains Mono\',monospace"><button onclick="config.password=document.getElementById(\'newPW\').value.trim()||config.password;save();alert(\'Access code updated!\')">Save</button></div>' +
+          '<h4>\u{1F514} Notifications</h4>' +
+          '<p>Get reminders for overdue and due-today tasks.</p>' +
+          '<div class="srow">' + notifStatus + notifAction + '</div>' +
         '</div>' +
 
         '<div class="sbox">' +
@@ -1059,46 +1407,63 @@ function showSettings() {
           '<div class="srow"><input type="text" id="newPers" placeholder="New person name..." onkeydown="if(event.key===\'Enter\'){addPers()}"><button onclick="addPers()">Add</button></div>' +
         '</div>' +
 
+        '<div class="sbox">' +
+          '<h4>\u{2601}\uFE0F Sync</h4>' +
+          '<p>Tasks sync across all your devices via Firebase. ' +
+          (firebaseReady ? '<span style="color:var(--green)">\u25CF Connected</span>' : '<span style="color:var(--amber)">\u25CB Connecting...</span>') +
+          '</p>' +
+          '<p style="font-size:12px;color:var(--tx-4)">Tasks: ' + tasks.length + ' synced</p>' +
+        '</div>' +
+
         '<div class="sfooter">' +
           '<button class="btn-sec" onclick="exportCSV()">\u{1F4E4} Export CSV</button>' +
-          '<button class="btn-danger" onclick="if(window.confirm(\'Clear all completed tasks?\')){tasks=tasks.filter(t=>t.status!==\'done\');save();render();closeM()}">Clear Completed</button>' +
+          '<button class="btn-danger" onclick="if(window.confirm(\'Clear all completed tasks?\')){clearCompleted()}">Clear Completed</button>' +
           '<button class="btn-sec" onclick="closeM()">Done</button>' +
         '</div>' +
       '</div>' +
     '</div>';
-  setTimeout(() => { const el = document.getElementById("apiKeyInput"); if (el) el.focus(); }, 50);
+  setTimeout(function() { var el = document.getElementById("apiKeyInput"); if (el) el.focus(); }, 50);
+}
+
+function clearCompleted() {
+  var done = tasks.filter(function(t) { return t.status === "done"; });
+  done.forEach(function(t) { deleteTaskFromCloud(t.id); });
+  tasks = tasks.filter(function(t) { return t.status !== "done"; });
+  SS("tc-tasks", tasks);
+  render();
+  closeM();
 }
 
 function addProj() {
-  const v = document.getElementById("newProj").value.trim();
-  if (v && !projects.includes(v)) { projects.push(v); save(); showSettings(); }
+  var v = document.getElementById("newProj").value.trim();
+  if (v && !projects.includes(v)) { projects.push(v); saveMeta(); showSettings(); }
 }
 
-function rmProj(i) { projects.splice(i, 1); save(); showSettings(); }
+function rmProj(i) { projects.splice(i, 1); saveMeta(); showSettings(); }
 
 function addPers() {
-  const v = document.getElementById("newPers").value.trim();
-  if (v && !people.includes(v)) { people.push(v); save(); showSettings(); }
+  var v = document.getElementById("newPers").value.trim();
+  if (v && !people.includes(v)) { people.push(v); saveMeta(); showSettings(); }
 }
 
-function rmPers(i) { people.splice(i, 1); save(); showSettings(); }
+function rmPers(i) { people.splice(i, 1); saveMeta(); showSettings(); }
 
 function addAlias() {
-  const k = document.getElementById("newAliasKey").value.trim();
-  const v = document.getElementById("newAliasVal").value;
-  if (k && v) { aliases[k.toLowerCase()] = v; save(); showSettings(); }
+  var k = document.getElementById("newAliasKey").value.trim();
+  var v = document.getElementById("newAliasVal").value;
+  if (k && v) { aliases[k.toLowerCase()] = v; saveMeta(); showSettings(); }
 }
 
-function rmAlias(k) { delete aliases[k]; save(); showSettings(); }
+function rmAlias(k) { delete aliases[k]; saveMeta(); showSettings(); }
 
 function exportCSV() {
-  const rows = [["Title","Project","Person","Priority","Status","Due Date","Notes","Created"]];
-  for (const t of tasks) {
+  var rows = [["Title","Project","Person","Priority","Status","Due Date","Notes","Created"]];
+  tasks.forEach(function(t) {
     rows.push([t.title, t.project, t.person, t.priority, t.status, t.due_date || "", t.notes || "", t.created_at]);
-  }
-  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const a = document.createElement("a");
+  });
+  var csv = rows.map(function(r) { return r.map(function(v) { return '"' + String(v).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
+  var blob = new Blob([csv], { type: "text/csv" });
+  var a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "tasks-" + iso(new Date()) + ".csv";
   a.click();
@@ -1106,8 +1471,10 @@ function exportCSV() {
 
 function closeM() { document.getElementById("mc").innerHTML = ""; }
 
-/* === DRAG & DROP === */
-let dragTaskId = null;
+/* ============================================================
+   DRAG & DROP
+   ============================================================ */
+var dragTaskId = null;
 
 function dragStart(e) {
   dragTaskId = e.target.closest('.card').dataset.taskId;
@@ -1118,46 +1485,47 @@ function dragStart(e) {
 
 function dragEnd(e) {
   e.target.closest('.card').classList.remove('dragging');
-  document.querySelectorAll('.board-col').forEach(c => c.classList.remove('drag-over'));
+  document.querySelectorAll('.board-col').forEach(function(c) { c.classList.remove('drag-over'); });
   dragTaskId = null;
 }
 
 function dragOver(e) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
-  const col = e.target.closest('.board-col');
+  var col = e.target.closest('.board-col');
   if (col) col.classList.add('drag-over');
 }
 
 function dragLeave(e) {
-  const col = e.target.closest('.board-col');
+  var col = e.target.closest('.board-col');
   if (col && !col.contains(e.relatedTarget)) col.classList.remove('drag-over');
 }
 
 function drop(e) {
   e.preventDefault();
-  const col = e.target.closest('.board-col');
+  var col = e.target.closest('.board-col');
   if (!col || !dragTaskId) return;
   col.classList.remove('drag-over');
-  const newStatus = col.dataset.status;
-  const task = tasks.find(t => t.id === dragTaskId);
+  var newStatus = col.dataset.status;
+  var task = tasks.find(function(t) { return t.id === dragTaskId; });
   if (!task || task.status === newStatus) return;
   task.status = newStatus;
   if (newStatus === 'done') { task.completed_at = new Date().toISOString(); }
   else { task.completed_at = null; }
-  save();
+  SS("tc-tasks", tasks);
+  saveTaskToCloud(task);
   render();
 }
 
 // Touch drag support for mobile
-let touchDragEl = null;
-let touchClone = null;
-let touchStartX = 0;
-let touchStartY = 0;
-let touchMoved = false;
+var touchDragEl = null;
+var touchClone = null;
+var touchStartX = 0;
+var touchStartY = 0;
+var touchMoved = false;
 
 document.addEventListener('touchstart', function(e) {
-  const card = e.target.closest('.card[draggable]');
+  var card = e.target.closest('.card[draggable]');
   if (!card || e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
   touchDragEl = card;
   touchStartX = e.touches[0].clientX;
@@ -1167,8 +1535,8 @@ document.addEventListener('touchstart', function(e) {
 
 document.addEventListener('touchmove', function(e) {
   if (!touchDragEl) return;
-  const dx = e.touches[0].clientX - touchStartX;
-  const dy = e.touches[0].clientY - touchStartY;
+  var dx = e.touches[0].clientX - touchStartX;
+  var dy = e.touches[0].clientY - touchStartY;
   if (!touchMoved && Math.abs(dx) + Math.abs(dy) < 10) return;
   touchMoved = true;
   e.preventDefault();
@@ -1182,8 +1550,8 @@ document.addEventListener('touchmove', function(e) {
   touchClone.style.left = (e.touches[0].clientX - touchDragEl.offsetWidth / 2) + 'px';
   touchClone.style.top = (e.touches[0].clientY - 20) + 'px';
 
-  document.querySelectorAll('.board-col').forEach(c => {
-    const r = c.getBoundingClientRect();
+  document.querySelectorAll('.board-col').forEach(function(c) {
+    var r = c.getBoundingClientRect();
     if (e.touches[0].clientX >= r.left && e.touches[0].clientX <= r.right && e.touches[0].clientY >= r.top && e.touches[0].clientY <= r.bottom) {
       c.classList.add('drag-over');
     } else {
@@ -1195,19 +1563,20 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('touchend', function(e) {
   if (!touchDragEl) return;
   if (touchClone) {
-    const touch = e.changedTouches[0];
-    let dropped = false;
-    document.querySelectorAll('.board-col').forEach(c => {
-      const r = c.getBoundingClientRect();
+    var touch = e.changedTouches[0];
+    var dropped = false;
+    document.querySelectorAll('.board-col').forEach(function(c) {
+      var r = c.getBoundingClientRect();
       if (touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom) {
-        const newStatus = c.dataset.status;
-        const taskId = touchDragEl.dataset.taskId;
-        const task = tasks.find(t => t.id === taskId);
+        var newStatus = c.dataset.status;
+        var taskId = touchDragEl.dataset.taskId;
+        var task = tasks.find(function(t) { return t.id === taskId; });
         if (task && task.status !== newStatus) {
           task.status = newStatus;
           if (newStatus === 'done') task.completed_at = new Date().toISOString();
           else task.completed_at = null;
-          save();
+          SS("tc-tasks", tasks);
+          saveTaskToCloud(task);
           dropped = true;
         }
       }
@@ -1222,13 +1591,15 @@ document.addEventListener('touchend', function(e) {
   touchMoved = false;
 });
 
-/* === VOICE INPUT === */
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let isRecording = false;
+/* ============================================================
+   VOICE INPUT
+   ============================================================ */
+var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+var recognition = null;
+var isRecording = false;
 
 function initVoice() {
-  const micBtn = document.getElementById("micBtn");
+  var micBtn = document.getElementById("micBtn");
   if (!SpeechRecognition) {
     micBtn.classList.add("unavailable");
     return;
@@ -1238,8 +1609,8 @@ function initVoice() {
   recognition.interimResults = true;
   recognition.lang = "en-US";
 
-  let finalTranscript = "";
-  let startText = "";
+  var finalTranscript = "";
+  var startText = "";
 
   recognition.onstart = function() {
     isRecording = true;
@@ -1250,17 +1621,17 @@ function initVoice() {
   };
 
   recognition.onresult = function(e) {
-    let interim = "";
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript;
+    var interim = "";
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      var t = e.results[i][0].transcript;
       if (e.results[i].isFinal) {
         finalTranscript += t;
       } else {
         interim += t;
       }
     }
-    const input = document.getElementById("mainInput");
-    const sep = startText && !startText.endsWith(" ") ? " " : "";
+    var input = document.getElementById("mainInput");
+    var sep = startText && !startText.endsWith(" ") ? " " : "";
     input.value = startText + sep + finalTranscript + interim;
     updatePreview();
     if (interim) setVoiceStatus("Listening...");
@@ -1279,7 +1650,6 @@ function initVoice() {
 
   recognition.onend = function() {
     if (isRecording) {
-      // Auto-stopped — finalize
       stopVoice();
     }
   };
@@ -1296,25 +1666,26 @@ function toggleVoice() {
 
 function stopVoice() {
   isRecording = false;
-  const micBtn = document.getElementById("micBtn");
+  var micBtn = document.getElementById("micBtn");
   micBtn.classList.remove("recording");
-  const input = document.getElementById("mainInput");
+  var input = document.getElementById("mainInput");
   if (input.value.trim()) {
     setVoiceStatus("Done — edit or hit Add");
   } else {
     setVoiceStatus("");
   }
-  setTimeout(() => setVoiceStatus(""), 3000);
+  setTimeout(function() { setVoiceStatus(""); }, 3000);
 }
 
 function setVoiceStatus(msg) {
-  const el = document.getElementById("voiceStatus");
+  var el = document.getElementById("voiceStatus");
   el.textContent = msg;
   el.className = msg ? "voice-status" : "";
 }
 
-/* === INIT === */
-document.getElementById("gateInput").addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
+/* ============================================================
+   INIT
+   ============================================================ */
 document.getElementById("mainInput").addEventListener("input", updatePreview);
 document.getElementById("mainForm").addEventListener("submit", handleSubmit);
 
@@ -1322,7 +1693,7 @@ document.getElementById("mainForm").addEventListener("submit", handleSubmit);
 initVoice();
 
 // Greeting
-const hr = new Date().getHours();
+var hr = new Date().getHours();
 document.getElementById("greeting").textContent =
   hr < 12 ? "Good morning \u2014 what needs to get done today?" :
   hr < 17 ? "Good afternoon \u2014 let's knock some tasks out." :
@@ -1330,16 +1701,47 @@ document.getElementById("greeting").textContent =
 
 // Restore parse mode toggle
 if (config.parseMode === "ai") {
-  document.querySelectorAll("#parseMode button[data-mode]").forEach(b => b.classList.remove("active"));
-  const aiBtn = document.querySelector('#parseMode button[data-mode="ai"]');
+  document.querySelectorAll("#parseMode button[data-mode]").forEach(function(b) { b.classList.remove("active"); });
+  var aiBtn = document.querySelector('#parseMode button[data-mode="ai"]');
   if (aiBtn) aiBtn.classList.add("active");
 }
 
-// Auto-login
-if (sessionStorage.getItem("tc-auth") === "1") {
-  document.getElementById("gate").classList.add("hidden");
-  document.getElementById("app").classList.add("visible");
-  render();
+// Initial render from localStorage (fast first paint)
+render();
+
+// Firebase auth + sync
+if (auth) {
+  auth.signInAnonymously().then(function() {
+    firebaseReady = true;
+    startSync();
+    migrateIfNeeded();
+    updateSyncBadge();
+  }).catch(function(err) {
+    console.error("Auth error:", err);
+    syncStatus = "error";
+    updateSyncBadge();
+    showToast("Cloud sync unavailable — working offline", "warning");
+  });
+} else {
+  syncStatus = "offline";
+  updateSyncBadge();
+}
+
+// Check notifications on load
+setTimeout(function() { checkDueNotifications(false); }, 2000);
+
+/* === PWA SERVICE WORKER === */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/tools/sw.js', { scope: '/tools/' })
+      .then(function(reg) {
+        console.log('SW registered, scope:', reg.scope);
+        setInterval(function() { reg.update(); }, 60 * 60 * 1000);
+      })
+      .catch(function(err) {
+        console.log('SW registration failed:', err);
+      });
+  });
 }
 </script>
 </body>
