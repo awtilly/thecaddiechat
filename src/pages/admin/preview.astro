@@ -508,10 +508,11 @@ import Footer from '../../components/Footer.astro';
     'https://us-central1-thecaddiechat-178de.cloudfunctions.net/publishDraft';
 
   // ── Mutable state ─────────────────────────────────────────────────────────
-  let currentRaw  = '';   // full MDX string as loaded / last saved
-  let currentSha  = '';   // file blob sha for GitHub Contents API
-  let currentSlug = '';   // slug from query string
-  let isDirty     = false;
+  let currentRaw        = '';   // full MDX string as loaded / last saved
+  let currentSha        = '';   // file blob sha for GitHub Contents API
+  let currentSlug       = '';   // slug from query string
+  let currentCollection = 'chronicles';
+  let isDirty           = false;
   let debounceTimer: ReturnType<typeof setTimeout>;
   let toastTimer:   ReturnType<typeof setTimeout>;
 
@@ -534,11 +535,13 @@ import Footer from '../../components/Footer.astro';
   } else {
     const params = new URLSearchParams(location.search);
     const slug = params.get('slug');
+    const collection = params.get('collection') || 'chronicles';
     if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
       window.location.href = '/admin/';
     } else {
       currentSlug = slug;
-      loadPreview(slug);
+      currentCollection = collection;
+      loadPreview(slug, collection);
     }
   }
 
@@ -595,14 +598,14 @@ import Footer from '../../components/Footer.astro';
   }
 
   // ── Load read-only preview ────────────────────────────────────────────────
-  async function loadPreview(slug: string) {
+  async function loadPreview(slug: string, collection = 'chronicles') {
     const titleEl = document.getElementById('preview-title');
     const metaEl  = document.getElementById('preview-meta');
     const bodyEl  = document.getElementById('preview-body');
     const badgeEl = document.getElementById('preview-badge');
 
     try {
-      const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/chronicles/${slug}.mdx`;
+      const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/${collection}/${slug}.mdx`;
       const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github+json' } });
       if (!res.ok) throw new Error(`GitHub API ${res.status} — file not found for slug: ${slug}`);
 
@@ -728,6 +731,7 @@ import Footer from '../../components/Footer.astro';
           password:     storedPw,
           action:       'save',
           slug:         currentSlug,
+          collection:   currentCollection,
           content:      mdxEditor.value,
           sha:          currentSha,
           alsoPublish,

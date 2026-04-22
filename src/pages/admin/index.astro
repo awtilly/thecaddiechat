@@ -390,6 +390,8 @@
     const GITHUB_REPO = 'awtilly/thecaddiechat';
     const CHRONICLES_API =
       `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/chronicles`;
+    const FIELD_NOTES_API =
+      `https://api.github.com/repos/${GITHUB_REPO}/contents/src/content/field-notes`;
     const SESSION_KEY = 'tcc-admin-pw';
 
     // ── DOM refs ──────────────────────────────────────────
@@ -498,34 +500,44 @@
       appSubtitle.textContent = '';
 
       try {
-        const dirRes = await fetch(CHRONICLES_API, {
-          headers: { Accept: 'application/vnd.github+json' },
-        });
-        if (!dirRes.ok) throw new Error(`GitHub API ${dirRes.status}`);
+        const [chronRes, fnRes] = await Promise.all([
+          fetch(CHRONICLES_API, { headers: { Accept: 'application/vnd.github+json' } }),
+          fetch(FIELD_NOTES_API, { headers: { Accept: 'application/vnd.github+json' } }),
+        ]);
+        if (!chronRes.ok) throw new Error(`GitHub API ${chronRes.status} (chronicles)`);
 
-        const files = await dirRes.json();
-        const mdxFiles = files.filter((f) => f.type === 'file' && f.name.endsWith('.mdx'));
+        const chronFiles = await chronRes.json();
+        const fnFiles = fnRes.ok ? await fnRes.json() : [];
 
-        if (mdxFiles.length === 0) {
+        const taggedFiles = [
+          ...chronFiles
+            .filter((f) => f.type === 'file' && f.name.endsWith('.mdx'))
+            .map((f) => ({ ...f, collection: 'chronicles' })),
+          ...fnFiles
+            .filter((f) => f.type === 'file' && f.name.endsWith('.mdx'))
+            .map((f) => ({ ...f, collection: 'field-notes' })),
+        ];
+
+        if (taggedFiles.length === 0) {
           loadingEl.hidden = true;
           emptyEl.hidden = false;
           return;
         }
 
         const contents = await Promise.all(
-          mdxFiles.map((f) =>
+          taggedFiles.map((f) =>
             fetch(f.url, { headers: { Accept: 'application/vnd.github+json' } })
               .then((r) => r.json())
-              .then((data) => ({ name: f.name, data }))
+              .then((data) => ({ name: f.name, collection: f.collection, data }))
           )
         );
 
         const drafts = [];
-        for (const { name, data } of contents) {
+        for (const { name, collection, data } of contents) {
           const raw = atob(data.content.replace(/\s/g, ''));
           const slug = name.replace(/\.mdx$/, '');
           const parsed = parseFrontmatter(raw);
-          if (parsed) drafts.push({ slug, ...parsed });
+          if (parsed) drafts.push({ slug, collection, ...parsed });
         }
 
         drafts.sort((a, b) => (b.date > a.date ? 1 : -1));
@@ -566,13 +578,15 @@
 
       const preview = draft.bodyPreview + (draft.bodyPreview.length >= 300 ? '…' : '');
       const slug = escHtml(draft.slug);
+      const collection = escHtml(draft.collection || 'chronicles');
+      const collectionLabel = draft.collection === 'field-notes' ? 'Field Notes' : 'Chronicles';
 
       return `
 <article class="draft-card" id="card-${slug}">
   <header class="card-header">
     <span class="draft-badge">Draft</span>
     <h2 class="card-title">${escHtml(draft.title)}</h2>
-    <span class="card-meta">${escHtml(formattedDate)} &middot; <code>${slug}</code></span>
+    <span class="card-meta">${escHtml(formattedDate)} &middot; <code>${slug}</code> &middot; ${collectionLabel}</span>
   </header>
   <div class="card-body">
     <p class="card-desc">${escHtml(draft.description)}</p>
@@ -580,9 +594,9 @@
     ${sourceHtml}
   </div>
   <footer class="card-actions">
-    <a href="/admin/preview/?slug=${slug}" target="_blank" class="admin-btn btn-preview">Preview →</a>
-    <button class="admin-btn btn-publish" data-slug="${slug}" data-action="publish">Publish</button>
-    <button class="admin-btn btn-discard" data-slug="${slug}" data-action="discard">Discard</button>
+    <a href="/admin/preview/?slug=${slug}&collection=${collection}" target="_blank" class="admin-btn btn-preview">Preview →</a>
+    <button class="admin-btn btn-publish" data-slug="${slug}" data-collection="${collection}" data-action="publish">Publish</button>
+    <button class="admin-btn btn-discard" data-slug="${slug}" data-collection="${collection}" data-action="discard">Discard</button>
     <span class="card-status" id="status-${slug}"></span>
   </footer>
 </article>`;
@@ -603,15 +617,16 @@
         btn.addEventListener('click', () => {
           const slug = btn.dataset.slug;
           const action = btn.dataset.action;
+          const collection = btn.dataset.collection || 'chronicles';
           if (action === 'discard') {
             if (!confirm(`Discard "${slug}"?\n\nThis permanently deletes the draft.`)) return;
           }
-          handleAction(slug, action);
+          handleAction(slug, action, collection);
         });
       });
     }
 
-    async function handleAction(slug, action) {
+    async function handleAction(slug, action, collection = 'chronicles') {
       const card = document.getElementById(`card-${slug}`);
       const statusEl = document.getElementById(`status-${slug}`);
       const buttons = card?.querySelectorAll('.btn-publish, .btn-discard');
@@ -626,7 +641,7 @@
         const res = await fetch(FUNCTION_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password, action, slug }),
+          body: JSON.stringify({ password, action, slug, collection }),
         });
 
         let data;
