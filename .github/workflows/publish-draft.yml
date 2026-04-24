@@ -11,8 +11,13 @@ on:
         required: true
         type: string
       slug:
-        description: 'Chronicle slug (MDX filename without .mdx extension)'
+        description: 'Slug (MDX filename without .mdx extension)'
         required: true
+        type: string
+      collection:
+        description: 'Content collection ("chronicles" or "field-notes"). Defaults to chronicles for backwards compatibility.'
+        required: false
+        default: 'chronicles'
         type: string
 
 permissions:
@@ -45,7 +50,11 @@ jobs:
             echo "::error::Invalid action: ${{ inputs.action }}"
             exit 1
           fi
-          FILE="src/content/chronicles/${{ inputs.slug }}.mdx"
+          if [[ "${{ inputs.collection }}" != "chronicles" && "${{ inputs.collection }}" != "field-notes" ]]; then
+            echo "::error::Invalid collection: ${{ inputs.collection }}"
+            exit 1
+          fi
+          FILE="src/content/${{ inputs.collection }}/${{ inputs.slug }}.mdx"
           if [ ! -f "$FILE" ]; then
             echo "::error::File not found: $FILE"
             exit 1
@@ -54,16 +63,16 @@ jobs:
       - name: Publish draft (flip draft flag to false)
         if: inputs.action == 'publish'
         run: |
-          FILE="src/content/chronicles/${{ inputs.slug }}.mdx"
+          FILE="src/content/${{ inputs.collection }}/${{ inputs.slug }}.mdx"
           sed -i 's/^draft: true$/draft: false/' "$FILE"
           git add "$FILE"
-          git commit -m "publish(chronicles): ${{ inputs.slug }}"
+          git commit -m "publish(${{ inputs.collection }}): ${{ inputs.slug }}"
           git push
 
       - name: Discard draft (delete file)
         if: inputs.action == 'discard'
         run: |
-          FILE="src/content/chronicles/${{ inputs.slug }}.mdx"
+          FILE="src/content/${{ inputs.collection }}/${{ inputs.slug }}.mdx"
           git rm "$FILE"
-          git commit -m "discard(chronicles): ${{ inputs.slug }}"
+          git commit -m "discard(${{ inputs.collection }}): ${{ inputs.slug }}"
           git push

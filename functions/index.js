@@ -21,6 +21,10 @@ const ALLOWED_ORIGINS = [
 
 const SLUG_RE = /^[a-z0-9-]+$/;
 
+// Content collections the admin is allowed to write to. Keep in sync with
+// src/content.config.ts and the workflow in .github/workflows/publish-draft.yml.
+const VALID_COLLECTIONS = ['chronicles', 'field-notes'];
+
 // ── Shared helpers ───────────────────────────────────────
 
 async function verifyPassword(password) {
@@ -69,6 +73,8 @@ exports.publishDraft = functions.https.onRequest(async (req, res) => {
 
   // ── Input validation ─────────────────────────────────────
   const { password, action, slug } = req.body || {};
+  // Default to 'chronicles' so old admin clients (pre-field-notes) keep working.
+  const collection = (req.body && req.body.collection) || 'chronicles';
 
   if (!password || typeof password !== 'string') {
     res.status(400).json({ error: 'Missing password' });
@@ -80,6 +86,10 @@ exports.publishDraft = functions.https.onRequest(async (req, res) => {
   }
   if (!slug || !SLUG_RE.test(slug)) {
     res.status(400).json({ error: 'Invalid slug' });
+    return;
+  }
+  if (!VALID_COLLECTIONS.includes(collection)) {
+    res.status(400).json({ error: `Invalid collection — must be one of ${VALID_COLLECTIONS.join(', ')}` });
     return;
   }
 
@@ -118,13 +128,13 @@ exports.publishDraft = functions.https.onRequest(async (req, res) => {
 
     const encodedContent = Buffer.from(finalContent).toString('base64');
     const commitMessage = alsoPublish
-      ? `publish(chronicles): save and publish "${slug}" via admin`
-      : `edit(chronicles): update "${slug}" draft via admin`;
+      ? `publish(${collection}): save and publish "${slug}" via admin`
+      : `edit(${collection}): update "${slug}" draft via admin`;
 
     let ghRes;
     try {
       ghRes = await fetch(
-        `https://api.github.com/repos/awtilly/thecaddiechat/contents/src/content/chronicles/${slug}.mdx`,
+        `https://api.github.com/repos/awtilly/thecaddiechat/contents/src/content/${collection}/${slug}.mdx`,
         {
           method: 'PUT',
           headers: {
@@ -185,7 +195,7 @@ exports.publishDraft = functions.https.onRequest(async (req, res) => {
         },
         body: JSON.stringify({
           ref: 'main',
-          inputs: { action, slug },
+          inputs: { action, slug, collection },
         }),
       }
     );
