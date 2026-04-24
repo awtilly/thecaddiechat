@@ -19,5 +19,8 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Claude Code
+.claude/
+
 # Nested original site (has its own git repo)
 thecaddiechat/
