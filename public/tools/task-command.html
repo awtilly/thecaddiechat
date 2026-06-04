@@ -708,7 +708,7 @@ function startSync() {
   if (!db) return;
 
   // Listen to tasks collection
-  db.collection("tasks").onSnapshot(function(snapshot) {
+  db.collection("tasks").onSnapshot({ includeMetadataChanges: true }, function(snapshot) {
     var firestoreTasks = [];
     snapshot.forEach(function(doc) {
       var data = doc.data();
