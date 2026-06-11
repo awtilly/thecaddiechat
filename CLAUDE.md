@@ -67,6 +67,10 @@ Once all of the above is done, delete this section from CLAUDE.md.
 - `build.format: 'directory'` -- generates /path/index.html structure
 - All 19 existing URLs must be preserved without redirects
 - Do NOT set `base` in astro config (custom domain handles this)
+- Do NOT delete the root `CNAME` file -- GitHub unsets the Pages custom
+  domain (thecaddiechat.com) when it disappears from main, taking the site
+  down. Both copies are required: root `CNAME` (Pages settings) and
+  `public/CNAME` (copied into dist/ by the build).
 
 ## MDX Components (Courses)
 
