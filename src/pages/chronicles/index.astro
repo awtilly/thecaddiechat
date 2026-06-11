@@ -6,7 +6,7 @@ import CtaBanner from '../../components/CtaBanner.astro';
 import { getCollection } from 'astro:content';
 
 const allChronicles = await getCollection('chronicles');
-// Drafts are never shown in the main listing — review them at /admin/drafts
+// Entries with draft: true are never shown in the main listing
 const chronicles = allChronicles
   .filter((e) => !e.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
