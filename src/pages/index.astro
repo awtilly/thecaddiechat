@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
-import StatsRow from '../components/StatsRow.astro';
 import CardGrid from '../components/CardGrid.astro';
 import ContentCard from '../components/ContentCard.astro';
 import CtaBanner from '../components/CtaBanner.astro';
@@ -26,7 +25,7 @@ import cameraCardImg from '../assets/images/courses/mountain-ridge/dramatic-clou
         <div class="intro-text">
           <span class="section-label">About</span>
           <h2>Every round tells a story. Every course has a soul.</h2>
-          <p>I'm Joe Stoehner — caddie, Evans Scholar, and storyteller. From carrying bags for Viktor Hovland and Tyrrell Hatton on the PGA Tour to chasing golden age architecture across the Northeast, this is where I document the game's most human moments.</p>
+          <p>I'm Joe Stoehner — caddie, Evans Scholar, and storyteller. As an Evans Scholar, I've had the opportunity to caddie for PGA Tour pros like Viktor Hovland and Tyrrell Hatton at charity pro-ams — and when I'm not carrying a bag, I'm chasing golden age architecture across the Northeast. This is where I document the game's most human moments.</p>
           <p>The Caddie Chat is a home for the stories, photography, and perspectives that emerge when you spend your life inside the ropes.</p>
           <div style="margin-top: 2rem;">
             <a href="/chronicles/" class="btn btn-arrow">Start Reading</a>
@@ -39,17 +38,6 @@ import cameraCardImg from '../assets/images/courses/mountain-ridge/dramatic-clou
     </div>
   </section>
 
-  <section>
-    <div class="container">
-      <StatsRow stats={[
-        { count: 3, suffix: '+', label: 'PGA Tour Bags' },
-        { count: 8, label: 'Golden Age Courses' },
-        { count: 8, label: 'Photo Collections' },
-        { count: 9, label: 'Days on the Road' },
-      ]} />
-    </div>
-  </section>
-
   <section class="section-pad-lg">
     <div class="container">
       <span class="section-label" data-scroll-reveal>Explore</span>
@@ -57,7 +45,7 @@ import cameraCardImg from '../assets/images/courses/mountain-ridge/dramatic-clou
       <CardGrid>
         <ContentCard
           title="Chronicles"
-          description="First-person stories from inside the ropes — caddying for Viktor Hovland, Tyrrell Hatton, Matt Fitzpatrick, and the moments that happen between the shots."
+          description="First-person stories from inside the ropes — pro-am rounds caddying for Viktor Hovland, Tyrrell Hatton, and Matt Fitzpatrick, and the moments that happen between the shots."
           image={chroniclesCardImg}
           href="/chronicles/"
           tag="01"
