@@ -1,5 +1,25 @@
 # The Caddie Chat - Project Conventions
 
+## PENDING CLEANUP TASK (do this when running locally with Firebase access)
+
+The article-publishing automation was removed from this repo (admin pages,
+functions/, publish-draft workflow) in June 2026, but cloud-side resources
+still exist. When a session has Firebase CLI or MCP access, finish the job:
+
+1. Delete the leftover Cloud Function from the OLD publishing project:
+   `firebase functions:delete publishDraft --project thecaddiechat-178de`
+2. Remind the user (Joe) to also:
+   - Delete the `PUBLISH_PAT` secret in GitHub repo Settings → Secrets → Actions
+   - Revoke the underlying fine-grained PAT at github.com/settings/tokens
+   - Delete the Sunday "chronicles drafter" scheduled task in Cowork (it pushes
+     draft commits to main)
+
+DO NOT TOUCH Firebase project `todolist-6ca86` — that is the live backend for
+the Task Command app (`public/tools/task-command.html`); its Firestore rules
+live in `tools/firestore/`.
+
+Once all of the above is done, delete this section from CLAUDE.md.
+
 ## Framework & Stack
 
 - **Framework:** Astro 5 with MDX integration (@astrojs/mdx)
