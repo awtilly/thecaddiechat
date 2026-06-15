@@ -347,6 +347,9 @@ input, select, textarea, button { font-family:inherit; }
   #toasts { right:10px; left:10px; }
   .alert-bar { font-size:13px; padding:8px 12px; }
 
+  .dpill { padding:9px 14px; font-size:14px; }
+  .cmdk-over { padding:8vh 12px 12px; }
+
   /* === MOBILE PWA ENHANCEMENTS === */
 
   /* Hide desktop toolbar extras on mobile — replaced by bottom tabs + FAB */
@@ -475,6 +478,39 @@ input, select, textarea, button { font-family:inherit; }
 .wins-empty { text-align:center; color:var(--tx-4); padding:48px 20px; }
 .wins-empty .big { font-size:40px; margin-bottom:8px; }
 .summary-ta { width:100%; min-height:300px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; padding:14px; border:1px solid var(--border); border-radius:var(--r); background:var(--bg-3); color:var(--tx-1); resize:vertical; outline:none; }
+
+/* SMART DATE VIEWS */
+.dscope { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.dpill { background:var(--bg-2); color:var(--tx-2); border:1px solid var(--border); border-radius:20px; padding:6px 14px; font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:border-color 0.15s; }
+.dpill:hover { border-color:var(--border-h); }
+.dpill.act { background:var(--blue); color:#fff; border-color:var(--blue); }
+.dcount { font-size:11px; font-weight:700; background:var(--bg-3); color:var(--tx-3); border-radius:10px; padding:1px 6px; min-width:16px; text-align:center; }
+.dpill.act .dcount { background:rgba(255,255,255,0.25); color:#fff; }
+.dpill .dcount.urg { background:#fef2f2; color:#dc2626; }
+.dpill.act .dcount.urg { background:rgba(255,255,255,0.3); color:#fff; }
+.dpill .dcount:empty { display:none; }
+
+/* COMMAND PALETTE (Cmd+K) */
+.cmdk-over { position:fixed; inset:0; background:rgba(0,0,0,0.35); backdrop-filter:blur(4px); z-index:3000; display:flex; align-items:flex-start; justify-content:center; padding:12vh 20px 20px; }
+.cmdk-box { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-lg); width:100%; max-width:560px; box-shadow:0 16px 48px rgba(0,0,0,0.22); overflow:hidden; animation:fadeUp 0.15s ease; display:flex; flex-direction:column; max-height:70vh; }
+.cmdk-input { border:none; border-bottom:1px solid var(--border); padding:18px 20px; font-size:17px; color:var(--tx-1); background:transparent; outline:none; }
+.cmdk-input::placeholder { color:var(--tx-4); }
+.cmdk-list { overflow-y:auto; padding:6px; }
+.cmdk-item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 14px; border-radius:var(--r); cursor:pointer; }
+.cmdk-item.sel { background:var(--blue-g); }
+.cmdk-label { font-size:14px; color:var(--tx-1); font-weight:500; }
+.cmdk-item.sel .cmdk-label { color:var(--blue); }
+.cmdk-hint { font-size:11px; color:var(--tx-3); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; background:var(--bg-3); padding:2px 8px; border-radius:10px; flex-shrink:0; }
+.cmdk-empty { padding:24px; text-align:center; color:var(--tx-4); font-size:14px; }
+.cmdk-foot { display:flex; gap:16px; padding:10px 16px; border-top:1px solid var(--border); font-size:11px; color:var(--tx-3); }
+.cmdk-foot kbd, kbd { font-family:'JetBrains Mono',monospace; font-size:10px; background:var(--bg-3); border:1px solid var(--border); border-radius:4px; padding:1px 5px; margin-right:3px; color:var(--tx-2); }
+.kbd-btn { font-family:'JetBrains Mono',monospace; font-size:12px !important; letter-spacing:0.3px; }
+
+/* SHORTCUTS HELP */
+.kbd-grid { display:grid; grid-template-columns:auto 1fr; gap:10px 16px; align-items:center; }
+.kbd-grid .k { display:flex; flex-wrap:wrap; gap:4px; }
+.kbd-grid kbd { font-size:12px; padding:3px 8px; border-bottom-width:2px; }
+.kbd-grid .d { font-size:14px; color:var(--tx-2); }
 </style>
 </head>
 <body>
@@ -536,9 +572,17 @@ input, select, textarea, button { font-family:inherit; }
       <button id="vTable" onclick="setView('table')">&#9636; Table</button>
       <button id="vWins" onclick="setView('wins')">&#127942; Wins</button>
       <button onclick="showQuickAdd()">+ Add</button>
+      <button class="kbd-btn" onclick="openCmdK()" title="Command palette (&#8984;K / Ctrl+K)">&#8984;K</button>
       <button class="notif-btn" id="notifBtn" onclick="handleNotifClick()" title="Notifications">&#128276;<span class="notif-badge" id="notifBadge" style="display:none">0</span></button>
       <button onclick="showSettings()">&#9881;</button>
     </div>
+  </div>
+
+  <div class="dscope" id="dscope">
+    <button class="dpill act" data-scope="all" onclick="setDateScope('all')">All dates</button>
+    <button class="dpill" data-scope="today" onclick="setDateScope('today')">Today <span class="dcount" id="dc-today"></span></button>
+    <button class="dpill" data-scope="week" onclick="setDateScope('week')">Next 7 days <span class="dcount" id="dc-week"></span></button>
+    <button class="dpill" data-scope="overdue" onclick="setDateScope('overdue')">Overdue <span class="dcount" id="dc-overdue"></span></button>
   </div>
 
   <div id="content"></div>
@@ -581,6 +625,7 @@ input, select, textarea, button { font-family:inherit; }
 <button class="fab" id="fab" onclick="showQuickAdd()">+</button>
 
 <div id="mc"></div>
+<div id="cmdk"></div>
 
 <script>
 /* ============================================================
@@ -640,6 +685,7 @@ var view = "board";
 var editId = null;
 var syncStatus = "syncing";
 var winRange = "all";
+var dateScope = "all";
 
 // Snapshot of localStorage data BEFORE Firebase can touch it (for migration)
 var _localBackup = {
@@ -1229,6 +1275,9 @@ function renderNow() {
   updateFilters();
   updateStats();
   updateAlerts();
+  updateScopeCounts();
+  var dsc = document.getElementById("dscope");
+  if (dsc) dsc.style.display = (view === "wins") ? "none" : "flex";
   var ft = filtered();
   var content = document.getElementById("content");
   var tips = document.getElementById("tips");
@@ -1256,8 +1305,23 @@ function filtered() {
     if (f.person !== "All People" && t.person !== f.person) return false;
     if (f.status === "active" && t.status === "done") return false;
     if (f.status === "done" && t.status !== "done") return false;
+    if (!inDateScope(t)) return false;
     return true;
   });
+}
+
+// Smart date views — composes with the project/person/status filters.
+function inDateScope(t) {
+  if (dateScope === "all") return true;
+  if (dateScope === "overdue") return isOverdue(t);
+  if (!t.due_date) return false;
+  var today = iso(new Date());
+  if (dateScope === "today") return t.due_date === today;
+  if (dateScope === "week") {
+    var wk = new Date(); wk.setDate(wk.getDate() + 7);
+    return t.due_date >= today && t.due_date <= iso(wk);
+  }
+  return true;
 }
 
 var _filterSig = "";
@@ -1293,6 +1357,27 @@ function updateStats() {
   if (overdue > 0) h += '<span class="stat urg">' + overdue + ' overdue</span>';
   h += '<span class="stat grn">' + doneWeek + ' done this week</span>';
   document.getElementById("stats").innerHTML = h;
+}
+
+function setDateScope(v) {
+  dateScope = v;
+  document.querySelectorAll(".dpill").forEach(function(b) { b.classList.toggle("act", b.dataset.scope === v); });
+  render();
+}
+
+function updateScopeCounts() {
+  var today = iso(new Date());
+  var wk = new Date(); wk.setDate(wk.getDate() + 7); var wks = iso(wk);
+  var act = tasks.filter(function(t) { return !t.archived && t.status !== "done"; });
+  var setC = function(id, n, urg) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = n > 0 ? n : "";
+    el.className = "dcount" + (urg && n > 0 ? " urg" : "");
+  };
+  setC("dc-today", act.filter(function(t) { return t.due_date === today; }).length, false);
+  setC("dc-week", act.filter(function(t) { return t.due_date && t.due_date >= today && t.due_date <= wks; }).length, false);
+  setC("dc-overdue", tasks.filter(function(t) { return !t.archived && isOverdue(t); }).length, true);
 }
 
 /* ============================================================
@@ -1830,6 +1915,129 @@ function exportCSV() {
 function closeM() { document.getElementById("mc").innerHTML = ""; }
 
 /* ============================================================
+   COMMAND PALETTE (Cmd+K) + KEYBOARD SHORTCUTS
+   ============================================================ */
+var cmdkOpen = false, cmdkCmds = [], cmdkFiltered = [], cmdkSel = 0;
+
+// Filter setters that drive the existing toolbar <select> elements.
+function setStatusFilter(v) { var el = document.getElementById("fStat"); if (el) { el.value = v; render(); } }
+function setProjFilter(v) { var el = document.getElementById("fProj"); if (el) { el.value = v; render(); } }
+function setPersFilter(v) { var el = document.getElementById("fPers"); if (el) { el.value = v; render(); } }
+
+function buildCommands() {
+  var c = [];
+  // Views
+  c.push({ label: "Board view", hint: "View", kw: "board kanban columns", run: function() { setView("board"); } });
+  c.push({ label: "List view", hint: "View", kw: "list", run: function() { setView("list"); } });
+  c.push({ label: "Table view", hint: "View", kw: "table grid", run: function() { setView("table"); } });
+  c.push({ label: "Wins / accomplishments", hint: "View", kw: "wins done completed accomplishments review", run: function() { setView("wins"); } });
+  // Date scopes
+  c.push({ label: "All dates", hint: "Date", kw: "all dates clear", run: function() { setDateScope("all"); } });
+  c.push({ label: "Due today", hint: "Date", kw: "today due", run: function() { setDateScope("today"); } });
+  c.push({ label: "Next 7 days", hint: "Date", kw: "week upcoming next 7 seven days", run: function() { setDateScope("week"); } });
+  c.push({ label: "Overdue", hint: "Date", kw: "overdue late past", run: function() { setDateScope("overdue"); } });
+  // Status filters
+  c.push({ label: "Show active tasks", hint: "Filter", kw: "active open status", run: function() { setStatusFilter("active"); } });
+  c.push({ label: "Show completed tasks", hint: "Filter", kw: "completed done status", run: function() { setStatusFilter("done"); } });
+  c.push({ label: "Show all tasks", hint: "Filter", kw: "all status", run: function() { setStatusFilter("all"); } });
+  // Actions
+  c.push({ label: "Add task…", hint: "Action", kw: "add new create task", run: function() { showQuickAdd(); } });
+  c.push({ label: "Focus the add bar", hint: "Action", kw: "focus input type quick", run: function() { var mi = document.getElementById("mainInput"); if (mi) mi.focus(); } });
+  c.push({ label: "Settings", hint: "Action", kw: "settings config api key projects people", run: function() { showSettings(); } });
+  c.push({ label: "Archive completed", hint: "Action", kw: "archive clean clear completed", run: function() { archiveCompleted(); } });
+  c.push({ label: "Export CSV", hint: "Action", kw: "export csv download", run: function() { exportCSV(); } });
+  c.push({ label: "Keyboard shortcuts", hint: "Help", kw: "keyboard shortcuts help keys", run: function() { showShortcuts(); } });
+  // Dynamic: project + person filters
+  c.push({ label: "All projects", hint: "Project", kw: "project all", run: function() { setProjFilter("All Projects"); } });
+  Array.from(new Set(projects.concat(tasks.map(function(t) { return t.project; })))).sort().forEach(function(p) {
+    if (!p) return;
+    c.push({ label: p, hint: "Project", kw: "project " + p.toLowerCase(), run: function() { setProjFilter(p); } });
+  });
+  c.push({ label: "All people", hint: "Person", kw: "person people all", run: function() { setPersFilter("All People"); } });
+  Array.from(new Set(people.concat(tasks.map(function(t) { return t.person; })))).sort().forEach(function(p) {
+    if (!p) return;
+    c.push({ label: p, hint: "Person", kw: "person from " + p.toLowerCase(), run: function() { setPersFilter(p); } });
+  });
+  return c;
+}
+
+function openCmdK() {
+  if (cmdkOpen) return;
+  cmdkOpen = true;
+  cmdkCmds = buildCommands();
+  cmdkSel = 0;
+  document.getElementById("cmdk").innerHTML =
+    '<div class="cmdk-over" onclick="if(event.target===this)closeCmdK()">' +
+      '<div class="cmdk-box" role="dialog" aria-label="Command palette">' +
+        '<input type="text" id="cmdkInput" class="cmdk-input" placeholder="Type a command…  (try \'today\', \'board\', \'add\')" autocomplete="off" oninput="filterCmdK(this.value)" onkeydown="cmdkKeydown(event)">' +
+        '<div class="cmdk-list" id="cmdkList"></div>' +
+        '<div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd>navigate</span><span><kbd>↵</kbd>run</span><span><kbd>esc</kbd>close</span></div>' +
+      '</div>' +
+    '</div>';
+  filterCmdK("");
+  setTimeout(function() { var el = document.getElementById("cmdkInput"); if (el) el.focus(); }, 30);
+}
+
+function closeCmdK() { cmdkOpen = false; document.getElementById("cmdk").innerHTML = ""; }
+
+function filterCmdK(q) {
+  q = (q || "").toLowerCase().trim();
+  cmdkFiltered = q ? cmdkCmds.filter(function(c) { return (c.label + " " + (c.kw || "")).toLowerCase().indexOf(q) >= 0; }) : cmdkCmds.slice();
+  if (cmdkSel >= cmdkFiltered.length) cmdkSel = 0;
+  renderCmdK();
+}
+
+function renderCmdK() {
+  var list = document.getElementById("cmdkList");
+  if (!list) return;
+  if (cmdkFiltered.length === 0) { list.innerHTML = '<div class="cmdk-empty">No matching commands</div>'; return; }
+  list.innerHTML = cmdkFiltered.map(function(c, i) {
+    return '<div class="cmdk-item' + (i === cmdkSel ? " sel" : "") + '" onmousemove="cmdkHover(' + i + ')" onclick="cmdkRun(' + i + ')">' +
+      '<span class="cmdk-label">' + esc(c.label) + '</span>' +
+      (c.hint ? '<span class="cmdk-hint">' + esc(c.hint) + '</span>' : "") +
+    '</div>';
+  }).join("");
+  var sel = list.children[cmdkSel];
+  if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: "nearest" });
+}
+
+function cmdkHover(i) { if (i !== cmdkSel) { cmdkSel = i; renderCmdK(); } }
+
+function cmdkRun(i) {
+  var c = cmdkFiltered[i];
+  if (!c) return;
+  closeCmdK();
+  c.run();
+}
+
+function cmdkKeydown(e) {
+  if (e.key === "ArrowDown") { e.preventDefault(); cmdkSel = Math.min(cmdkSel + 1, cmdkFiltered.length - 1); renderCmdK(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); cmdkSel = Math.max(cmdkSel - 1, 0); renderCmdK(); }
+  else if (e.key === "Enter") { e.preventDefault(); cmdkRun(cmdkSel); }
+  else if (e.key === "Escape") { e.preventDefault(); closeCmdK(); }
+}
+
+function showShortcuts() {
+  var row = function(keys, desc) {
+    return '<div class="k">' + keys.map(function(k) { return "<kbd>" + k + "</kbd>"; }).join("") + '</div><div class="d">' + desc + "</div>";
+  };
+  document.getElementById("mc").innerHTML =
+    '<div class="mover" onclick="if(event.target===this)closeM()">' +
+      '<div class="modal" style="max-width:440px">' +
+        "<h3>Keyboard Shortcuts</h3>" +
+        '<div class="kbd-grid">' +
+          row(["⌘ / Ctrl", "K"], "Command palette") +
+          row(["/"], "Focus the add bar") +
+          row(["C"], "Quick add task") +
+          row(["B", "L", "T", "W"], "Board · List · Table · Wins") +
+          row(["1", "2", "3", "4"], "All · Today · Next 7 · Overdue") +
+          row(["?"], "Show this help") +
+        "</div>" +
+      "</div>" +
+    "</div>";
+}
+
+/* ============================================================
    DRAG & DROP
    ============================================================ */
 var dragTaskId = null;
@@ -2102,6 +2310,41 @@ function setVoiceStatus(msg) {
    ============================================================ */
 document.getElementById("mainInput").addEventListener("input", updatePreview);
 document.getElementById("mainForm").addEventListener("submit", handleSubmit);
+
+// Global keyboard shortcuts
+function _kbTyping(e) {
+  var t = e.target; if (!t) return false;
+  var tag = (t.tagName || "").toLowerCase();
+  return tag === "input" || tag === "textarea" || tag === "select" || t.isContentEditable;
+}
+function _kbModalOpen() {
+  return document.getElementById("mc").innerHTML !== "" || document.getElementById("cmdk").innerHTML !== "";
+}
+document.addEventListener("keydown", function(e) {
+  // Command palette — works anywhere
+  if ((e.metaKey || e.ctrlKey) && (e.key === "k" || e.key === "K")) {
+    e.preventDefault();
+    if (cmdkOpen) closeCmdK(); else openCmdK();
+    return;
+  }
+  if (e.key === "Escape" && cmdkOpen) { closeCmdK(); return; }
+  // Single-key shortcuts — only when not typing, no modifiers, no modal open
+  if (_kbTyping(e) || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (_kbModalOpen()) return;
+  switch (e.key) {
+    case "/": e.preventDefault(); var mi = document.getElementById("mainInput"); if (mi) mi.focus(); break;
+    case "c": case "C": e.preventDefault(); showQuickAdd(); break;
+    case "b": case "B": setView("board"); break;
+    case "l": case "L": setView("list"); break;
+    case "t": case "T": setView("table"); break;
+    case "w": case "W": setView("wins"); break;
+    case "1": setDateScope("all"); break;
+    case "2": setDateScope("today"); break;
+    case "3": setDateScope("week"); break;
+    case "4": setDateScope("overdue"); break;
+    case "?": e.preventDefault(); showShortcuts(); break;
+  }
+});
 
 // Voice input
 initVoice();
