@@ -182,6 +182,12 @@
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
+    /* Hero pages: stay transparent over the hero image. Must re-assert after the
+       opaque mobile bar above, or the cream bg wins the cascade and the white
+       hero-nav logo/toggle render invisibly on cream. */
+    :global(.nav.hero-nav) {
+      background: transparent;
+    }
     .nav-links {
       position: fixed;
       top: 0;
