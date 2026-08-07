@@ -12,7 +12,7 @@
   --color-border-strong: rgba(0, 0, 0, 0.15);
   --color-text-primary: #1c1c1c;
   --color-text-secondary: #5e5953;
-  --color-text-muted: #9a948c;
+  --color-text-muted: #6f6a63;
   --color-accent: #2d5a3f;
   --color-accent-light: #3a7352;
   --color-accent-dim: rgba(45, 90, 63, 0.08);
@@ -125,6 +125,11 @@ img { max-width: 100%; height: auto; display: block; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(var(--distance-lg)); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 [data-scroll-reveal] { opacity: 0; transform: translateY(var(--distance-md)); }
+/* GSAP reveals never run under reduced motion — content must stay visible.
+   Must come AFTER the pre-hide rule above: equal specificity, cascade order wins. */
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-reveal] { opacity: 1; transform: none; }
+}
 
 /* --- Buttons --- */
 .btn {

@@ -150,17 +150,37 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       'Last scan: ' + new Date(latest).toLocaleString();
   }
 
+  // Two [year, month] pairs to display: the first two distinct months present
+  // in the tracked data, falling back to current + next month when empty
+  function calendarMonths(dateKeys) {
+    const months = [...new Set(dateKeys.map(function (ds) { return ds.slice(0, 7); }))].sort();
+    if (months.length === 0) {
+      const now = new Date();
+      months.push(now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
+    }
+    if (months.length === 1) {
+      const parts = months[0].split('-');
+      const next = new Date(Number(parts[0]), Number(parts[1]), 1); // month is 1-based here, so this is +1
+      months.push(next.getFullYear() + '-' + String(next.getMonth() + 1).padStart(2, '0'));
+    }
+    return months.slice(0, 2).map(function (ym) {
+      const parts = ym.split('-');
+      return [Number(parts[0]), Number(parts[1]) - 1];
+    });
+  }
+
   function renderCalendars() {
     const outRoute = 'CLT-' + dest;
     const retRoute = dest + '-CLT';
     const outData = latestByDate(outRoute);
     const retData = latestByDate(retRoute);
 
-    // June (month 5) and July (month 6) 2026
+    const months = calendarMonths(Object.keys(outData).concat(Object.keys(retData)));
+
     document.getElementById('outCalendars').innerHTML =
-      monthGrid(2026, 5, outData, outRoute) + monthGrid(2026, 6, outData, outRoute);
+      months.map(function (m) { return monthGrid(m[0], m[1], outData, outRoute); }).join('');
     document.getElementById('retCalendars').innerHTML =
-      monthGrid(2026, 5, retData, retRoute) + monthGrid(2026, 6, retData, retRoute);
+      months.map(function (m) { return monthGrid(m[0], m[1], retData, retRoute); }).join('');
 
     document.getElementById('outDest').textContent = dest;
     document.getElementById('retOrigin').textContent = dest;

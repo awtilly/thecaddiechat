@@ -249,20 +249,41 @@
 </style>
 
 <script>
+  // Window/document listeners registered per page-load are aborted on swap so
+  // they don't accumulate across soft navigations. Element listeners die with
+  // their elements when the body is swapped.
+  let pageAbort: AbortController | null = null;
+
+  document.addEventListener('astro:before-swap', () => {
+    // Release the drawer's body scroll lock if navigating with the menu open
+    document.body.style.overflow = '';
+    pageAbort?.abort();
+    pageAbort = null;
+  });
+
   document.addEventListener('astro:page-load', () => {
+    pageAbort = new AbortController();
+    const { signal } = pageAbort;
+
     const nav = document.querySelector('.nav');
     const hero = document.querySelector('.hero');
     if (nav && hero) {
       nav.classList.add('hero-nav');
+      // Cache the hero height: reading offsetHeight inside the scroll handler
+      // forces a layout on every scroll event
+      let heroHeight = (hero as HTMLElement).offsetHeight;
+      window.addEventListener('resize', () => {
+        heroHeight = (hero as HTMLElement).offsetHeight;
+      }, { passive: true, signal });
       window.addEventListener('scroll', () => {
-        const pastHero = window.scrollY > hero.offsetHeight - 100;
+        const pastHero = window.scrollY > heroHeight - 100;
         nav.classList.toggle('scrolled', pastHero);
         nav.classList.toggle('hero-nav', !pastHero);
-      }, { passive: true });
+      }, { passive: true, signal });
     } else if (nav) {
       window.addEventListener('scroll', () => {
         nav.classList.toggle('scrolled', window.scrollY > 50);
-      }, { passive: true });
+      }, { passive: true, signal });
     }
 
     const toggle = document.querySelector('.nav-toggle');
@@ -310,7 +331,7 @@
         if (e.key === 'Escape' && links.classList.contains('open')) {
           closeMenu();
         }
-      });
+      }, { signal });
     }
   }, { once: false });
 </script>

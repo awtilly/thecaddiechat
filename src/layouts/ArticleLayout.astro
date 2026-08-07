@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ArticleNav from '../components/ArticleNav.astro';
+import Lightbox from '../components/Lightbox.astro';
 import { Image } from 'astro:assets';
 
 interface Source {
@@ -93,6 +94,7 @@ const jsonLd = {
     )}
     <ArticleNav prev={prev} next={next} basePath={collectionPath} />
   </section>
+  <Lightbox />
   <Footer />
 </BaseLayout>
 
@@ -244,14 +246,6 @@ const jsonLd = {
     font-size: var(--font-size-md);
     color: var(--color-text-primary);
     line-height: var(--leading-relaxed);
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .article-body blockquote {
-      opacity: 1;
-      transform: none;
-    }
   }
   .article-body .pull-quote {
     text-align: center;
