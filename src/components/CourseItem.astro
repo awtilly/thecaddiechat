@@ -16,7 +16,7 @@ const { title, architect, courseNumber, href, image } = Astro.props;
   <span class="course-num">{courseNumber}</span>
   {image && (
     <div class="course-thumb">
-      <Image src={image} alt={title} loading="lazy" width={100} sizes="100px" />
+      <Image src={image} alt="" loading="lazy" width={100} sizes="100px" />
     </div>
   )}
   <div class="course-info">

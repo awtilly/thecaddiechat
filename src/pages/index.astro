@@ -37,6 +37,7 @@ const jsonLd = {
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <Nav />
+  <main id="main">
   <Hero />
 
   <section class="section-pad-lg">
@@ -95,6 +96,7 @@ const jsonLd = {
     buttonHref="https://instagram.com/thecaddiechat"
     buttonExternal={true}
   />
+  </main>
 
   <Footer />
 </BaseLayout>

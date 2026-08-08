@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Tarmac" noindex>
+  <main id="main">
   <div class="tracker" id="tracker">
     <header class="tracker-header">
       <h1 class="tracker-title">Tarmac</h1>
@@ -9,9 +10,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <p class="last-updated" id="lastUpdated">Loading&hellip;</p>
     </header>
 
-    <nav class="route-tabs" id="routeTabs">
-      <button class="route-tab active" data-dest="DUB">Dublin (DUB)</button>
-      <button class="route-tab" data-dest="SNN">Shannon (SNN)</button>
+    <nav class="route-tabs" id="routeTabs" aria-label="Destination">
+      <button class="route-tab active" data-dest="DUB" aria-pressed="true">Dublin (DUB)</button>
+      <button class="route-tab" data-dest="SNN" aria-pressed="false">Shannon (SNN)</button>
     </nav>
 
     <section class="section" id="bestDeals">
@@ -52,6 +53,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       <p class="muted">Data refreshes twice daily via GitHub Actions.</p>
     </footer>
   </div>
+  </main>
 
 <script is:inline>
 (function () {
@@ -135,12 +137,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const tip = m ? ds + ': ' + m.toLocaleString() + ' miles' : ds + ': no data';
       const stops = e ? e.stops : '';
 
-      h += '<div class="cd" data-date="' + ds + '" data-route="' + routeKey + '" '
-        + 'style="background:' + bg + ';color:' + fg + '" title="' + tip + '">'
+      h += '<button type="button" class="cd" data-date="' + ds + '" data-route="' + routeKey + '" '
+        + 'style="background:' + bg + ';color:' + fg + '" title="' + tip + '" '
+        + 'aria-label="' + tip + '">'
         + '<span class="dn">' + day + '</span>'
         + '<span class="dm">' + label + '</span>'
         + (m && stops !== '' ? '<span class="ds">' + stops + 'st</span>' : '')
-        + '</div>';
+        + '</button>';
     }
 
     h += '</div></div>';
@@ -325,8 +328,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     // Tab handlers
     document.querySelectorAll('.route-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
-        document.querySelectorAll('.route-tab').forEach(function (t) { t.classList.remove('active'); });
+        document.querySelectorAll('.route-tab').forEach(function (t) {
+          t.classList.remove('active');
+          t.setAttribute('aria-pressed', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-pressed', 'true');
         dest = tab.getAttribute('data-dest');
         render();
       });
@@ -541,6 +548,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     padding-bottom: 0.35rem;
   }
   :global(.cd) {
+    border: none;
+    padding: 0;
+    font-family: inherit;
     aspect-ratio: 1;
     display: flex;
     flex-direction: column;

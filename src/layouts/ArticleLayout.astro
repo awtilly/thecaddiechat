@@ -69,11 +69,12 @@ const jsonLd = {
 <BaseLayout title={`${title} | The Caddie Chat`} description={description} ogImage={heroImage} ogType="article">
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <Nav />
+  <main id="main">
   <div class="container">
     <header class="article-header">
-      <div class="breadcrumb">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href={collectionPath}>{collectionLabel}</a> &nbsp;/&nbsp; {title.length > 50 ? title.substring(0, 47) + '...' : title}
-      </div>
+      </nav>
       <h1>{title}</h1>
       <div class="article-meta">
         {meta && <span>{meta}</span>}
@@ -111,6 +112,7 @@ const jsonLd = {
     )}
     <ArticleNav prev={prev} next={next} basePath={collectionPath} />
   </section>
+  </main>
   <Lightbox />
   <Footer />
 </BaseLayout>

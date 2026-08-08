@@ -18,6 +18,7 @@ courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
 >
   <Nav />
 
+  <main id="main">
   <div class="series-hero">
     <Picture src={seriesHeroImg} alt="A tee shot through the dune corridor at Friar's Head with Long Island Sound visible through the gap, shot on 35mm film" formats={['avif', 'webp']} layout="full-width" priority />
     <div class="series-hero-overlay">
@@ -56,6 +57,7 @@ courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
     buttonText="Back to Courses"
     buttonHref="/courses/"
   />
+  </main>
 
   <Footer />
 </BaseLayout>

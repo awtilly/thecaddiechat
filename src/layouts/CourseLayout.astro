@@ -69,6 +69,7 @@ const jsonLd = {
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <Nav />
 
+  <main id="main">
   <section class="course-hero">
     <div class="container">
       <span class="section-label">
@@ -129,6 +130,7 @@ const jsonLd = {
       <ArticleNav prev={prev} next={next} basePath="/courses/" />
     </div>
   </section>
+  </main>
 
   <Lightbox />
   <Footer />

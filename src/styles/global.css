@@ -147,6 +147,25 @@ img { max-width: 100%; height: auto; display: block; }
 .btn-arrow::after { content: '\2192'; transition: transform var(--duration-fast) var(--ease-out); }
 .btn-arrow:hover::after { transform: translateX(4px); }
 
+/* Skip link: visually hidden until keyboard-focused */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: var(--space-sm);
+  z-index: 2000;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.skip-link:focus {
+  top: var(--space-sm);
+}
+
 /* Focus-visible: keyboard accessibility */
 :focus-visible {
   outline: 2px solid var(--color-accent);
