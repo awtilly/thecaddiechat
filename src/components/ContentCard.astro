@@ -13,7 +13,7 @@ const { title, description, image, href, tag } = Astro.props;
 ---
 <a href={href} class="content-card" data-scroll-reveal>
   <div class="content-card-image">
-    <Image src={image} alt={title} loading="lazy" />
+    <Image src={image} alt={title} loading="lazy" width={420} sizes="(max-width: 900px) 100vw, 420px" />
   </div>
   <div class="content-card-body">
     {tag && <span class="content-card-number">{tag}</span>}

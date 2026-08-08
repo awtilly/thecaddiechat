@@ -53,16 +53,30 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     </footer>
   </div>
 
-<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
-
 <script is:inline>
 (function () {
+  // Chart.js (~200 KB) is only needed when a calendar date is clicked --
+  // loaded on demand in showTrend() instead of eagerly on every visit
+  function loadChartJs() {
+    if (window.Chart) return Promise.resolve();
+    if (!window.__chartJsLoading) {
+      window.__chartJsLoading = new Promise(function (resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js';
+        s.onload = resolve;
+        s.onerror = function () { window.__chartJsLoading = null; reject(new Error('Chart.js failed to load')); };
+        document.head.appendChild(s);
+      });
+    }
+    return window.__chartJsLoading;
+  }
   const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const DAY_NAMES = ['Mo','Tu','We','Th','Fr','Sa','Su'];
 
   let allData = [];
   let dest = 'DUB';
-  let chart = null;
+  // Chart singleton lives on window so it survives this script re-running
+  // across view-transition swaps (destroyed in astro:before-swap below)
 
   // ── Data helpers ──────────────────────────────────────
 
@@ -238,7 +252,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     });
   }
 
-  function showTrend(route, date) {
+  async function showTrend(route, date) {
     var entries = allData.filter(function (d) { return d.route === route && d.date === date; });
     entries.sort(function (a, b) { return a.ts < b.ts ? -1 : 1; });
 
@@ -249,14 +263,21 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       return;
     }
 
+    try {
+      await loadChartJs();
+    } catch (e) {
+      section.style.display = 'none';
+      return;
+    }
+
     section.style.display = '';
     document.getElementById('trendTitle').textContent =
       'Price Trend: ' + route + ' on ' + fmtDate(date);
 
     var ctx = document.getElementById('trendChart');
-    if (chart) chart.destroy();
+    if (window.__tarmacChart) window.__tarmacChart.destroy();
 
-    chart = new Chart(ctx, {
+    window.__tarmacChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: entries.map(function (e) { return new Date(e.ts).toLocaleDateString(); }),
@@ -322,11 +343,22 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       .catch(function () { showEmpty(); });
   }
 
-  // Support Astro view transitions
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+  // Init on astro:page-load (fires on initial load AND after every
+  // view-transition swap; the old DOMContentLoaded never re-fired on soft
+  // navigation back to this page). Guarded so document-level listeners are
+  // only registered once no matter how often this script re-executes.
+  if (!window.__tarmacListeners) {
+    window.__tarmacListeners = true;
+    document.addEventListener('astro:page-load', function () {
+      if (!document.getElementById('tracker')) return;
+      init();
+    });
+    document.addEventListener('astro:before-swap', function () {
+      if (window.__tarmacChart) {
+        window.__tarmacChart.destroy();
+        window.__tarmacChart = null;
+      }
+    });
   }
 })();
 </script>

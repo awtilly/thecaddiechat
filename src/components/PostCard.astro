@@ -13,7 +13,7 @@ const { title, description, href, image } = Astro.props;
 ---
 <a href={href} class="post-card" data-scroll-reveal>
   <div class="post-card-image">
-    <Image src={image} alt={title} loading="lazy" />
+    <Image src={image} alt={title} loading="lazy" width={600} sizes="(max-width: 700px) 100vw, 600px" />
   </div>
   <div class="post-card-body">
     <h3>{title}</h3>

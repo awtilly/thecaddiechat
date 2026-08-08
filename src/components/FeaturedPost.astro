@@ -13,7 +13,7 @@ const { title, description, href, image, label } = Astro.props;
 ---
 <a href={href} class="featured-post" data-scroll-reveal style="text-decoration: none;">
   <div class="featured-post-image">
-    <Image src={image} alt={title} loading="lazy" />
+    <Image src={image} alt={title} loading="lazy" width={680} sizes="(max-width: 900px) 100vw, 680px" />
   </div>
   <div>
     {label && <span class="section-label">{label}</span>}

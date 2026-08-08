@@ -124,11 +124,13 @@ img { max-width: 100%; height: auto; display: block; }
 /* --- Animations --- */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(var(--distance-lg)); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-[data-scroll-reveal] { opacity: 0; transform: translateY(var(--distance-md)); }
+/* Pre-hide for the GSAP reveal only when JS is running (.js is set by an
+   inline head script) — no-JS visitors get visible content immediately */
+.js [data-scroll-reveal] { opacity: 0; transform: translateY(var(--distance-md)); }
 /* GSAP reveals never run under reduced motion — content must stay visible.
    Must come AFTER the pre-hide rule above: equal specificity, cascade order wins. */
 @media (prefers-reduced-motion: reduce) {
-  [data-scroll-reveal] { opacity: 1; transform: none; }
+  .js [data-scroll-reveal] { opacity: 1; transform: none; }
 }
 
 /* --- Buttons --- */
@@ -169,5 +171,5 @@ body::before {
 
 /* --- Responsive base --- */
 @media (max-width: 768px) {
-  [data-scroll-reveal] { opacity: 1; transform: none; }
+  .js [data-scroll-reveal] { opacity: 1; transform: none; }
 }
