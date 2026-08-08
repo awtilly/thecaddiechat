@@ -1,7 +1,6 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import FeaturedPost from '../../components/FeaturedPost.astro';
-import PostCard from '../../components/PostCard.astro';
+import PostListing from '../../components/PostListing.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import { getCollection } from 'astro:content';
 
@@ -10,14 +9,6 @@ const allFieldNotes = await getCollection('fieldNotes');
 const fieldNotes = allFieldNotes
   .filter((e) => !e.data.draft)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-// Split: posts with heroImage go in the visual grid, those without get a text list
-const withImage = fieldNotes.filter((e) => !!e.data.heroImage);
-const withoutImage = fieldNotes.filter((e) => !e.data.heroImage);
-
-// Featured = first (most recent) post with an image, rest go in grid
-const featured = withImage[0];
-const rest = withImage.slice(1);
 ---
 <PageLayout
   title="Field Notes | The Caddie Chat"
@@ -26,61 +17,21 @@ const rest = withImage.slice(1);
   pageSubtitle="Technical insights from the dirt, drainage, and design of golf course construction."
   sectionLabel="Construction & Design"
 >
-  <section class="section-pad-lg">
-    <div class="container">
-      {featured && (
-        <FeaturedPost
-          title={featured.data.title}
-          description={featured.data.description}
-          href={`/field-notes/${featured.id}/`}
-          image={featured.data.heroImage!}
-          label="Featured"
-        />
-      )}
-
-      <div class="post-grid">
-        {rest.map((note) => (
-          <PostCard
-            title={note.data.title}
-            description={note.data.description}
-            href={`/field-notes/${note.id}/`}
-            image={note.data.heroImage!}
-          />
-        ))}
-      </div>
-
-      {withoutImage.length > 0 && (
-        <div class="text-posts">
-          {withoutImage.map((note) => (
-            <a href={`/field-notes/${note.id}/`} class="text-post">
-              <div>
-                <span class="text-post-meta">{note.data.meta}</span>
-                <h3>{note.data.title}</h3>
-                <p>{note.data.description}</p>
-              </div>
-              <span class="read-more">Read More &rarr;</span>
-            </a>
-          ))}
-        </div>
-      )}
-
-      {fieldNotes.length === 0 && (
-        <div class="empty-state">
-          <span class="section-label">Coming Soon</span>
-          <h2>The first notes are being written.</h2>
-          <p>
-            Field Notes is where the construction side of the story gets told:
-            what actually happens in the dirt when a golf course gets built or
-            restored. Drainage that works with the land instead of against it,
-            shaping that turns an architect's sketch into a green you can putt
-            on, and the decisions made in muddy boots that golfers never see.
-            The first entries are in progress and will land here as projects
-            move forward.
-          </p>
-        </div>
-      )}
+  <PostListing posts={fieldNotes} basePath="/field-notes/">
+    <div class="empty-state" slot="empty">
+      <span class="section-label">Coming Soon</span>
+      <h2>The first notes are being written.</h2>
+      <p>
+        Field Notes is where the construction side of the story gets told:
+        what actually happens in the dirt when a golf course gets built or
+        restored. Drainage that works with the land instead of against it,
+        shaping that turns an architect's sketch into a green you can putt
+        on, and the decisions made in muddy boots that golfers never see.
+        The first entries are in progress and will land here as projects
+        move forward.
+      </p>
     </div>
-  </section>
+  </PostListing>
 
   <CtaBanner
     heading='More notes <em>coming.</em>'
@@ -92,65 +43,6 @@ const rest = withImage.slice(1);
 </PageLayout>
 
 <style>
-  .post-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
-  }
-  @media (max-width: 700px) {
-    .post-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .text-posts {
-    margin-top: var(--space-md);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-  }
-
-  .text-post {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-sm) 0;
-    border-top: 1px solid var(--color-border);
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .text-post:last-child {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .text-post-meta {
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--color-accent);
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-
-  .text-post h3 {
-    margin: 0 0 0.25rem;
-    font-size: var(--font-size-lg);
-  }
-
-  .text-post p {
-    margin: 0;
-    font-size: var(--font-size-sm);
-    color: var(--color-text-muted);
-  }
-
-  .text-post .read-more {
-    flex-shrink: 0;
-    font-size: var(--font-size-sm);
-    color: var(--color-accent);
-  }
-
   .empty-state {
     max-width: 640px;
     padding: var(--space-md) 0;

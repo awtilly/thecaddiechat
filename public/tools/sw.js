@@ -63,8 +63,10 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  // App shell (navigation + same-origin): network-first for fresh updates, fall back to cache
-  if (event.request.mode === 'navigate' || url.indexOf('/tools/') !== -1) {
+  // App shell (navigations within /tools/ only): network-first for fresh
+  // updates, fall back to cache. Must be && -- with || this would intercept
+  // EVERY site navigation if the SW scope ever widened beyond /tools/.
+  if (event.request.mode === 'navigate' && url.indexOf('/tools/') !== -1) {
     event.respondWith(
       fetch(event.request).then(function(response) {
         if (response.ok) {

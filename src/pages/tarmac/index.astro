@@ -5,6 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   <main id="main">
   <div class="tracker" id="tracker">
     <header class="tracker-header">
+      <a href="/" class="back-link">&larr; The Caddie Chat</a>
       <h1 class="tracker-title">Tarmac</h1>
       <p class="tracker-sub">CLT &harr; Ireland &middot; AA Award Tracker</p>
       <p class="last-updated" id="lastUpdated">Loading&hellip;</p>
@@ -372,6 +373,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-body);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    transition: var(--transition-color);
+  }
+  .back-link:hover {
+    color: var(--color-accent);
+  }
   .tracker {
     max-width: 960px;
     margin: 0 auto;

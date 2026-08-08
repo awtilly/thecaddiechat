@@ -13,15 +13,22 @@ export async function getStaticPaths() {
   const entries = import.meta.env.PROD
     ? fieldNotes.filter((e) => !e.data.draft)
     : fieldNotes;
-  return entries.map((entry) => ({
+  // prev/next derived from chronological order -- new entries join the chain
+  // automatically, no frontmatter to keep in sync
+  const sorted = entries.sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+  return sorted.map((entry, i) => ({
     params: { slug: entry.id },
-    props: { entry },
+    props: {
+      entry,
+      prev: i > 0 ? { slug: sorted[i - 1].id, title: sorted[i - 1].data.title } : undefined,
+      next: i < sorted.length - 1 ? { slug: sorted[i + 1].id, title: sorted[i + 1].data.title } : undefined,
+    },
   }));
 }
 
-const { entry } = Astro.props;
+const { entry, prev, next } = Astro.props;
 const { Content } = await render(entry);
-const { title, description, date, heroImage, meta, prev, next, sources } = entry.data;
+const { title, description, date, heroImage, meta, sources } = entry.data;
 ---
 <ArticleLayout
   title={title}

@@ -1,0 +1,134 @@
+---
+// PostListing.astro - Shared listing body for chronicles/ and field-notes/
+// (featured post + image grid + text-only list). Pass posts already
+// draft-filtered and sorted; slot name="empty" renders when there are none.
+import FeaturedPost from './FeaturedPost.astro';
+import PostCard from './PostCard.astro';
+
+interface Post {
+  id: string;
+  data: {
+    title: string;
+    description: string;
+    meta?: string;
+    heroImage?: ImageMetadata;
+  };
+}
+
+interface Props {
+  posts: Post[];
+  basePath: string;
+}
+
+const { posts, basePath } = Astro.props;
+
+// Split: posts with heroImage go in the visual grid, those without get a text list
+const withImage = posts.filter((p) => !!p.data.heroImage);
+const withoutImage = posts.filter((p) => !p.data.heroImage);
+
+// Featured = first (most recent) post with an image, rest go in grid
+const featured = withImage[0];
+const rest = withImage.slice(1);
+---
+<section class="section-pad-lg">
+  <div class="container">
+    {featured && (
+      <FeaturedPost
+        title={featured.data.title}
+        description={featured.data.description}
+        href={`${basePath}${featured.id}/`}
+        image={featured.data.heroImage!}
+        label="Featured"
+      />
+    )}
+
+    <div class="post-grid">
+      {rest.map((post) => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          href={`${basePath}${post.id}/`}
+          image={post.data.heroImage!}
+        />
+      ))}
+    </div>
+
+    {withoutImage.length > 0 && (
+      <div class="text-posts">
+        {withoutImage.map((post) => (
+          <a href={`${basePath}${post.id}/`} class="text-post">
+            <div>
+              <span class="text-post-meta">{post.data.meta}</span>
+              <h3>{post.data.title}</h3>
+              <p>{post.data.description}</p>
+            </div>
+            <span class="read-more">Read More &rarr;</span>
+          </a>
+        ))}
+      </div>
+    )}
+
+    {posts.length === 0 && <slot name="empty" />}
+  </div>
+</section>
+
+<style>
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+  @media (max-width: 700px) {
+    .post-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .text-posts {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .text-post {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-top: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .text-post:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .text-post-meta {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .text-post h3 {
+    margin: 0 0 0.25rem;
+    font-size: var(--font-size-lg);
+  }
+
+  .text-post p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .text-post .read-more {
+    flex-shrink: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-accent);
+  }
+</style>

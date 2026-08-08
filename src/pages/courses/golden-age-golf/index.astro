@@ -8,9 +8,11 @@ import { getCollection } from 'astro:content';
 import { Picture } from 'astro:assets';
 import seriesHeroImg from '../../../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg';
 
-const courses = await getCollection('courses');
-// Sort by courseNumber ascending
-courses.sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
+const allCourses = await getCollection('courses');
+// Drafts never show in the listing; sort by courseNumber ascending
+const courses = allCourses
+  .filter((e) => !e.data.draft)
+  .sort((a, b) => a.data.courseNumber.localeCompare(b.data.courseNumber));
 ---
 <BaseLayout
   title="Golden Age Golf | Courses | The Caddie Chat"
