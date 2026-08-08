@@ -6,6 +6,7 @@ dist/
 
 # Astro
 .astro/
+.astro-cache/
 
 # Environment
 .env

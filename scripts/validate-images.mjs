@@ -79,9 +79,14 @@ if (!existsSync(DIST)) {
 
 console.log('Image & Font Validation (FNDN-03 / FNDN-04)\n');
 
-// Collect HTML and CSS files once
-const htmlFiles = collectFiles(DIST, ['.html']);
-const cssFiles = collectFiles(DIST, ['.css']);
+// Collect HTML and CSS files once.
+// dist/tools/ is the standalone Task Command app (copied from public/tools/);
+// it legitimately loads Google Fonts + Firebase CDNs and is not part of the
+// Astro-built site, so it is excluded from these checks.
+const TOOLS_DIR = join(DIST, 'tools');
+const notTools = (f) => !f.startsWith(TOOLS_DIR);
+const htmlFiles = collectFiles(DIST, ['.html']).filter(notTools);
+const cssFiles = collectFiles(DIST, ['.css']).filter(notTools);
 const astroDir = join(DIST, '_astro');
 
 // --- FNDN-03a: Responsive srcset present ---

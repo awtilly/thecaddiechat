@@ -5,6 +5,9 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://thecaddiechat.com',
   output: 'static',
+  // Outside node_modules so CI can restore it across runs (npm ci wipes
+  // node_modules, which is the default cache location)
+  cacheDir: './.astro-cache',
   trailingSlash: 'always',
   build: {
     format: 'directory',

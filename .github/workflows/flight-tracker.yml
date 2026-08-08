@@ -39,6 +39,16 @@ jobs:
             echo "No data changes to commit"
           fi
 
+      # Same image cache as deploy.yml -- this workflow builds twice daily and
+      # would otherwise re-encode every image variant on each run
+      - name: Restore Astro image cache
+        uses: actions/cache@v4
+        with:
+          path: .astro-cache
+          key: astro-assets-${{ hashFiles('src/assets/images/**') }}
+          restore-keys: |
+            astro-assets-
+
       - name: Build site
         uses: withastro/action@v5
 

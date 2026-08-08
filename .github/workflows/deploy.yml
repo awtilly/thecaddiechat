@@ -15,7 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+
+      # Astro's transformed-image cache (cacheDir: ./.astro-cache) -- without
+      # this every push re-encodes all ~1200 image variants from scratch
+      - name: Restore Astro image cache
+        uses: actions/cache@v4
+        with:
+          path: .astro-cache
+          key: astro-assets-${{ hashFiles('src/assets/images/**') }}
+          restore-keys: |
+            astro-assets-
+
       - uses: withastro/action@v5
+
+      - name: Validate build output
+        run: |
+          npm run validate-urls
+          npm run validate-images
 
   deploy:
     needs: build

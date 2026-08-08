@@ -81,7 +81,10 @@ Custom image layout components for course articles:
 - `FeaturedImage` -- Featured image with styled caption line
 - `Memorabilia` -- Centered memorabilia display with label
 
-## Key URLs (19 Pages)
+## Key URLs (21 Pages)
+
+Keep this list in sync with `EXPECTED_URLS` in `scripts/validate-urls.mjs` --
+the validator fails the deploy on any mismatch (missing OR unexpected pages).
 
 ```
 /                            Homepage
@@ -91,6 +94,7 @@ Custom image layout components for course articles:
 /chronicles/matt-fitzpatrick/ Chronicle article
 /chronicles/beauty-or-burden/ Chronicle article
 /chronicles/uphill-challenge/ Chronicle article
+/chronicles/nicklaus-20-majors-design-empire/ Chronicle article
 /courses/                    Courses listing
 /courses/golden-age-golf/    Golden Age Golf hub (standalone page)
 /courses/stonewall/          Course article
@@ -102,9 +106,16 @@ Custom image layout components for course articles:
 /courses/winged-foot/        Course article
 /courses/friars-head/        Course article
 /camera-roll/                Camera Roll (standalone page)
+/field-notes/                Field Notes listing (empty state until content ships)
+/tarmac/                     AA award tracker (noindex, not in sitemap)
 ```
 
 ## Validation
 
 - `npm run build` validates all content schemas, routes, and renders
-- `npm run validate-urls` checks dist/ output for all 19 expected URL paths
+- `npm run validate-urls` checks dist/ against the 21 expected URL paths in
+  both directions (missing and unexpected pages both fail), plus 404.html,
+  CNAME, robots.txt, and sitemap-index.xml
+- `npm run validate-images` checks responsive images and self-hosted fonts in
+  dist/ (dist/tools/ excluded -- the Task Command app uses external CDNs)
+- Both validators run in CI after the build and gate the deploy
