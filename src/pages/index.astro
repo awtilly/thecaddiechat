@@ -11,11 +11,31 @@ import introImg from '../assets/images/courses/francis-a-byrne/hero-caddie-tee.j
 import chroniclesCardImg from '../assets/images/chronicles/viktor-hovland/inline-2.jpg';
 import coursesCardImg from '../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg';
 import cameraCardImg from '../assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "The Caddie Chat",
+      "url": "https://thecaddiechat.com/",
+      "description": "Stories from inside the ropes, golden age golf courses, and the world through a caddie's lens.",
+    },
+    {
+      "@type": "Person",
+      "name": "Joe Stoehner",
+      "url": "https://thecaddiechat.com/",
+      "description": "Caddie, Evans Scholar, and storyteller documenting golden age golf architecture and pro-am rounds with PGA Tour players.",
+      "sameAs": ["https://instagram.com/thecaddiechat"],
+    },
+  ],
+};
 ---
 <BaseLayout
   title="The Caddie Chat | Caddie. Builder. Storyteller."
   description="Stories from inside the ropes, golden age golf courses, and the world through a caddie's lens."
 >
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <Nav />
   <Hero />
 

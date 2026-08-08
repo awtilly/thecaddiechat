@@ -63,6 +63,22 @@ const rest = withImage.slice(1);
           ))}
         </div>
       )}
+
+      {fieldNotes.length === 0 && (
+        <div class="empty-state">
+          <span class="section-label">Coming Soon</span>
+          <h2>The first notes are being written.</h2>
+          <p>
+            Field Notes is where the construction side of the story gets told:
+            what actually happens in the dirt when a golf course gets built or
+            restored. Drainage that works with the land instead of against it,
+            shaping that turns an architect's sketch into a green you can putt
+            on, and the decisions made in muddy boots that golfers never see.
+            The first entries are in progress and will land here as projects
+            move forward.
+          </p>
+        </div>
+      )}
     </div>
   </section>
 
@@ -133,5 +149,22 @@ const rest = withImage.slice(1);
     flex-shrink: 0;
     font-size: var(--font-size-sm);
     color: var(--color-accent);
+  }
+
+  .empty-state {
+    max-width: 640px;
+    padding: var(--space-md) 0;
+  }
+  .empty-state h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+    line-height: var(--leading-snug);
+    margin-bottom: var(--space-sm);
+  }
+  .empty-state p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+    line-height: var(--leading-relaxed);
   }
 </style>

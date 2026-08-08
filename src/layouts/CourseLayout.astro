@@ -4,7 +4,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ArticleNav from '../components/ArticleNav.astro';
 import Lightbox from '../components/Lightbox.astro';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 
 interface Props {
   title: string;
@@ -25,8 +25,48 @@ const { title, description, architect, year, location, heroImage, courseNumber, 
 const titleParts = title.split(' ');
 const lastWord = titleParts.pop();
 const firstPart = titleParts.join(' ');
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const jsonLdImage = heroImage
+  ? new URL((await getImage({ src: heroImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src, Astro.site).href
+  : undefined;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  ...(description && { "description": description }),
+  ...(jsonLdImage && { "image": [jsonLdImage] }),
+  "url": canonical,
+  "mainEntityOfPage": canonical,
+  "author": {
+    "@type": "Person",
+    "name": "Joe Stoehner",
+    "url": "https://thecaddiechat.com/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "The Caddie Chat",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://thecaddiechat.com/favicon.svg"
+    }
+  },
+  "about": {
+    "@type": "GolfCourse",
+    "name": title,
+    ...(location && { "address": location }),
+    ...(architect && {
+      "additionalProperty": [
+        { "@type": "PropertyValue", "name": "Architect", "value": architect },
+        ...(year ? [{ "@type": "PropertyValue", "name": "Opened", "value": String(year) }] : []),
+      ]
+    }),
+  }
+};
 ---
-<BaseLayout title={`${title} | The Caddie Chat`} description={description}>
+<BaseLayout title={`${title} | The Caddie Chat`} description={description} ogImage={heroImage} ogType="article">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <Nav />
 
   <section class="course-hero">

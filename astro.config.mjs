@@ -1,5 +1,6 @@
-import { defineConfig } from 'astro/config';
+﻿import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://thecaddiechat.com',
@@ -8,9 +9,14 @@ export default defineConfig({
   build: {
     format: 'directory',
   },
-  integrations: [mdx()],
+  integrations: [
+    mdx(),
+    // /tarmac/ is noindex -- keep it out of the sitemap too
+    sitemap({ filter: (page) => !page.includes('/tarmac/') }),
+  ],
   image: {
     layout: 'constrained',
     responsiveStyles: true,
   },
 });
+

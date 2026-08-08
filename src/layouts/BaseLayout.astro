@@ -1,16 +1,31 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
+import defaultOgSrc from '../assets/images/courses/friars-head/hero-clubhouse-bluff.jpg';
 
 interface Props {
   title: string;
   description?: string;
+  ogImage?: ImageMetadata;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogImage, ogType = 'website', noindex = false } = Astro.props;
 import '../styles/global.css';
 import '@fontsource-variable/playfair-display';
 import '@fontsource-variable/playfair-display/wght-italic.css';
 import '@fontsource-variable/dm-sans';
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogProcessed = await getImage({
+  src: ogImage ?? defaultOgSrc,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpg',
+});
+const ogImageUrl = new URL(ogProcessed.src, Astro.site).href;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +34,24 @@ import '@fontsource-variable/dm-sans';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
   {description && <meta name="description" content={description} />}
+  {noindex && <meta name="robots" content="noindex" />}
+  <link rel="canonical" href={canonical}>
+  <meta name="theme-color" content="#2d5a3f">
+  <meta property="og:title" content={title}>
+  {description && <meta property="og:description" content={description} />}
+  <meta property="og:url" content={canonical}>
+  <meta property="og:type" content={ogType}>
+  <meta property="og:site_name" content="The Caddie Chat">
+  <meta property="og:image" content={ogImageUrl}>
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  {description && <meta name="twitter:description" content={description} />}
+  <meta name="twitter:image" content={ogImageUrl}>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <slot name="head" />
   <ClientRouter />
 </head>
