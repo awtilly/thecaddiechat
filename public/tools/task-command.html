@@ -512,6 +512,18 @@ input, select, textarea, button { font-family:inherit; }
 .kbd-grid kbd { font-size:12px; padding:3px 8px; border-bottom-width:2px; }
 .kbd-grid .d { font-size:14px; color:var(--tx-2); }
 
+/* === WORK / PERSONAL PAGES === */
+.spaces { display:inline-flex; align-self:flex-start; gap:4px; padding:4px; background:var(--bg-1); border:1px solid var(--border); border-radius:var(--r-lg); margin-bottom:16px; }
+.spaces button { display:inline-flex; align-items:center; gap:8px; padding:8px 18px; background:transparent; border:none; border-radius:var(--r); color:var(--tx-3); font-size:15px; font-weight:600; cursor:pointer; }
+.spaces button:hover { color:var(--tx-1); }
+.spaces button.act { background:var(--bg-2); color:var(--tx-1); box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+.spaces .dcount:empty { display:none; }
+.spaces button.act .dcount { background:var(--blue); color:#fff; }
+@media (max-width:768px) {
+  .spaces { display:flex; align-self:stretch; margin-bottom:12px; }
+  .spaces button { flex:1; justify-content:center; min-height:44px; padding:8px 10px; }
+}
+
 /* === PROJECTS VIEW === */
 .pv .inp-wrap, .pv #parseMode, .pv #syntaxHelp, .pv .toolbar select { display:none; }
 .pgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; align-items:start; }
@@ -584,6 +596,11 @@ input, select, textarea, button { font-family:inherit; }
       <div id="syncBadge"><span class="sync-dot syncing"></span><span>Connecting...</span></div>
       <button class="mob-notif notif-btn" onclick="handleNotifClick()" title="Notifications" style="background:var(--bg-2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:14px;cursor:pointer;">&#128276;<span class="notif-badge" id="notifBadgeMob" style="display:none">0</span></button>
     </div>
+  </div>
+
+  <div class="spaces" id="spaces">
+    <button data-space="work" onclick="setSpace('work')">Work <span class="dcount" id="sc-work"></span></button>
+    <button data-space="personal" onclick="setSpace('personal')">Personal <span class="dcount" id="sc-personal"></span></button>
   </div>
 
   <div id="alerts"></div>
@@ -744,6 +761,28 @@ var syncStatus = "syncing";
 var winRange = "all";
 var dateScope = "all";
 
+// Two pages, Work and Personal. A project is Work unless it's listed here;
+// tasks follow their project. The list syncs via meta/spaces.
+var space = LS("tc-space") === "personal" ? "personal" : "work";
+var personalProjects = LS("tc-personal") || [];
+
+function projSpace(p) { return personalProjects.indexOf(p) !== -1 ? "personal" : "work"; }
+function inSpace(t) { return projSpace(t.project) === space; }
+function spaceTasks() { return tasks.filter(inSpace); }
+function spaceProjects() { return projects.filter(function(p) { return projSpace(p) === space; }); }
+function defaultProject() { return space === "personal" ? "Personal" : "General / Office"; }
+
+function saveSpaces() {
+  SS("tc-personal", personalProjects);
+  if (db) db.collection("meta").doc("spaces").set({ personal: personalProjects }).catch(function(e) { console.error("Save spaces:", e); });
+}
+
+// New projects land on whichever page you're on
+function addProject(name) {
+  projects.push(name);
+  if (space === "personal" && personalProjects.indexOf(name) === -1) { personalProjects.push(name); saveSpaces(); }
+}
+
 // Snapshot of localStorage data BEFORE Firebase can touch it (for migration)
 var _localBackup = {
   tasks: tasks.slice(),
@@ -787,8 +826,8 @@ function updateAlerts() {
   var el = document.getElementById("alerts");
   if (!el) return;
   var today = iso(new Date());
-  var overdue = tasks.filter(function(t) { return isOverdue(t); });
-  var dueToday = tasks.filter(function(t) { return t.status !== "done" && t.due_date === today; });
+  var overdue = spaceTasks().filter(function(t) { return isOverdue(t); });
+  var dueToday = spaceTasks().filter(function(t) { return t.status !== "done" && t.due_date === today; });
   var html = "";
 
   if (overdue.length > 0 && !alertsDismissed.overdue) {
@@ -872,6 +911,15 @@ function startSync() {
     if (doc.exists && doc.data().items) {
       people = doc.data().items;
       SS("tc-people", people);
+      render();
+    }
+  });
+
+  // Listen to meta/spaces
+  db.collection("meta").doc("spaces").onSnapshot(function(doc) {
+    if (doc.exists && Array.isArray(doc.data().personal)) {
+      personalProjects = doc.data().personal;
+      SS("tc-personal", personalProjects);
       render();
     }
   });
@@ -1098,7 +1146,7 @@ function parseSingle(text) {
       break;
     }
   }
-  if (!project) project = "General / Office";
+  if (!project) project = defaultProject();
 
   rem = rem.replace(/\s+/g, " ").replace(/^[\s\-\u2013\u2014:,;]+/, "").replace(/[\s\-\u2013\u2014:,;]+$/, "").trim();
   if (rem.length > 0) rem = rem[0].toUpperCase() + rem.slice(1);
@@ -1176,7 +1224,7 @@ async function aiParse(text) {
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: "You are a task management assistant. Interpret user input and return structured JSON. Today is " + today + ".\n\nKnown projects: " + projects.join(", ") + "\nKnown people: " + people.join(", ") + "\n\nReturn ONLY valid JSON with NO markdown backticks and NO preamble.\n\nDetermine the user's INTENT from their input. There are 3 possible intents:\n\n1. \"tasks\" — They want to create one or more tasks (this is the most common intent — any actionable item)\n   Return: {\"intent\":\"tasks\",\"items\":[{\"title\":\"concise task title\",\"project\":\"exact match from known projects or General / Office\",\"person\":\"exact match from known people or Self\",\"priority\":\"high|medium|low\",\"due_date\":\"YYYY-MM-DD or null\",\"notes\":\"extracted context or null\"}]}\n\n2. \"new_projects\" — They want to add new project(s) to their list.\n   Return: {\"intent\":\"new_projects\",\"items\":[\"Project Name 1\",\"Project Name 2\"]}\n\n3. \"new_people\" — They want to add new person(s) to their people list.\n   Return: {\"intent\":\"new_people\",\"items\":[\"Person Name 1\"]}\n\nIMPORTANT intent rules:\n- If it sounds like something to DO, it's a task — even if short\n- If it's just a name of a place, course, company, or job site with no action, it's a new project\n- If it's just a person's name with no action, it's a new person\n- When unsure between project and task, default to task\n- For tasks: split multiples separated by commas, semicolons, or \"and\"\n- Default project \"General / Office\", default person \"Self\", default priority \"low\"",
+      system: "You are a task management assistant. Interpret user input and return structured JSON. Today is " + today + ".\n\nKnown projects: " + spaceProjects().join(", ") + "\nKnown people: " + people.join(", ") + "\n\nReturn ONLY valid JSON with NO markdown backticks and NO preamble.\n\nDetermine the user's INTENT from their input. There are 3 possible intents:\n\n1. \"tasks\" — They want to create one or more tasks (this is the most common intent — any actionable item)\n   Return: {\"intent\":\"tasks\",\"items\":[{\"title\":\"concise task title\",\"project\":\"exact match from known projects or General / Office\",\"person\":\"exact match from known people or Self\",\"priority\":\"high|medium|low\",\"due_date\":\"YYYY-MM-DD or null\",\"notes\":\"extracted context or null\"}]}\n\n2. \"new_projects\" — They want to add new project(s) to their list.\n   Return: {\"intent\":\"new_projects\",\"items\":[\"Project Name 1\",\"Project Name 2\"]}\n\n3. \"new_people\" — They want to add new person(s) to their people list.\n   Return: {\"intent\":\"new_people\",\"items\":[\"Person Name 1\"]}\n\nIMPORTANT intent rules:\n- If it sounds like something to DO, it's a task — even if short\n- If it's just a name of a place, course, company, or job site with no action, it's a new project\n- If it's just a person's name with no action, it's a new person\n- When unsure between project and task, default to task\n- For tasks: split multiples separated by commas, semicolons, or \"and\"\n- Default project \"General / Office\", default person \"Self\", default priority \"low\"",
       messages: [{ role: "user", content: text }]
     })
   });
@@ -1234,7 +1282,7 @@ async function handleSubmit(e) {
   var projCmd = text.match(/^\/p(?:roject)?\s+(.+)/i);
   if (projCmd) {
     var name = projCmd[1].trim();
-    if (name && !projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) projects.push(name);
+    if (name && !projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) addProject(name);
     input.value = ""; document.getElementById("preview").innerHTML = ""; saveMeta(); render(); return;
   }
   var personCmdMatch = text.match(/^\/person\s+(.+)/i);
@@ -1248,7 +1296,7 @@ async function handleSubmit(e) {
 
   function createTasks(parsed) {
     parsed.forEach(function(t) {
-      if (t.project && !projects.includes(t.project) && t.project !== "General / Office") projects.push(t.project);
+      if (t.project && !projects.includes(t.project) && t.project !== "General / Office") addProject(t.project);
       if (t.person && !people.includes(t.person) && t.person !== "Self") people.push(t.person);
       var task = {
         id: crypto.randomUUID(), title: t.title, project: t.project, person: t.person,
@@ -1273,7 +1321,7 @@ async function handleSubmit(e) {
 
       if (result.intent === "new_projects") {
         result.items.forEach(function(name) {
-          if (name && !projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) projects.push(name);
+          if (name && !projects.some(function(p) { return p.toLowerCase() === name.toLowerCase(); })) addProject(name);
         });
         saveMeta(); render();
         input.value = ""; document.getElementById("preview").innerHTML = "";
@@ -1293,7 +1341,7 @@ async function handleSubmit(e) {
 
       var parsed = (result.items || result.tasks || []).map(function(t) {
         return {
-          title: t.title || text, project: t.project || "General / Office",
+          title: t.title || text, project: t.project || defaultProject(),
           person: t.person || "Self", priority: t.priority || "low",
           due_date: t.due_date || null, notes: t.notes || null
         };
@@ -1329,6 +1377,7 @@ function render() {
 }
 
 function renderNow() {
+  updateSpaceTabs();
   updateFilters();
   updateStats();
   updateAlerts();
@@ -1348,6 +1397,25 @@ function renderNow() {
   else renderTable(ft, content);
 }
 
+function updateSpaceTabs() {
+  ["work", "personal"].forEach(function(sp) {
+    var n = tasks.filter(function(t) { return !t.archived && t.status !== "done" && projSpace(t.project) === sp; }).length;
+    var el = document.getElementById("sc-" + sp);
+    if (el) el.textContent = n > 0 ? n : "";
+  });
+  document.querySelectorAll("#spaces button").forEach(function(b) { b.classList.toggle("act", b.dataset.space === space); });
+}
+
+function setSpace(v) {
+  if (v === space) return;
+  space = v;
+  SS("tc-space", space);
+  projMenu = null;
+  projRename = null;
+  editId = null;
+  render();
+}
+
 function getFilters() {
   return {
     project: document.getElementById("fProj").value,
@@ -1359,6 +1427,7 @@ function getFilters() {
 function filtered() {
   var f = getFilters();
   return tasks.filter(function(t) {
+    if (!inSpace(t)) return false;
     if (t.archived) return false; // archived work lives in the Wins log
     if (f.project !== "All Projects" && t.project !== f.project) return false;
     if (f.person !== "All People" && t.person !== f.person) return false;
@@ -1387,7 +1456,7 @@ var _filterSig = "";
 function updateFilters() {
   var projEl = document.getElementById("fProj");
   var persEl = document.getElementById("fPers");
-  var allProj = Array.from(new Set(projects.concat(tasks.map(function(t) { return t.project; })))).sort();
+  var allProj = Array.from(new Set(spaceProjects().concat(spaceTasks().map(function(t) { return t.project; })))).sort();
   var allPers = Array.from(new Set(people.concat(tasks.map(function(t) { return t.person; })))).sort();
 
   // Skip rebuilding the <select> options unless the project/people set changed.
@@ -1405,11 +1474,11 @@ function updateFilters() {
 }
 
 function updateStats() {
-  var active = tasks.filter(function(t) { return t.status !== "done"; }).length;
-  var urgent = tasks.filter(function(t) { return t.priority === "high" && t.status !== "done"; }).length;
-  var overdue = tasks.filter(function(t) { return isOverdue(t); }).length;
+  var active = spaceTasks().filter(function(t) { return t.status !== "done"; }).length;
+  var urgent = spaceTasks().filter(function(t) { return t.priority === "high" && t.status !== "done"; }).length;
+  var overdue = spaceTasks().filter(function(t) { return isOverdue(t); }).length;
   var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-  var doneWeek = tasks.filter(function(t) { return t.status === "done" && t.completed_at && new Date(t.completed_at) >= weekAgo; }).length;
+  var doneWeek = spaceTasks().filter(function(t) { return t.status === "done" && t.completed_at && new Date(t.completed_at) >= weekAgo; }).length;
 
   var h = '<span class="stat">' + active + ' active</span>';
   if (urgent > 0) h += '<span class="stat urg">' + urgent + ' urgent</span>';
@@ -1427,7 +1496,7 @@ function setDateScope(v) {
 function updateScopeCounts() {
   var today = iso(new Date());
   var wk = new Date(); wk.setDate(wk.getDate() + 7); var wks = iso(wk);
-  var act = tasks.filter(function(t) { return !t.archived && t.status !== "done"; });
+  var act = spaceTasks().filter(function(t) { return !t.archived && t.status !== "done"; });
   var setC = function(id, n, urg) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -1436,7 +1505,7 @@ function updateScopeCounts() {
   };
   setC("dc-today", act.filter(function(t) { return t.due_date === today; }).length, false);
   setC("dc-week", act.filter(function(t) { return t.due_date && t.due_date >= today && t.due_date <= wks; }).length, false);
-  setC("dc-overdue", tasks.filter(function(t) { return !t.archived && isOverdue(t); }).length, true);
+  setC("dc-overdue", spaceTasks().filter(function(t) { return !t.archived && isOverdue(t); }).length, true);
 }
 
 /* ============================================================
@@ -1445,7 +1514,7 @@ function updateScopeCounts() {
 function editPanelHTML(task) {
   var statOpts = Object.entries(STATUSES).map(function(kv) { return '<option value="' + kv[0] + '"' + (task.status === kv[0] ? ' selected' : '') + '>' + esc(kv[1].label) + '</option>'; }).join("");
   var priOpts = [["high","\u{1F534} High"],["medium","\u{1F7E1} Medium"],["low","\u{1F7E2} Low"]].map(function(vl) { return '<option value="' + vl[0] + '"' + (task.priority === vl[0] ? ' selected' : '') + '>' + vl[1] + '</option>'; }).join("");
-  var projOpts = Array.from(new Set(projects.concat([task.project]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
+  var projOpts = Array.from(new Set(spaceProjects().concat([task.project]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
   var persOpts = Array.from(new Set(people.concat([task.person]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.person === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
 
   return '<div class="epan">' +
@@ -1509,7 +1578,12 @@ var projRename = null; // project being renamed
 
 function escA(s) { return esc(s).replace(/"/g, "&quot;"); }
 
+// Cards on the current page, in order
 function projectNames() {
+  return allProjectNames().filter(function(p) { return projSpace(p) === space; });
+}
+
+function allProjectNames() {
   var seen = {}, out = [];
   projects.concat(tasks.filter(function(t) { return !t.archived; }).map(function(t) { return t.project; })).forEach(function(p) {
     if (p && !seen[p]) { seen[p] = true; out.push(p); }
@@ -1542,7 +1616,7 @@ function renderProjects(el) {
   var names = projectNames();
   if (projMenu && names.indexOf(projMenu) === -1) projMenu = null;
   if (projRename && names.indexOf(projRename) === -1) projRename = null;
-  var sig = names.join("\n") + "|" + (projMenu || "") + "|" + (projRename || "");
+  var sig = space + "|" + names.join("\n") + "|" + (projMenu || "") + "|" + (projRename || "");
   var grid = el.firstElementChild;
 
   if (!grid || !grid.classList.contains("pgrid") || sig !== _projSig) {
@@ -1573,6 +1647,7 @@ function renderProjects(el) {
             '<button onclick="startProjRename(' + i + ')">✎ Rename</button>' +
             '<button onclick="moveProject(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '>← Earlier</button>' +
             '<button onclick="moveProject(' + i + ',1)"' + (i === names.length - 1 ? ' disabled' : '') + '>Later →</button>' +
+            '<button onclick="moveProjSpace(' + i + ')">Move to ' + (space === "personal" ? 'Work' : 'Personal') + '</button>' +
           '</div>';
         }
       }
@@ -1669,9 +1744,13 @@ function addProjInline(e) {
   var input = e.target.querySelector("input");
   var name = input.value.trim();
   if (!name) return false;
-  var existing = projectNames().find(function(p) { return p.toLowerCase() === name.toLowerCase(); });
+  var existing = allProjectNames().find(function(p) { return p.toLowerCase() === name.toLowerCase(); });
+  if (existing && projSpace(existing) !== space) {
+    showToast('"' + existing + '" is on your ' + (space === "personal" ? "Work" : "Personal") + ' page', "warning");
+    return false;
+  }
   input.value = "";
-  if (!existing) { projects.push(name); saveMeta(); }
+  if (!existing) { addProject(name); saveMeta(); }
   // Focus that project's add box (after the rebuild if it's a new card)
   _projFocus = "p:" + (existing || name);
   _projSig = null;
@@ -1701,11 +1780,13 @@ function submitProjRename(e, i) {
   var oldName = _projNames[i];
   var newName = e.target.querySelector("input").value.trim();
   if (!newName || newName === oldName) { cancelProjRename(); return false; }
-  var clash = projectNames().some(function(p) { return p !== oldName && p.toLowerCase() === newName.toLowerCase(); });
+  var clash = allProjectNames().some(function(p) { return p !== oldName && p.toLowerCase() === newName.toLowerCase(); });
   if (clash) { showToast('"' + newName + '" already exists', "warning"); return false; }
 
   // The name lives on every task, so renaming rewrites them all (archived too)
-  projects = projectNames().map(function(p) { return p === oldName ? newName : p; });
+  projects = allProjectNames().map(function(p) { return p === oldName ? newName : p; });
+  var pi = personalProjects.indexOf(oldName);
+  if (pi !== -1) { personalProjects[pi] = newName; saveSpaces(); }
   var moved = tasks.filter(function(t) { return t.project === oldName; });
   moved.forEach(function(t) { t.project = newName; });
   Object.keys(aliases).forEach(function(k) { if (aliases[k] === oldName) aliases[k] = newName; });
@@ -1726,14 +1807,29 @@ function submitProjRename(e, i) {
   return false;
 }
 
-// Card order is the order of the shared projects list
+// Card order is the order of the shared projects list; a move repositions
+// the project relative to its neighbour on this page.
 function moveProjectTo(from, to) {
-  var names = projectNames();
-  if (from === to || from < 0 || to < 0 || from >= names.length || to >= names.length) return;
-  var p = names.splice(from, 1)[0];
-  names.splice(to, 0, p);
-  projects = names;
+  var vis = projectNames();
+  if (from === to || from < 0 || to < 0 || from >= vis.length || to >= vis.length) return;
+  var p = vis[from], target = vis[to];
+  var all = allProjectNames().filter(function(x) { return x !== p; });
+  all.splice(all.indexOf(target) + (to > from ? 1 : 0), 0, p);
+  projects = all;
   saveMeta();
+  render();
+}
+
+function moveProjSpace(i) {
+  var p = _projNames[i];
+  if (!p) return;
+  var to = (space === "personal") ? "work" : "personal";
+  personalProjects = personalProjects.filter(function(x) { return x !== p; });
+  if (to === "personal") personalProjects.push(p);
+  saveSpaces();
+  if (projects.indexOf(p) === -1) { projects.push(p); saveMeta(); }
+  projMenu = null;
+  showToast('"' + p + '" moved to ' + (to === "personal" ? "Personal" : "Work"), "success");
   render();
 }
 
@@ -1866,6 +1962,7 @@ function inRange(t, range) {
 function winsTasks() {
   var f = getFilters();
   return tasks.filter(function(t) {
+    if (!inSpace(t)) return false;
     if (t.status !== "done") return false;
     if (f.project !== "All Projects" && t.project !== f.project) return false;
     if (f.person !== "All People" && t.person !== f.person) return false;
@@ -2063,7 +2160,7 @@ function setParseMode(mode, btn) {
    QUICK ADD MODAL
    ============================================================ */
 function showQuickAdd() {
-  var projOpts = projects.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
+  var projOpts = (spaceProjects().length ? spaceProjects() : [defaultProject()]).map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
   var persOpts = people.map(function(p) { return '<option value="' + esc(p) + '">' + esc(p) + '</option>'; }).join("");
 
   document.getElementById("mc").innerHTML =
@@ -2099,6 +2196,7 @@ function submitQA() {
     created_at: new Date().toISOString(),
     completed_at: null
   };
+  if (!projects.includes(task.project)) addProject(task.project);
   tasks.unshift(task);
   SS("tc-tasks", tasks);
   saveTaskToCloud(task);
@@ -2215,7 +2313,7 @@ function archiveCompleted() {
 
 function addProj() {
   var v = document.getElementById("newProj").value.trim();
-  if (v && !projects.includes(v)) { projects.push(v); saveMeta(); showSettings(); }
+  if (v && !projects.includes(v)) { addProject(v); saveMeta(); showSettings(); }
 }
 
 function rmProj(i) { projects.splice(i, 1); saveMeta(); showSettings(); }
@@ -2263,6 +2361,8 @@ function setPersFilter(v) { var el = document.getElementById("fPers"); if (el) {
 function buildCommands() {
   var c = [];
   // Views
+  c.push({ label: "Work page", hint: "Page", kw: "work page switch space", run: function() { setSpace("work"); } });
+  c.push({ label: "Personal page", hint: "Page", kw: "personal page switch space home", run: function() { setSpace("personal"); } });
   c.push({ label: "Projects view", hint: "View", kw: "projects home todo to-do list", run: function() { setView("projects"); } });
   c.push({ label: "Board view", hint: "View", kw: "board kanban columns", run: function() { setView("board"); } });
   c.push({ label: "List view", hint: "View", kw: "list", run: function() { setView("list"); } });
@@ -2286,7 +2386,7 @@ function buildCommands() {
   c.push({ label: "Keyboard shortcuts", hint: "Help", kw: "keyboard shortcuts help keys", run: function() { showShortcuts(); } });
   // Dynamic: project + person filters
   c.push({ label: "All projects", hint: "Project", kw: "project all", run: function() { setProjFilter("All Projects"); } });
-  Array.from(new Set(projects.concat(tasks.map(function(t) { return t.project; })))).sort().forEach(function(p) {
+  Array.from(new Set(spaceProjects().concat(spaceTasks().map(function(t) { return t.project; })))).sort().forEach(function(p) {
     if (!p) return;
     c.push({ label: p, hint: "Project", kw: "project " + p.toLowerCase(), run: function() { setProjFilter(p); } });
   });
