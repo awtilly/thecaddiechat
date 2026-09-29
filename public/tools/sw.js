@@ -1,4 +1,4 @@
-var CACHE_NAME = 'tc-v5';
+var CACHE_NAME = 'tc-v6';
 var PRECACHE_URLS = [
   '/tools/task-command.html',
   '/tools/manifest.json',

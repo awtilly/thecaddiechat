@@ -537,6 +537,18 @@ input, select, textarea, button { font-family:inherit; }
 .pempty { font-size:14px; color:var(--tx-4); padding:10px 2px; border-top:1px solid var(--bg-3); }
 .pdone-tog { display:block; width:100%; text-align:left; background:transparent; border:none; border-top:1px solid var(--bg-3); color:var(--tx-3); font-size:13px; font-weight:500; padding:10px 2px 6px; cursor:pointer; }
 .pdone-tog:hover { color:var(--tx-1); }
+.pcard-hdr[draggable="true"] { cursor:grab; }
+.pcard.dragging { opacity:0.4; }
+.pcard.pdrop { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-g); }
+.pmenu-btn { background:transparent; border:none; color:var(--tx-3); font-size:20px; line-height:1; cursor:pointer; padding:2px 6px; border-radius:4px; }
+.pmenu-btn:hover, .pmenu-btn.on { color:var(--tx-1); background:var(--bg-3); }
+.pmenu { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.pmenu button { padding:6px 12px; background:var(--bg-3); color:var(--tx-2); border:1px solid var(--border); border-radius:var(--r); font-size:13px; font-weight:500; cursor:pointer; }
+.pmenu button:hover { border-color:var(--border-h); color:var(--tx-1); }
+.pmenu button:disabled { opacity:0.4; cursor:default; }
+.padd.prename { margin-bottom:10px; }
+.padd.prename input { font-weight:600; background:var(--bg-2); }
+.padd button.sec { background:var(--bg-3); color:var(--tx-2); border:1px solid var(--border); }
 .pcard.pnew { background:transparent; border-style:dashed; box-shadow:none; padding-bottom:16px; }
 .pcard.pnew .padd { margin-bottom:0; }
 .pcard.pnew .padd button { background:var(--bg-3); color:var(--tx-2); border:1px solid var(--border); }
@@ -546,6 +558,8 @@ input, select, textarea, button { font-family:inherit; }
   .pcard { padding:14px 14px 8px; }
   .padd input { font-size:16px; padding:12px; min-height:44px; }
   .padd button { width:48px; min-height:44px; }
+  .pmenu-btn { min-width:40px; min-height:40px; }
+  .pmenu button { min-height:40px; padding:8px 14px; font-size:14px; }
   .prow { align-items:center; gap:8px; padding:0; }
   .prow .ck { min-width:26px; min-height:26px; width:26px; height:26px; border-radius:6px; margin:9px 2px; }
   .prow-b { padding:10px 0; }
@@ -1488,7 +1502,12 @@ function cardHTML(task) {
 var _projNames = [];
 var _projSig = null;
 var _projFocus = null;
+var _projDrag = null;
 var projShowDone = {};
+var projMenu = null;   // project whose rename/move menu is open
+var projRename = null; // project being renamed
+
+function escA(s) { return esc(s).replace(/"/g, "&quot;"); }
 
 function projectNames() {
   var seen = {}, out = [];
@@ -1521,7 +1540,9 @@ function projRowHTML(task) {
 
 function renderProjects(el) {
   var names = projectNames();
-  var sig = names.join("\n");
+  if (projMenu && names.indexOf(projMenu) === -1) projMenu = null;
+  if (projRename && names.indexOf(projRename) === -1) projRename = null;
+  var sig = names.join("\n") + "|" + (projMenu || "") + "|" + (projRename || "");
   var grid = el.firstElementChild;
 
   if (!grid || !grid.classList.contains("pgrid") || sig !== _projSig) {
@@ -1535,10 +1556,30 @@ function renderProjects(el) {
     _projFocus = null;
 
     el.innerHTML = '<div class="pgrid">' + names.map(function(p, i) {
-      return '<div class="pcard" data-pi="' + i + '">' +
-        '<div class="pcard-hdr"><span class="pcard-name">' + esc(p) + '</span><span class="pcard-cnt"></span></div>' +
+      var hdr;
+      if (projRename === p) {
+        hdr = '<form class="padd prename" onsubmit="return submitProjRename(event,' + i + ')">' +
+          '<input type="text" id="projRenameInput" autocomplete="off" enterkeyhint="done" onkeydown="if(event.key===\'Escape\'){cancelProjRename()}">' +
+          '<button type="submit" title="Save name">✓</button>' +
+          '<button type="button" class="sec" onclick="cancelProjRename()" title="Cancel">×</button>' +
+        '</form>';
+      } else {
+        hdr = '<div class="pcard-hdr" draggable="true" ondragstart="projDragStart(event,' + i + ')" ondragend="projDragEnd()">' +
+          '<span class="pcard-name">' + esc(p) + '</span><span class="pcard-cnt"></span>' +
+          '<button class="pmenu-btn' + (projMenu === p ? ' on' : '') + '" onclick="togProjMenu(' + i + ')" title="Rename or move">⋯</button>' +
+        '</div>';
+        if (projMenu === p) {
+          hdr += '<div class="pmenu">' +
+            '<button onclick="startProjRename(' + i + ')">✎ Rename</button>' +
+            '<button onclick="moveProject(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '>← Earlier</button>' +
+            '<button onclick="moveProject(' + i + ',1)"' + (i === names.length - 1 ? ' disabled' : '') + '>Later →</button>' +
+          '</div>';
+        }
+      }
+      return '<div class="pcard" data-pi="' + i + '" ondragover="projDragOver(event)" ondragleave="projDragLeave(event)" ondrop="projDrop(event,' + i + ')">' +
+        hdr +
         '<form class="padd" onsubmit="return addTodo(event,' + i + ')">' +
-          '<input type="text" data-keep="p:' + i + '" placeholder="Add a to-do…" autocomplete="off" enterkeyhint="done">' +
+          '<input type="text" data-keep="p:' + escA(p) + '" placeholder="Add a to-do…" autocomplete="off" enterkeyhint="done">' +
           '<button type="submit" title="Add">+</button>' +
         '</form>' +
         '<div class="plist"></div>' +
@@ -1557,6 +1598,8 @@ function renderProjects(el) {
       if (keep[i.dataset.keep]) i.value = keep[i.dataset.keep];
       if (focusKey && i.dataset.keep === focusKey) i.focus();
     });
+    var rn = document.getElementById("projRenameInput");
+    if (rn) { rn.value = projRename; rn.focus(); rn.select(); }
   }
 
   var priOrder = { high: 0, medium: 1, low: 2 };
@@ -1577,7 +1620,8 @@ function renderProjects(el) {
       if (projShowDone[p]) h += done.map(projRowHTML).join("");
     }
 
-    card.querySelector(".pcard-cnt").textContent = open.length || "";
+    var cnt = card.querySelector(".pcard-cnt");
+    if (cnt) cnt.textContent = open.length || "";
     if (card._h !== h) { card._h = h; card.querySelector(".plist").innerHTML = h; }
   });
 }
@@ -1625,20 +1669,106 @@ function addProjInline(e) {
   var input = e.target.querySelector("input");
   var name = input.value.trim();
   if (!name) return false;
-  var names = projectNames();
-  var idx = names.findIndex(function(p) { return p.toLowerCase() === name.toLowerCase(); });
+  var existing = projectNames().find(function(p) { return p.toLowerCase() === name.toLowerCase(); });
   input.value = "";
-  if (idx === -1) {
-    projects.push(name);
-    saveMeta();
-    // New card lands at the end of the list order — focus its add box after rebuild
-    _projFocus = "p:" + projectNames().indexOf(name);
-    render();
-  } else {
-    var el = document.querySelector('#content input[data-keep="p:' + idx + '"]');
-    if (el) el.focus();
-  }
+  if (!existing) { projects.push(name); saveMeta(); }
+  // Focus that project's add box (after the rebuild if it's a new card)
+  _projFocus = "p:" + (existing || name);
+  _projSig = null;
+  render();
   return false;
+}
+
+function togProjMenu(i) {
+  var p = _projNames[i];
+  projMenu = (projMenu === p) ? null : p;
+  projRename = null;
+  render();
+}
+
+function startProjRename(i) {
+  projRename = _projNames[i];
+  render();
+}
+
+function cancelProjRename() {
+  projRename = null;
+  render();
+}
+
+function submitProjRename(e, i) {
+  e.preventDefault();
+  var oldName = _projNames[i];
+  var newName = e.target.querySelector("input").value.trim();
+  if (!newName || newName === oldName) { cancelProjRename(); return false; }
+  var clash = projectNames().some(function(p) { return p !== oldName && p.toLowerCase() === newName.toLowerCase(); });
+  if (clash) { showToast('"' + newName + '" already exists', "warning"); return false; }
+
+  // The name lives on every task, so renaming rewrites them all (archived too)
+  projects = projectNames().map(function(p) { return p === oldName ? newName : p; });
+  var moved = tasks.filter(function(t) { return t.project === oldName; });
+  moved.forEach(function(t) { t.project = newName; });
+  Object.keys(aliases).forEach(function(k) { if (aliases[k] === oldName) aliases[k] = newName; });
+  if (projShowDone[oldName]) { projShowDone[newName] = true; delete projShowDone[oldName]; }
+  SS("tc-tasks", tasks);
+  saveMeta();
+  if (db) {
+    for (var n = 0; n < moved.length; n += 400) {
+      var batch = db.batch();
+      moved.slice(n, n + 400).forEach(function(t) { batch.update(db.collection("tasks").doc(t.id), { project: newName }); });
+      batch.commit().catch(function(err) { console.error("Rename project:", err); showToast("Rename didn't fully sync", "error"); });
+    }
+  }
+
+  projRename = null;
+  projMenu = null;
+  render();
+  return false;
+}
+
+// Card order is the order of the shared projects list
+function moveProjectTo(from, to) {
+  var names = projectNames();
+  if (from === to || from < 0 || to < 0 || from >= names.length || to >= names.length) return;
+  var p = names.splice(from, 1)[0];
+  names.splice(to, 0, p);
+  projects = names;
+  saveMeta();
+  render();
+}
+
+function moveProject(i, dir) { moveProjectTo(i, i + dir); }
+
+function projDragStart(e, i) {
+  _projDrag = i;
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", _projNames[i]);
+  var card = e.target.closest(".pcard");
+  if (card) setTimeout(function() { card.classList.add("dragging"); }, 0);
+}
+
+function projDragEnd() {
+  _projDrag = null;
+  document.querySelectorAll(".pcard.dragging, .pcard.pdrop").forEach(function(c) { c.classList.remove("dragging", "pdrop"); });
+}
+
+function projDragOver(e) {
+  if (_projDrag === null) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  e.currentTarget.classList.add("pdrop");
+}
+
+function projDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.classList.remove("pdrop");
+}
+
+function projDrop(e, i) {
+  if (_projDrag === null) return;
+  e.preventDefault();
+  var from = _projDrag;
+  projDragEnd();
+  moveProjectTo(from, i);
 }
 
 function renderBoard(ft, el) {
