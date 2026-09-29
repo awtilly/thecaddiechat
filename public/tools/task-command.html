@@ -511,6 +511,48 @@ input, select, textarea, button { font-family:inherit; }
 .kbd-grid .k { display:flex; flex-wrap:wrap; gap:4px; }
 .kbd-grid kbd { font-size:12px; padding:3px 8px; border-bottom-width:2px; }
 .kbd-grid .d { font-size:14px; color:var(--tx-2); }
+
+/* === PROJECTS VIEW === */
+.pv .inp-wrap, .pv #parseMode, .pv #syntaxHelp, .pv .toolbar select { display:none; }
+.pgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; align-items:start; }
+.pcard { background:var(--bg-2); border:1px solid var(--border); border-radius:var(--r-lg); padding:16px 16px 10px; box-shadow:0 1px 3px rgba(0,0,0,0.04); min-width:0; }
+.pcard-hdr { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.pcard-name { font-size:17px; font-weight:600; flex:1; min-width:0; overflow-wrap:anywhere; }
+.pcard-cnt { font-size:12px; font-weight:700; background:var(--proj-bg); color:var(--proj-tx); border-radius:10px; padding:2px 8px; min-width:22px; text-align:center; }
+.pcard-cnt:empty { display:none; }
+.padd { display:flex; gap:6px; margin-bottom:6px; }
+.padd input { flex:1; min-width:0; background:var(--bg-1); border:1px solid var(--border); border-radius:var(--r); padding:9px 12px; font-size:15px; color:var(--tx-1); outline:none; }
+.padd input:focus { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-g); background:var(--bg-2); }
+.padd input::placeholder { color:var(--tx-4); }
+.padd button { width:40px; flex-shrink:0; background:var(--blue); color:#fff; border:none; border-radius:var(--r); font-size:20px; line-height:1; cursor:pointer; }
+.padd button:hover { opacity:0.9; }
+.prow { display:flex; align-items:flex-start; gap:10px; padding:8px 2px; border-top:1px solid var(--bg-3); }
+.prow-b { flex:1; min-width:0; cursor:pointer; }
+.prow-t { font-size:15px; line-height:1.4; word-break:break-word; }
+.prow.done .prow-t { text-decoration:line-through; color:var(--tx-4); }
+.prow .cmeta:empty { display:none; }
+.prow-x { background:transparent; border:none; color:var(--tx-4); cursor:pointer; font-size:16px; padding:0 4px; border-radius:3px; opacity:0.5; }
+.prow-x:hover { color:var(--red); opacity:1; }
+.prow + .epan { margin:0 0 8px; padding-top:8px; }
+.pempty { font-size:14px; color:var(--tx-4); padding:10px 2px; border-top:1px solid var(--bg-3); }
+.pdone-tog { display:block; width:100%; text-align:left; background:transparent; border:none; border-top:1px solid var(--bg-3); color:var(--tx-3); font-size:13px; font-weight:500; padding:10px 2px 6px; cursor:pointer; }
+.pdone-tog:hover { color:var(--tx-1); }
+.pcard.pnew { background:transparent; border-style:dashed; box-shadow:none; padding-bottom:16px; }
+.pcard.pnew .padd { margin-bottom:0; }
+.pcard.pnew .padd button { background:var(--bg-3); color:var(--tx-2); border:1px solid var(--border); }
+@media (max-width:768px) {
+  .pv .toolbar { display:none; }
+  .pgrid { grid-template-columns:1fr; gap:10px; }
+  .pcard { padding:14px 14px 8px; }
+  .padd input { font-size:16px; padding:12px; min-height:44px; }
+  .padd button { width:48px; min-height:44px; }
+  .prow { align-items:center; gap:8px; padding:0; }
+  .prow .ck { min-width:26px; min-height:26px; width:26px; height:26px; border-radius:6px; margin:9px 2px; }
+  .prow-b { padding:10px 0; }
+  .prow-x { min-width:40px; min-height:44px; }
+  /* Inline add boxes replace the quick-add FAB here */
+  #app.pv ~ .fab { display:none !important; }
+}
 </style>
 </head>
 <body>
@@ -567,7 +609,8 @@ input, select, textarea, button { font-family:inherit; }
       <option value="all">All</option>
     </select>
     <div class="tright">
-      <button id="vBoard" class="act" onclick="setView('board')">&#9638; Board</button>
+      <button id="vProjects" class="act" onclick="setView('projects')">&#128193; Projects</button>
+      <button id="vBoard" onclick="setView('board')">&#9638; Board</button>
       <button id="vList" onclick="setView('list')">&#9776; List</button>
       <button id="vTable" onclick="setView('table')">&#9636; Table</button>
       <button id="vWins" onclick="setView('wins')">&#127942; Wins</button>
@@ -599,17 +642,17 @@ input, select, textarea, button { font-family:inherit; }
 
 <!-- Mobile Bottom Tab Bar -->
 <div class="btabs" id="btabs">
-  <button class="btab act" data-view="board" onclick="setView('board')">
+  <button class="btab act" data-view="projects" onclick="setView('projects')">
+    <span class="btab-icon">&#128193;</span>
+    <span class="btab-label">Projects</span>
+  </button>
+  <button class="btab" data-view="board" onclick="setView('board')">
     <span class="btab-icon">&#9638;</span>
     <span class="btab-label">Board</span>
   </button>
   <button class="btab" data-view="list" onclick="setView('list')">
     <span class="btab-icon">&#9776;</span>
     <span class="btab-label">List</span>
-  </button>
-  <button class="btab" data-view="table" onclick="setView('table')">
-    <span class="btab-icon">&#9636;</span>
-    <span class="btab-label">Table</span>
   </button>
   <button class="btab" data-view="wins" onclick="setView('wins')">
     <span class="btab-icon">&#127942;</span>
@@ -681,7 +724,7 @@ var projects = LS("tc-projects") || DEF_PROJECTS.slice();
 var people = LS("tc-people") || DEF_PEOPLE.slice();
 var aliases = LS("tc-aliases") || {};
 var config = LS("tc-config") || { apiKey:"", parseMode:"smart" };
-var view = "board";
+var view = "projects";
 var editId = null;
 var syncStatus = "syncing";
 var winRange = "all";
@@ -1277,13 +1320,15 @@ function renderNow() {
   updateAlerts();
   updateScopeCounts();
   var dsc = document.getElementById("dscope");
-  if (dsc) dsc.style.display = (view === "wins") ? "none" : "flex";
+  if (dsc) dsc.style.display = (view === "wins" || view === "projects") ? "none" : "flex";
+  document.getElementById("app").classList.toggle("pv", view === "projects");
   var ft = filtered();
   var content = document.getElementById("content");
   var tips = document.getElementById("tips");
-  tips.style.display = (tasks.length === 0 && view !== "wins") ? "block" : "none";
+  tips.style.display = (tasks.length === 0 && view !== "wins" && view !== "projects") ? "block" : "none";
 
-  if (view === "board") renderBoard(ft, content);
+  if (view === "projects") renderProjects(content);
+  else if (view === "board") renderBoard(ft, content);
   else if (view === "list") renderList(ft, content);
   else if (view === "wins") renderWins(content);
   else renderTable(ft, content);
@@ -1383,6 +1428,23 @@ function updateScopeCounts() {
 /* ============================================================
    CARD HTML
    ============================================================ */
+function editPanelHTML(task) {
+  var statOpts = Object.entries(STATUSES).map(function(kv) { return '<option value="' + kv[0] + '"' + (task.status === kv[0] ? ' selected' : '') + '>' + esc(kv[1].label) + '</option>'; }).join("");
+  var priOpts = [["high","\u{1F534} High"],["medium","\u{1F7E1} Medium"],["low","\u{1F7E2} Low"]].map(function(vl) { return '<option value="' + vl[0] + '"' + (task.priority === vl[0] ? ' selected' : '') + '>' + vl[1] + '</option>'; }).join("");
+  var projOpts = Array.from(new Set(projects.concat([task.project]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
+  var persOpts = Array.from(new Set(people.concat([task.person]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.person === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
+
+  return '<div class="epan">' +
+    '<div><label>Status</label><select onchange="upd(\'' + task.id + '\',{status:this.value})">' + statOpts + '</select></div>' +
+    '<div><label>Priority</label><select onchange="upd(\'' + task.id + '\',{priority:this.value})">' + priOpts + '</select></div>' +
+    '<div><label>Project</label><select onchange="upd(\'' + task.id + '\',{project:this.value})">' + projOpts + '</select></div>' +
+    '<div><label>From</label><select onchange="upd(\'' + task.id + '\',{person:this.value})">' + persOpts + '</select></div>' +
+    '<div class="full"><label>Due Date</label><input type="date" value="' + (task.due_date || '') + '" onchange="upd(\'' + task.id + '\',{due_date:this.value||null})"></div>' +
+    '<div class="full"><label>Notes</label><input type="text" value="' + esc(task.notes) + '" onchange="upd(\'' + task.id + '\',{notes:this.value})"></div>' +
+    '<div class="full"><label>Result / Impact (for reviews)</label><input type="text" value="' + esc(task.impact || "") + '" placeholder="What was the outcome — why it mattered" onchange="upd(\'' + task.id + '\',{impact:this.value})"></div>' +
+    '</div>';
+}
+
 function cardHTML(task) {
   var done = task.status === "done";
   var od = isOverdue(task);
@@ -1390,23 +1452,7 @@ function cardHTML(task) {
   if (done) cls += " done";
   if (od) cls += " overdue";
 
-  var editPanel = "";
-  if (editId === task.id) {
-    var statOpts = Object.entries(STATUSES).map(function(kv) { return '<option value="' + kv[0] + '"' + (task.status === kv[0] ? ' selected' : '') + '>' + esc(kv[1].label) + '</option>'; }).join("");
-    var priOpts = [["high","\u{1F534} High"],["medium","\u{1F7E1} Medium"],["low","\u{1F7E2} Low"]].map(function(vl) { return '<option value="' + vl[0] + '"' + (task.priority === vl[0] ? ' selected' : '') + '>' + vl[1] + '</option>'; }).join("");
-    var projOpts = Array.from(new Set(projects.concat([task.project]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.project === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
-    var persOpts = Array.from(new Set(people.concat([task.person]))).map(function(p) { return '<option value="' + esc(p) + '"' + (task.person === p ? ' selected' : '') + '>' + esc(p) + '</option>'; }).join("");
-
-    editPanel = '<div class="epan">' +
-      '<div><label>Status</label><select onchange="upd(\'' + task.id + '\',{status:this.value})">' + statOpts + '</select></div>' +
-      '<div><label>Priority</label><select onchange="upd(\'' + task.id + '\',{priority:this.value})">' + priOpts + '</select></div>' +
-      '<div><label>Project</label><select onchange="upd(\'' + task.id + '\',{project:this.value})">' + projOpts + '</select></div>' +
-      '<div><label>From</label><select onchange="upd(\'' + task.id + '\',{person:this.value})">' + persOpts + '</select></div>' +
-      '<div class="full"><label>Due Date</label><input type="date" value="' + (task.due_date || '') + '" onchange="upd(\'' + task.id + '\',{due_date:this.value||null})"></div>' +
-      '<div class="full"><label>Notes</label><input type="text" value="' + esc(task.notes) + '" onchange="upd(\'' + task.id + '\',{notes:this.value})"></div>' +
-      '<div class="full"><label>Result / Impact (for reviews)</label><input type="text" value="' + esc(task.impact || "") + '" placeholder="What was the outcome — why it mattered" onchange="upd(\'' + task.id + '\',{impact:this.value})"></div>' +
-      '</div>';
-  }
+  var editPanel = (editId === task.id) ? editPanelHTML(task) : "";
 
   var dateChip = task.due_date ? '<span class="tg due' + (od ? ' od' : '') + '">' + (od ? '\u26A0 ' : '') + fmtD(task.due_date) + '</span>' : '';
   var notesDiv = task.notes ? '<div class="cnotes">' + esc(task.notes) + '</div>' : '';
@@ -1436,6 +1482,165 @@ function cardHTML(task) {
 /* ============================================================
    VIEW RENDERERS
    ============================================================ */
+// Projects view: one card per project, open to-dos listed under it, with an
+// inline add box. The card shells (and their inputs) persist across renders so
+// typing and focus survive cloud snapshots; only each card's list is rebuilt.
+var _projNames = [];
+var _projSig = null;
+var _projFocus = null;
+var projShowDone = {};
+
+function projectNames() {
+  var seen = {}, out = [];
+  projects.concat(tasks.filter(function(t) { return !t.archived; }).map(function(t) { return t.project; })).forEach(function(p) {
+    if (p && !seen[p]) { seen[p] = true; out.push(p); }
+  });
+  return out;
+}
+
+function projRowHTML(task) {
+  var done = task.status === "done";
+  var od = isOverdue(task);
+  var chips = "";
+  if (!done && task.priority !== "low") chips += '<span class="pdot ' + task.priority + '"></span>';
+  if (task.status === "in_progress" || task.status === "waiting") chips += '<span class="tg pers">' + esc(STATUSES[task.status].label) + '</span>';
+  if (task.due_date) chips += '<span class="tg due' + (od ? ' od' : '') + '">' + (od ? '⚠ ' : '') + fmtD(task.due_date) + '</span>';
+  var notesDiv = task.notes ? '<div class="cnotes">' + esc(task.notes) + '</div>' : '';
+
+  return '<div class="prow' + (done ? ' done' : '') + '">' +
+      '<button class="ck' + (done ? ' on' : '') + '" onclick="tog(\'' + task.id + '\')">' + (done ? '✓' : '') + '</button>' +
+      '<div class="prow-b" onclick="edt(\'' + task.id + '\')">' +
+        '<div class="prow-t">' + esc(task.title) + '</div>' +
+        '<div class="cmeta">' + chips + '</div>' +
+        notesDiv +
+      '</div>' +
+      '<button class="prow-x" onclick="del(\'' + task.id + '\')" title="Delete">×</button>' +
+    '</div>' +
+    (editId === task.id ? editPanelHTML(task) : "");
+}
+
+function renderProjects(el) {
+  var names = projectNames();
+  var sig = names.join("\n");
+  var grid = el.firstElementChild;
+
+  if (!grid || !grid.classList.contains("pgrid") || sig !== _projSig) {
+    var keep = {}, focusKey = _projFocus;
+    el.querySelectorAll("input[data-keep]").forEach(function(i) {
+      if (i.value) keep[i.dataset.keep] = i.value;
+      if (!focusKey && document.activeElement === i) focusKey = i.dataset.keep;
+    });
+    _projNames = names;
+    _projSig = sig;
+    _projFocus = null;
+
+    el.innerHTML = '<div class="pgrid">' + names.map(function(p, i) {
+      return '<div class="pcard" data-pi="' + i + '">' +
+        '<div class="pcard-hdr"><span class="pcard-name">' + esc(p) + '</span><span class="pcard-cnt"></span></div>' +
+        '<form class="padd" onsubmit="return addTodo(event,' + i + ')">' +
+          '<input type="text" data-keep="p:' + i + '" placeholder="Add a to-do…" autocomplete="off" enterkeyhint="done">' +
+          '<button type="submit" title="Add">+</button>' +
+        '</form>' +
+        '<div class="plist"></div>' +
+      '</div>';
+    }).join("") +
+      '<div class="pcard pnew">' +
+        '<form class="padd" onsubmit="return addProjInline(event)">' +
+          '<input type="text" data-keep="new" placeholder="New project…" autocomplete="off" enterkeyhint="done">' +
+          '<button type="submit" title="Add project">+</button>' +
+        '</form>' +
+      '</div>' +
+    '</div>';
+
+    grid = el.firstElementChild;
+    grid.querySelectorAll("input[data-keep]").forEach(function(i) {
+      if (keep[i.dataset.keep]) i.value = keep[i.dataset.keep];
+      if (focusKey && i.dataset.keep === focusKey) i.focus();
+    });
+  }
+
+  var priOrder = { high: 0, medium: 1, low: 2 };
+  grid.querySelectorAll(".pcard[data-pi]").forEach(function(card) {
+    var i = +card.dataset.pi;
+    var p = _projNames[i];
+    var mine = tasks.filter(function(t) { return t.project === p && !t.archived; });
+    var open = mine.filter(function(t) { return t.status !== "done"; }).sort(function(a, b) {
+      return (priOrder[a.priority] || 2) - (priOrder[b.priority] || 2) || new Date(b.created_at) - new Date(a.created_at);
+    });
+    var done = mine.filter(function(t) { return t.status === "done"; }).sort(function(a, b) {
+      return new Date(b.completed_at || b.created_at) - new Date(a.completed_at || a.created_at);
+    });
+
+    var h = open.length ? open.map(projRowHTML).join("") : '<div class="pempty">Nothing open</div>';
+    if (done.length) {
+      h += '<button class="pdone-tog" onclick="togProjDone(' + i + ')">' + (projShowDone[p] ? '▾ Hide ' : '▸ Show ') + done.length + ' completed</button>';
+      if (projShowDone[p]) h += done.map(projRowHTML).join("");
+    }
+
+    card.querySelector(".pcard-cnt").textContent = open.length || "";
+    if (card._h !== h) { card._h = h; card.querySelector(".plist").innerHTML = h; }
+  });
+}
+
+function togProjDone(i) {
+  var p = _projNames[i];
+  projShowDone[p] = !projShowDone[p];
+  render();
+}
+
+// Inline add under a project. Title is taken as typed; only #priority tags
+// and due-date phrases ("by Friday", "tomorrow", "3/15") are pulled out.
+function addTodo(e, i) {
+  e.preventDefault();
+  var input = e.target.querySelector("input");
+  var raw = input.value.trim();
+  var project = _projNames[i];
+  if (!raw || !project) return false;
+
+  var text = raw, priority = "low";
+  if (/#(?:high|urgent|crit)\b/i.test(text)) { priority = "high"; text = text.replace(/#(?:high|urgent|crit)\b/gi, ""); }
+  else if (/#(?:med|medium)\b/i.test(text)) { priority = "medium"; text = text.replace(/#(?:med|medium)\b/gi, ""); }
+  else if (/#low\b/i.test(text)) { text = text.replace(/#low\b/gi, ""); }
+  var due = extractDate(text);
+  if (due) text = stripDate(text);
+  text = text.replace(/\s+/g, " ").replace(/[\s\-–—:,;]+$/, "").trim();
+  if (!text) text = raw;
+
+  var task = {
+    id: crypto.randomUUID(), title: text, project: project, person: "Self",
+    priority: priority, status: "todo", due_date: due || null, notes: "",
+    impact: "", archived: false,
+    created_at: new Date().toISOString(), completed_at: null
+  };
+  tasks.unshift(task);
+  SS("tc-tasks", tasks);
+  saveTaskToCloud(task);
+  input.value = "";
+  render();
+  return false;
+}
+
+function addProjInline(e) {
+  e.preventDefault();
+  var input = e.target.querySelector("input");
+  var name = input.value.trim();
+  if (!name) return false;
+  var names = projectNames();
+  var idx = names.findIndex(function(p) { return p.toLowerCase() === name.toLowerCase(); });
+  input.value = "";
+  if (idx === -1) {
+    projects.push(name);
+    saveMeta();
+    // New card lands at the end of the list order — focus its add box after rebuild
+    _projFocus = "p:" + projectNames().indexOf(name);
+    render();
+  } else {
+    var el = document.querySelector('#content input[data-keep="p:' + idx + '"]');
+    if (el) el.focus();
+  }
+  return false;
+}
+
 function renderBoard(ft, el) {
   var f = getFilters();
   var cols;
@@ -1705,6 +1910,7 @@ function del(id) {
 function setView(v) {
   view = v;
   // Desktop toolbar
+  document.getElementById("vProjects").classList.toggle("act", v === "projects");
   document.getElementById("vBoard").classList.toggle("act", v === "board");
   document.getElementById("vList").classList.toggle("act", v === "list");
   document.getElementById("vTable").classList.toggle("act", v === "table");
@@ -1927,6 +2133,7 @@ function setPersFilter(v) { var el = document.getElementById("fPers"); if (el) {
 function buildCommands() {
   var c = [];
   // Views
+  c.push({ label: "Projects view", hint: "View", kw: "projects home todo to-do list", run: function() { setView("projects"); } });
   c.push({ label: "Board view", hint: "View", kw: "board kanban columns", run: function() { setView("board"); } });
   c.push({ label: "List view", hint: "View", kw: "list", run: function() { setView("list"); } });
   c.push({ label: "Table view", hint: "View", kw: "table grid", run: function() { setView("table"); } });
@@ -2029,7 +2236,7 @@ function showShortcuts() {
           row(["⌘ / Ctrl", "K"], "Command palette") +
           row(["/"], "Focus the add bar") +
           row(["C"], "Quick add task") +
-          row(["B", "L", "T", "W"], "Board · List · Table · Wins") +
+          row(["P", "B", "L", "T", "W"], "Projects · Board · List · Table · Wins") +
           row(["1", "2", "3", "4"], "All · Today · Next 7 · Overdue") +
           row(["?"], "Show this help") +
         "</div>" +
@@ -2332,7 +2539,8 @@ document.addEventListener("keydown", function(e) {
   if (_kbTyping(e) || e.metaKey || e.ctrlKey || e.altKey) return;
   if (_kbModalOpen()) return;
   switch (e.key) {
-    case "/": e.preventDefault(); var mi = document.getElementById("mainInput"); if (mi) mi.focus(); break;
+    case "/": e.preventDefault(); var mi = (view === "projects") ? document.querySelector("#content .padd input") : document.getElementById("mainInput"); if (mi) mi.focus(); break;
+    case "p": case "P": setView("projects"); break;
     case "c": case "C": e.preventDefault(); showQuickAdd(); break;
     case "b": case "B": setView("board"); break;
     case "l": case "L": setView("list"); break;
