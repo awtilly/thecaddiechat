@@ -23,36 +23,22 @@
      "id": "002602370",
      "title": "Carolina, Fall",
      "date": "Fall 2026",
-     "place": "North Carolina",
+     "place": "North & South Carolina",
      "cover": "003",
      "chapters": [
       {
-       "title": "Mountain course",
+       "title": "Mountaintop, Cashiers NC",
        "frames": [
         {
          "frame": "001",
-         "alt": "Bunker and flag below hardwoods, mountain course",
+         "alt": "Bunker and flag below hardwoods, Mountaintop",
          "tags": [
           "course"
          ]
         },
         {
          "frame": "003",
-         "alt": "Downhill hole dropping into a valley of fall colour",
-         "tags": [
-          "course"
-         ]
-        },
-        {
-         "frame": "004",
-         "alt": "Fairway corridor in shadow with a peak beyond",
-         "tags": [
-          "course"
-         ]
-        },
-        {
-         "frame": "018",
-         "alt": "Mountain valley and ridgelines, course in the foreground",
+         "alt": "Downhill hole dropping into a valley of fall colour, Mountaintop",
          "tags": [
           "course"
          ]
@@ -60,7 +46,26 @@
        ]
       },
       {
-       "title": "The build",
+       "title": "Contentment, NC",
+       "frames": [
+        {
+         "frame": "004",
+         "alt": "Fairway corridor in shadow with a peak beyond, Contentment",
+         "tags": [
+          "course"
+         ]
+        },
+        {
+         "frame": "018",
+         "alt": "Mountain valley and ridgelines, Contentment in the foreground",
+         "tags": [
+          "course"
+         ]
+        }
+       ]
+      },
+      {
+       "title": "The build: the range at Mountaintop",
        "frames": [
         {
          "frame": "005",
@@ -100,11 +105,11 @@
        ]
       },
       {
-       "title": "Sandhills, overcast",
+       "title": "Mid Pines, Sandhills",
        "frames": [
         {
          "frame": "019",
-         "alt": "Georgian inn behind a green, longleaf pines",
+         "alt": "Georgian inn behind a green, longleaf pines, Mid Pines",
          "tags": [
           "course"
          ]
@@ -154,11 +159,11 @@
        ]
       },
       {
-       "title": "Last light",
+       "title": "Last light, Old Barnwell",
        "frames": [
         {
          "frame": "030",
-         "alt": "Sunburst on the tree line",
+         "alt": "Sunburst on the tree line, Old Barnwell",
          "tags": [
           "course"
          ]
@@ -378,11 +383,11 @@
      "cover": "008",
      "chapters": [
       {
-       "title": "Parkland course",
+       "title": "St. Louis Country Club",
        "frames": [
         {
          "frame": "001",
-         "alt": "Green and fescue bank under grey sky",
+         "alt": "Green and fescue bank under grey sky, St. Louis Country Club",
          "tags": [
           "course"
          ]
@@ -704,7 +709,7 @@
      "id": "002602370",
      "title": "Carolina Back Roads",
      "date": "Fall 2026",
-     "place": "North Carolina",
+     "place": "North & South Carolina",
      "cover": "011",
      "chapters": [
       {
