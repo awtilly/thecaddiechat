@@ -19,6 +19,9 @@
   --color-hero-overlay: rgba(28, 28, 28, 0.55);
   --color-white: #ffffff;
   --color-dark: #1c1c1c;
+  /* Identity system: brass is for 1px rules, foil and hardware only, NEVER text.
+     It is 3.6:1 on cream, below the 4.5:1 AA minimum. First use: ProvenanceTag. */
+  --brass: #9C7A3C;
 
   --font-display: 'Playfair Display Variable', Georgia, serif;
   --font-body: 'DM Sans Variable', -apple-system, sans-serif;

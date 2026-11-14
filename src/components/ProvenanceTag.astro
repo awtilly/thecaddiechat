@@ -1,0 +1,141 @@
+---
+/**
+ * ProvenanceTag: the one-line specimen label that closes a piece.
+ *
+ *   WALKED · TOBACCO ROAD, SANFORD NC · 11.2026 · S
+ *   VERB   · PLACE or MAKER           · MM.YYYY · S
+ *
+ * In MDX (registered in the chronicles / courses / field-notes routes, so no import):
+ *   <ProvenanceTag verb="WALKED" place="Tobacco Road, Sanford NC" date="2026-11" />
+ *   <ProvenanceTag verb="PRICED" place="Public bid tab, 18-hole regrass" date="10.2026" />
+ *   <ProvenanceTag verb="MADE" maker="King Ranch" place="Kingsville TX" />
+ *   <ProvenanceTag verb="SHOT" place="Roll 8" date="Fall 2026" />
+ *   <ProvenanceTag verb="WORN" place="6 months, veg-tan" date="2027-05" />
+ *
+ * Rules (identity system, section 3):
+ *   1. Facts only. A field you can't verify is left OUT, never filled with a
+ *      placeholder. Omitted or empty fields drop out along with their dot.
+ *   2. No adjectives inside the tag.
+ *   3. One tag per piece, as the last line.
+ *   4. The trailing S becomes the drawn mark (inline SVG, 1em) once the final
+ *      vector exists. Until then it is a plain Plex Mono capital.
+ *   5. Never on FFG.
+ * A bad verb or date fails the build, so a malformed tag can't ship quietly.
+ *
+ * Type: IBM Plex Mono set uppercase with 0.1em tracking. Plex Mono has no
+ * small-caps glyphs (no smcp feature), so font-variant-caps would be faked by
+ * the browser. Text is ink. Brass appears only as the 1px rule above the tag,
+ * never on the text (3.6:1 on cream, below the 4.5:1 AA minimum).
+ */
+
+const VERBS = ['WALKED', 'PRICED', 'MADE', 'SHOT', 'WORN'] as const;
+type Verb = (typeof VERBS)[number];
+
+interface Props {
+  /** WALKED (course notes) · PRICED (What It Cost, public numbers only) · MADE (objects) · SHOT (Camera Roll) · WORN (Patina Report) */
+  verb: Verb;
+  /** Where, or what: "Tobacco Road, Sanford NC", "Public bid tab, 18-hole regrass", "Roll 8", "6 months, veg-tan". */
+  place?: string;
+  /** Who made it (MADE). Printed before place: maker="King Ranch" place="Kingsville TX" -> KING RANCH, KINGSVILLE TX. */
+  maker?: string;
+  /** "2026-11" or "11.2026" (both print 11.2026), or a season and year: "Fall 2026". Leave it out if unknown. */
+  date?: string;
+}
+
+const { verb, place, maker, date } = Astro.props;
+
+const fail = (message: string): never => {
+  throw new Error(`[ProvenanceTag] ${message} (page: ${Astro.url.pathname})`);
+};
+
+const v = String(verb ?? '').trim().toUpperCase();
+if (!(VERBS as readonly string[]).includes(v)) {
+  fail(`verb must be one of ${VERBS.join(' / ')}; got "${verb}".`);
+}
+
+/** Rule 1: missing, empty or whitespace-only fields are dropped, never invented. */
+const clean = (value: unknown, field: string): string | undefined => {
+  if (value === undefined || value === null) return undefined;
+  const text = String(value).replace(/\s+/g, ' ').trim();
+  if (!text) return undefined;
+  if (text.includes('·')) fail(`${field} contains a "·". The component adds the separators.`);
+  return text;
+};
+
+const month = (year: string, mm: string, raw: string) => {
+  const n = Number(mm);
+  if (n < 1 || n > 12) fail(`date month must be 01-12; got "${raw}".`);
+  return { text: `${mm}.${year}`, datetime: `${year}-${mm}` };
+};
+
+const parseDate = (value: unknown): { text: string; datetime: string } | undefined => {
+  const raw = clean(value, 'date');
+  if (!raw) return undefined;
+  let m = raw.match(/^(\d{4})-(\d{2})$/); // ISO month: 2026-11
+  if (m) return month(m[1], m[2], raw);
+  m = raw.match(/^(\d{2})\.(\d{4})$/); // display form: 11.2026
+  if (m) return month(m[2], m[1], raw);
+  m = raw.match(/^(spring|summer|fall|winter)\s+(\d{4})$/i); // season: Fall 2026
+  if (m) return { text: `${m[1].toUpperCase()} ${m[2]}`, datetime: m[2] };
+  return fail(
+    `date must be "YYYY-MM", "MM.YYYY" or a season and year like "Fall 2026"; got "${raw}". ` +
+      `If the date isn't known, leave it out.`,
+  );
+};
+
+const subject = [clean(maker, 'maker'), clean(place, 'place')].filter(Boolean).join(', ') || undefined;
+const when = parseDate(date);
+
+if (!subject && !when) {
+  fail(`a ${v} tag needs at least one fact besides the verb: place, maker or date.`);
+}
+---
+<p class="provenance">
+  <span class="field">{v}<span class="sep" aria-hidden="true">&nbsp;·</span></span>
+  {subject && <span class="field">{subject}<span class="sep" aria-hidden="true">&nbsp;·</span></span>}
+  {when && <span class="field"><time datetime={when.datetime}>{when.text}</time><span class="sep" aria-hidden="true">&nbsp;·</span></span>}
+  {/* Rule 4: when the final vector exists, replace this span with the drawn mark as an
+      inline <svg class="field mark" role="img" aria-label="S"> sized to 1em. */}
+  <span class="field mark">S</span>
+</p>
+
+<style>
+  /* IBM Plex Mono, Latin, regular, woff2 only (the same lean approach as the
+     hand-rolled faces in BaseLayout). It is declared here so the file is only
+     downloaded on pages that actually render a tag. */
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+  }
+
+  /* Astro scopes this to .provenance[data-astro-cid-*] (specificity 0,2,0), which
+     beats the layouts' global `.article-body p` / `.course-body p` (0,1,1). That
+     way the tag never picks up body-copy colour, size, leading or margin. */
+  .provenance {
+    width: fit-content; /* the brass rule spans the tag, not the whole column */
+    max-width: 100%;
+    margin: var(--space-md) 0 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--brass); /* the only place brass appears on screen */
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.7;
+    letter-spacing: var(--tracking-wide); /* 0.1em */
+    text-transform: uppercase;
+    color: var(--color-text-primary); /* ink #1c1c1c, 15.5:1 on the page cream */
+    overflow-wrap: anywhere; /* never truncates, never overflows */
+  }
+
+  /* Each field (with its trailing dot) is one unit, so on narrow screens the
+     line wraps after a dot, not mid-field. A field that is wider than the
+     screen on its own still wraps inside itself instead of overflowing. */
+  .field {
+    display: inline-block;
+    max-width: 100%;
+  }
+</style>

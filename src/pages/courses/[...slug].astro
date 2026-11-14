@@ -5,6 +5,7 @@ import FeaturedImage from '../../components/mdx/FeaturedImage.astro';
 import FullBleed from '../../components/mdx/FullBleed.astro';
 import ImagePair from '../../components/mdx/ImagePair.astro';
 import Memorabilia from '../../components/mdx/Memorabilia.astro';
+import ProvenanceTag from '../../components/ProvenanceTag.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -35,5 +36,5 @@ const { title, description, architect, year, location, heroImage, courseNumber, 
   prev={prev}
   next={next}
 >
-  <Content components={{ InlineImage, FeaturedImage, FullBleed, ImagePair, Memorabilia }} />
+  <Content components={{ InlineImage, FeaturedImage, FullBleed, ImagePair, Memorabilia, ProvenanceTag }} />
 </CourseLayout>
