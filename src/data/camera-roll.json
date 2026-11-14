@@ -743,49 +743,6 @@
      ]
     },
     {
-     "no": 7,
-     "id": "001228180",
-     "title": "The Jeep",
-     "date": "08.2024",
-     "place": "Castle Pines GC, Castle Rock CO",
-     "cover": "036",
-     "chapters": [
-      {
-       "title": "The Jeep",
-       "frames": [
-        {
-         "frame": "035",
-         "alt": "Jeep steering wheel",
-         "tags": [
-          "stateside"
-         ]
-        },
-        {
-         "frame": "036",
-         "alt": "Rubber ducks lined on the dash",
-         "tags": [
-          "stateside"
-         ]
-        },
-        {
-         "frame": "037",
-         "alt": "Jeep floor mat",
-         "tags": [
-          "stateside"
-         ]
-        },
-        {
-         "frame": "038",
-         "alt": "Dash screen playing \"Call Me the Breeze\"",
-         "tags": [
-          "stateside"
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    {
      "no": 6,
      "id": "001228170",
      "title": "Flying West",
