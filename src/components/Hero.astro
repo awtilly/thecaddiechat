@@ -200,9 +200,15 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     .hero h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
     .hero-layout { padding-bottom: var(--space-lg); }
     .hero-meta { display: none; }
-    .hero-kicker { font-size: 0.6rem; }
+    .hero-kicker { font-size: 0.72rem; letter-spacing: 0.18em; }
+    .hero-scroll span { font-size: 0.68rem; }
     .hero-scroll { bottom: var(--space-sm); }
     .hero-scroll-line { height: 28px; }
+  }
+  @media (max-width: 380px) {
+    /* keeps the kicker on one line on the narrowest phones */
+    .hero-kicker { letter-spacing: 0.1em; gap: 0.6rem; }
+    .hero-kicker::before { width: 20px; }
   }
   @media (max-width: 480px) {
     .hero-cta { flex-direction: column; }

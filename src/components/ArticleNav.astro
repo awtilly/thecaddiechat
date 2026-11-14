@@ -48,4 +48,20 @@ const { prev, next, basePath } = Astro.props;
   .article-nav a:hover {
     color: var(--color-accent);
   }
+  /* Phones: prev and next each get their own line instead of sharing one */
+  @media (max-width: 768px) {
+    .article-nav {
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-bottom: var(--space-lg);
+    }
+    .article-nav a {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      padding: 0.6rem 0;
+    }
+    .article-nav span:empty {
+      display: none;
+    }
+  }
 </style>

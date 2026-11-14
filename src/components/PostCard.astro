@@ -75,4 +75,9 @@ const { title, description, href, image } = Astro.props;
     margin-top: var(--space-sm);
     display: inline-block;
   }
+  @media (max-width: 768px) {
+    .post-card h3 { font-size: 1.3rem; margin-bottom: 0.75rem; }
+    .post-card p { font-size: 1rem; }
+    .read-more { font-size: 0.8rem; }
+  }
 </style>

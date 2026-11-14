@@ -194,4 +194,13 @@ body::before {
 /* --- Responsive base --- */
 @media (max-width: 768px) {
   .js [data-scroll-reveal] { opacity: 1; transform: none; }
+
+  /* Phones: the fluid scale bottomed out at 10px labels, 13px captions and
+     16px body. Floor them at 12 / 14 / 17px so nothing reads as fine print. */
+  :root {
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1.0625rem;
+  }
+  .section-label { font-size: 0.75rem; letter-spacing: 0.18em; margin-bottom: 1.25rem; }
 }

@@ -178,6 +178,66 @@ body:has(.home)::before { display: none; }
   .home .strip figure { flex: 0 0 auto; width: calc(12rem * var(--r)); scroll-snap-align: start; }
   .home .index a { grid-template-columns: 5.2rem minmax(0, 1fr) 1rem; }
 }
+
+/* ---------- phones: breathing room ----------
+   Joe, 2026-11-14: "looks busy, text too close together, wrong sizing for mobile,
+   especially the very bottom". On a phone every label was under 12px and the
+   rows sat tight, so: no text under 12px, body copy at 17px, more air between
+   rows and sections, and the colophon set as one calm column. */
+@media (max-width: 760px) {
+  .home-section { padding-top: 6.5rem; }
+  .home .opener { margin-bottom: 2.5rem; padding-top: 0.9rem; }
+  .home .caps { font-size: 0.78rem; line-height: 1.6; letter-spacing: 0.14em; }
+  .home .opener h2 { font-size: 0.8rem; letter-spacing: 0.16em; }
+  .home .textlink { font-size: 0.8rem; letter-spacing: 0.14em; padding-top: 1rem; }
+  .home .display-2 { line-height: 1.14; }
+  .home .body-copy p { font-size: 1.0625rem; line-height: 1.8; }
+  .home .body-copy p + p { margin-top: 1.5rem; }
+
+  /* contents ledger */
+  .home .ledger-row { padding: 2.1rem 0 2.2rem; row-gap: 0.9rem; }
+  .home .lr-desc { font-size: 1.0625rem; line-height: 1.7; }
+
+  /* plates */
+  .home .label { margin-top: 1.1rem; padding-top: 0.9rem; }
+  .home .label-no { font-size: 0.75rem; letter-spacing: 0.16em; }
+  .home .label-text { font-size: 1.0625rem; line-height: 1.5; }
+  .home .label .provenance { margin-top: 1.1rem; }
+  .home .split > .plate { margin-bottom: 3.5rem; }
+  .home .split--rev > .plate { margin: 3.75rem 0 0; }
+
+  /* chronicles index: the date sits above the title instead of squeezing it
+     into a narrow column (titles were breaking onto three and four lines) */
+  .home .index { margin-bottom: 2.75rem; }
+  .home .index a { grid-template-columns: minmax(0, 1fr) 1rem; row-gap: 0.55rem; padding: 1.6rem 0 1.7rem; }
+  .home .ix-date { grid-column: 1; grid-row: 1; font-size: 0.75rem; }
+  .home .index a > span:not(.ix-arr) { grid-column: 1; grid-row: 2; }
+  .home .ix-arr { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .home .ix-title { font-size: 1.4rem; line-height: 1.3; }
+  .home .ix-meta { margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.55; }
+
+  /* field notes, roll strip, about */
+  .home .fn-intro { margin-bottom: 3rem; }
+  .home .fn-intro .display-2 { margin-bottom: 1.6rem; }
+  .home .inprep { margin-top: 2rem; }
+  .home .strip { margin-bottom: 2.5rem; }
+  .home .strip figcaption { font-size: 0.75rem; margin-top: 0.7rem; padding-top: 0.55rem; }
+  .home .about-head { margin-bottom: 2rem; }
+  .home .signature { margin-top: 2.25rem; }
+  .home .about-links { margin-top: 1.75rem; }
+
+  /* colophon: one column, one item per line, room under the last line */
+  .home .colophon { padding: 7.5rem 0 calc(3.5rem + env(safe-area-inset-bottom, 0px)); }
+  .home .colo-grid { row-gap: 3.25rem; padding-top: 3rem; }
+  .home .colo-mark .wordmark { font-size: 1.85rem; margin-bottom: 0.6rem; }
+  .home .colo-nav a { padding: 0.8rem 0; font-size: 1.25rem; }
+  .home .colo-follow .line { font-size: 1.4rem; margin-bottom: 0.75rem; }
+  .home .fineprint {
+    flex-direction: column; align-items: flex-start; gap: 1.15rem;
+    margin-top: 4.5rem; padding-top: 2rem;
+  }
+  .home .fineprint .colo-type { display: none; } /* typeface credit: desktop only */
+}
 @media (prefers-reduced-motion: reduce) {
   .home *, .home *::before, .home *::after { transition: none !important; }
 }

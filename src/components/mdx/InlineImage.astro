@@ -40,7 +40,10 @@ const { src, alt, caption } = Astro.props;
   @media (max-width: 868px) {
     .inline-image { margin: 2rem -1rem; }
   }
+  @media (max-width: 768px) {
+    figcaption { font-size: 0.875rem; line-height: 1.6; }
+  }
   @media (max-width: 480px) {
-    .inline-image { margin: 2rem 0; }
+    .inline-image { margin: 2.5rem 0; }
   }
 </style>

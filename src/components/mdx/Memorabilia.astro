@@ -53,4 +53,8 @@ const { src, alt, label, caption } = Astro.props;
     margin-top: 1rem;
     font-style: italic;
   }
+  @media (max-width: 768px) {
+    .memorabilia-label { font-size: 0.75rem; }
+    figcaption { font-size: 0.875rem; line-height: 1.6; }
+  }
 </style>
