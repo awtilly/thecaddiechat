@@ -130,6 +130,12 @@
       flex-direction: column;
       gap: var(--space-md);
     }
+    /* Five links in one row are 513px wide: on a phone the row ran off the
+       right edge and made every page with this footer scroll sideways. */
+    .footer-links {
+      flex-wrap: wrap;
+      gap: var(--space-sm) var(--space-md);
+    }
     .footer-bottom {
       flex-direction: column;
       gap: var(--space-sm);

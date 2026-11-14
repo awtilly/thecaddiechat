@@ -89,7 +89,7 @@ const jsonLd = {
       <Image src={heroImage} alt={title} layout="constrained" width={900} sizes="(max-width: 960px) 100vw, 900px" priority />
     </div>
   )}
-  <section class="section-pad">
+  <section class="section-pad article-section">
     <div class="article-body">
       <slot />
     </div>
@@ -148,6 +148,12 @@ const jsonLd = {
   .article-meta {
     font-size: var(--font-size-sm);
     color: var(--color-text-muted);
+  }
+  /* The body, sources and prev/next sit outside .container, so they need the
+     same side gutter or the text runs flush to the screen edge on phones. */
+  .article-section {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
   }
   .article-hero-image {
     max-width: 900px;

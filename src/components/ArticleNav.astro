@@ -26,6 +26,7 @@ const { prev, next, basePath } = Astro.props;
   .article-nav {
     display: flex;
     justify-content: space-between;
+    gap: var(--space-sm);
     border-top: 1px solid var(--color-border-strong);
     padding-top: var(--space-md);
     margin-top: var(--space-lg);
@@ -40,6 +41,9 @@ const { prev, next, basePath } = Astro.props;
     text-transform: uppercase;
     color: var(--color-text-secondary);
     transition: var(--transition-color);
+  }
+  .article-nav a:last-child {
+    text-align: right;
   }
   .article-nav a:hover {
     color: var(--color-accent);
