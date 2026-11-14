@@ -1,0 +1,27 @@
+---
+// ContentsLedger.astro - The homepage contents list: numbered, hairline-ruled
+// rows with a title, a line of description and a count. Replaces the image cards.
+interface Row {
+  title: string;
+  href: string;
+  description: string;
+  count: string;
+}
+interface Props {
+  rows: Row[];
+}
+const { rows } = Astro.props;
+---
+<ol class="ledger">
+  {rows.map((row, i) => (
+    <li>
+      <a class="ledger-row" href={row.href}>
+        <span class="lr-no">{String(i + 1).padStart(2, '0')}</span>
+        <span class="lr-title">{row.title}</span>
+        <span class="lr-desc">{row.description}</span>
+        <span class="lr-count caps">{row.count}</span>
+        <span class="lr-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+    </li>
+  ))}
+</ol>

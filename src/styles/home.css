@@ -1,0 +1,183 @@
+/* ============================================
+   HOMEPAGE — "The Plate and the Ledger"
+   Curated Archive / Editorial Heritage: clean cream, not grunge.
+   Every photo is a numbered plate with one ruled label; every list is a
+   hairline-ruled ledger. No cards, no overlays, no buttons below the hero.
+
+   Everything here is namespaced under .home (the wrapper in pages/index.astro)
+   so nothing leaks to other pages. Colours and fonts come from global.css.
+   ============================================ */
+
+.home {
+  --h-ink-2: #4f4a44;
+  --h-ink-3: #6b655d; /* 5.3:1 on --color-bg */
+  --h-rule: rgba(28, 28, 28, 0.17);
+  --h-paper-deep: #ebe5d8; /* image placeholder while a plate loads */
+  --h-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --h-wrap: 1360px;
+  --h-gutter: clamp(20px, 3.4vw, 48px);
+  --h-gap: clamp(16px, 2.3vw, 32px);
+}
+
+/* The homepage drops the site-wide paper-noise layer: clean cream. */
+body:has(.home)::before { display: none; }
+
+.home-wrap {
+  max-width: calc(var(--h-wrap) + 2 * var(--h-gutter));
+  margin: 0 auto;
+  padding: 0 var(--h-gutter);
+}
+
+/* small caps label voice: section heads, plate numbers, counts */
+.home .caps { font: 500 0.72rem/1.45 var(--font-body); letter-spacing: 0.17em; text-transform: uppercase; }
+.home .muted { color: var(--h-ink-3); }
+.home .double-rule { height: 6px; border-top: 2px solid var(--color-text-primary); border-bottom: 1px solid var(--color-text-primary); }
+
+/* text links replace buttons below the hero */
+.home .textlink {
+  display: inline-flex; align-items: baseline; gap: 0.6rem;
+  font: 500 0.74rem/1 var(--font-body); letter-spacing: 0.16em; text-transform: uppercase;
+  position: relative;
+  padding: 0.75rem 0 0.4rem;
+  border-bottom: 1px solid currentColor;
+  transition: var(--transition-color);
+}
+.home .textlink::after { content: ''; position: absolute; inset: -4px 0 -12px; } /* tap area */
+.home .textlink .arr { display: inline-block; letter-spacing: 0; transition: transform var(--duration-normal) var(--ease-out); }
+.home .textlink:hover { color: var(--color-accent); }
+.home .textlink:hover .arr { transform: translateX(4px); }
+
+/* ---------- sections ---------- */
+.home-section { padding-top: clamp(4.5rem, 9vw, 8rem); }
+.home .opener {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.15rem 1rem;
+  padding-top: 0.75rem; border-top: 1px solid var(--color-text-primary);
+  margin-bottom: clamp(1.75rem, 3.4vw, 3rem);
+}
+.home .opener h2 { font: 500 0.74rem/1.4 var(--font-body); letter-spacing: 0.18em; text-transform: uppercase; white-space: nowrap; }
+.home .opener .aside { text-align: right; }
+.home .display-2 { font: 400 clamp(2rem, 3.5vw, 3.1rem)/1.08 var(--font-display); letter-spacing: -0.02em; }
+.home .display-2 em { font-style: italic; }
+.home .body-copy p { font: 400 1.04rem/1.75 var(--font-body); color: var(--h-ink-2); max-width: 34rem; }
+.home .body-copy p + p { margin-top: 1.05rem; }
+
+/* ---------- plates ---------- */
+.home .plate-img { display: block; background: var(--h-paper-deep); }
+.home .plate-img img { width: 100%; max-width: none; height: auto; }
+.home .label {
+  display: grid; grid-template-columns: 6.4rem minmax(0, 1fr); column-gap: 1.25rem; align-items: baseline;
+  margin-top: 0.85rem; padding-top: 0.7rem; border-top: 1px solid var(--color-text-primary);
+  transition: border-color var(--duration-normal) var(--ease-out);
+}
+.home .plate:has(a.plate-img:hover) .label { border-top-color: var(--color-accent); }
+.home .label-no { font: 500 0.68rem/1 var(--font-body); letter-spacing: 0.18em; text-transform: uppercase; color: var(--h-ink-3); white-space: nowrap; }
+.home .label-no b { font: 400 1.08rem/1 var(--font-display); letter-spacing: 0; text-transform: none; color: var(--color-accent); margin-left: 0.4rem; }
+.home .label-text { font: italic 400 1rem/1.45 var(--font-display); }
+/* ProvenanceTag inside a plate label: sits under the caption, tighter than in an article.
+   Beside a list (and on phones, below) it takes the label's full width so a long
+   place name isn't squeezed into four lines. */
+.home .label .provenance { grid-column: 2; justify-self: start; margin-top: 0.75rem; }
+.home .split .label .provenance { grid-column: 1 / -1; }
+
+/* ---------- the ledger (contents) ---------- */
+.home .ledger { list-style: none; }
+.home .ledger li { border-bottom: 1px solid var(--h-rule); }
+.home .ledger-row {
+  display: grid; grid-template-columns: 3.2rem minmax(11rem, 1fr) minmax(0, 1.75fr) 9.5rem 1.4rem;
+  column-gap: var(--h-gap); align-items: baseline; padding: 1.45rem 0 1.6rem;
+}
+.home .lr-no { font: 400 1.02rem/1 var(--font-display); color: var(--color-accent); font-variant-numeric: lining-nums tabular-nums; }
+.home .lr-title { font: 400 clamp(1.6rem, 2.5vw, 2.25rem)/1.1 var(--font-display); letter-spacing: -0.016em; transition: var(--transition-color); }
+.home .lr-desc { font: 400 0.98rem/1.62 var(--font-body); color: var(--h-ink-2); max-width: 36rem; }
+.home .lr-count { text-align: right; color: var(--h-ink-3); }
+.home .lr-arrow { text-align: right; transition: transform var(--duration-normal) var(--ease-out); }
+.home a.ledger-row:hover .lr-title { color: var(--color-accent); }
+.home a.ledger-row:hover .lr-arrow { transform: translateX(4px); }
+
+/* ---------- split (plate beside a list or text) ---------- */
+.home .split { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--h-gap); align-items: start; }
+.home .split > .plate { grid-column: 1 / span 5; }
+.home .split > .split-body { grid-column: 7 / -1; }
+.home .split--rev > .plate { grid-column: 8 / -1; grid-row: 1; }
+.home .split--rev > .split-body { grid-column: 1 / span 6; grid-row: 1; }
+
+/* ---------- chronicles index ---------- */
+.home .index { list-style: none; margin-bottom: 2rem; border-top: 1px solid var(--h-rule); }
+.home .index li { border-bottom: 1px solid var(--h-rule); }
+.home .index a { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr) 1.2rem; column-gap: 1.25rem; align-items: baseline; padding: 1.05rem 0 1.15rem; }
+.home .ix-date { font: 500 0.67rem/1.6 var(--font-body); letter-spacing: 0.15em; text-transform: uppercase; color: var(--h-ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.home .ix-title { display: block; font: 400 1.3rem/1.28 var(--font-display); letter-spacing: -0.008em; transition: var(--transition-color); }
+.home .ix-meta { display: block; margin-top: 0.3rem; font: 400 0.86rem/1.5 var(--font-body); color: var(--h-ink-3); }
+.home .ix-arr { text-align: right; transition: transform var(--duration-normal) var(--ease-out); }
+.home .index a:hover .ix-title { color: var(--color-accent); }
+.home .index a:hover .ix-arr { transform: translateX(4px); }
+
+/* ---------- field notes ---------- */
+.home .fn-intro { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--h-gap); align-items: end; margin-bottom: clamp(2rem, 4vw, 3.25rem); }
+.home .fn-intro .display-2 { grid-column: 1 / span 5; }
+.home .fn-intro .body-copy { grid-column: 7 / -1; }
+.home .inprep { margin-top: 1.4rem; display: flex; gap: 0.9rem; align-items: baseline; flex-wrap: wrap; }
+.home .inprep .t { font: italic 400 1.15rem/1.3 var(--font-display); color: var(--color-text-primary); }
+
+/* ---------- roll strip ---------- */
+.home .strip { display: flex; gap: clamp(0.7rem, 1.6vw, 1.5rem); align-items: flex-end; margin-bottom: 2rem; }
+.home .strip figure { flex: var(--r) 1 0; min-width: 0; }
+.home .strip img { width: 100%; max-width: none; height: auto; background: var(--h-paper-deep); }
+.home .strip figcaption { margin-top: 0.55rem; padding-top: 0.45rem; border-top: 1px solid var(--h-rule); font: 400 0.7rem/1.4 var(--h-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--h-ink-3); }
+
+/* ---------- about ---------- */
+.home .about-head { margin-bottom: 1.6rem; }
+.home .signature { margin-top: 1.6rem; font: italic 400 1.5rem/1 var(--font-display); }
+.home .about-links { margin-top: 1.25rem; }
+
+/* ---------- colophon ---------- */
+.home .colophon { padding: clamp(5rem, 10vw, 9rem) 0 2.5rem; }
+.home .colo-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--h-gap); row-gap: 2.2rem; padding-top: 2rem; }
+.home .colo-mark { grid-column: 1 / span 4; }
+.home .colo-mark .wordmark { display: inline-block; padding: 0.5rem 0; margin: -0.5rem 0 0.25rem; font: 500 1.65rem/1 var(--font-display); letter-spacing: -0.012em; white-space: nowrap; }
+.home .colo-nav { grid-column: 5 / span 3; }
+.home .colo-nav ul { list-style: none; display: grid; }
+.home .colo-nav a { display: inline-block; padding: 0.6rem 0; font: 400 1.05rem/1.3 var(--font-display); transition: var(--transition-color); }
+.home .colo-nav a:hover { color: var(--color-accent); }
+.home .colo-follow { grid-column: 9 / -1; }
+.home .colo-follow .line { font: italic 400 1.35rem/1.3 var(--font-display); margin-bottom: 0.5rem; }
+.home .fineprint { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem 2rem; margin-top: 3.5rem; padding-top: 0.9rem; border-top: 1px solid var(--h-rule); color: var(--h-ink-3); }
+.home .fineprint a { padding: 0.8rem 0; margin: -0.8rem 0; } /* tap area, no layout change */
+.home .fineprint a:hover { color: var(--color-text-primary); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .home .ledger-row { grid-template-columns: 2.6rem minmax(9rem, 1fr) minmax(0, 1.6fr) 7.5rem 1.2rem; }
+}
+@media (max-width: 900px) {
+  .home .split, .home .fn-intro { grid-template-columns: 1fr; }
+  .home .split > .plate, .home .split > .split-body,
+  .home .split--rev > .plate, .home .split--rev > .split-body,
+  .home .fn-intro .display-2, .home .fn-intro .body-copy { grid-column: 1; grid-row: auto; }
+  .home .split > .plate { margin-bottom: 2.6rem; }
+  .home .split--rev > .plate { margin: 2.8rem 0 0; }
+  .home .fn-intro .display-2 { margin-bottom: 1.3rem; }
+  .home .ledger-row { grid-template-columns: 2.4rem minmax(0, 1fr) auto; grid-template-rows: auto auto auto; row-gap: 0.55rem; }
+  .home .lr-no { grid-row: 1; grid-column: 1; }
+  .home .lr-title { grid-row: 1; grid-column: 2; }
+  .home .lr-arrow { grid-row: 1; grid-column: 3; }
+  .home .lr-desc { grid-row: 2; grid-column: 2 / -1; }
+  .home .lr-count { grid-row: 3; grid-column: 2; text-align: left; }
+  .home .colo-mark, .home .colo-nav, .home .colo-follow { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .home .label { grid-template-columns: 4.9rem minmax(0, 1fr); }
+  .home .label .provenance { grid-column: 1 / -1; }
+  /* the strip becomes a swipe row that bleeds off the right edge */
+  .home .strip {
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; align-items: flex-start;
+    margin-right: calc(-1 * var(--h-gutter)); padding-right: var(--h-gutter);
+    -webkit-overflow-scrolling: touch;
+  }
+  .home .strip::-webkit-scrollbar { display: none; }
+  .home .strip figure { flex: 0 0 auto; width: calc(12rem * var(--r)); scroll-snap-align: start; }
+  .home .index a { grid-template-columns: 5.2rem minmax(0, 1fr) 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home *, .home *::before, .home *::after { transition: none !important; }
+}

@@ -1,0 +1,25 @@
+---
+// RollStrip.astro - Equal-height contact strip of frames from one roll, each
+// labelled with its frame number. Frames, not plates: no captions, no tags.
+// On phones it becomes a horizontal swipe row.
+import { Image } from 'astro:assets';
+
+interface Frame {
+  image: ImageMetadata;
+  /** Lab frame number, e.g. "018". */
+  frame: string;
+  alt: string;
+}
+interface Props {
+  frames: Frame[];
+}
+const { frames } = Astro.props;
+---
+<div class="strip" role="group" aria-label="Frames from the roll">
+  {frames.map(({ image, frame, alt }) => (
+    <figure style={`--r:${(image.width / image.height).toFixed(4)}`}>
+      <Image src={image} alt={alt} widths={[400, 800]} sizes="(max-width: 760px) 18rem, 33vw" loading="lazy" />
+      <figcaption>Fr. {frame}</figcaption>
+    </figure>
+  ))}
+</div>

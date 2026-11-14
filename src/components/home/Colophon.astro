@@ -1,0 +1,38 @@
+---
+// Colophon.astro - Homepage footer, set like the back page of a journal:
+// double rule, wordmark, section links, one Instagram line, fine print.
+// (Other pages keep Footer.astro.)
+const links = [
+  { href: '/chronicles/', label: 'Chronicles' },
+  { href: '/courses/', label: 'Courses' },
+  { href: '/field-notes/', label: 'Field Notes' },
+  { href: '/camera-roll/', label: 'Camera Roll' },
+];
+const year = new Date().getFullYear();
+---
+<footer class="colophon">
+  <div class="home-wrap">
+    <div class="double-rule" role="presentation"></div>
+    <div class="colo-grid">
+      <div class="colo-mark">
+        <a class="wordmark" href="/">The Caddie Chat</a>
+        <p class="caps muted">Stories from inside the ropes</p>
+      </div>
+      <nav class="colo-nav" aria-label="Footer">
+        <ul>
+          {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+      </nav>
+      <div class="colo-follow">
+        <p class="line">The story is still being written.</p>
+        <a class="textlink" href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">Instagram, @thecaddiechat <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </div>
+    </div>
+    <div class="fineprint caps">
+      <span>&copy; {year} The Caddie Chat</span>
+      <span>Set in Playfair Display, DM Sans &amp; IBM Plex Mono</span>
+      <span>Plates I to III on 35mm film</span>
+      <a href="https://stoekmedia.com" target="_blank" rel="noopener">StoekMedia.com</a>
+    </div>
+  </div>
+</footer>

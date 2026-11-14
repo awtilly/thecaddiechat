@@ -1,16 +1,92 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
-import CardGrid from '../components/CardGrid.astro';
-import ContentCard from '../components/ContentCard.astro';
-import CtaBanner from '../components/CtaBanner.astro';
-import Footer from '../components/Footer.astro';
-import { Image } from 'astro:assets';
-import introImg from '../assets/images/courses/francis-a-byrne/hero-caddie-tee.jpg';
-import chroniclesCardImg from '../assets/images/chronicles/viktor-hovland/inline-2.jpg';
-import coursesCardImg from '../assets/images/courses/friars-head/tee-dune-corridor-ocean.jpg';
-import cameraCardImg from '../assets/images/courses/mountain-ridge/dramatic-clouds-fairway.jpg';
+import Masthead from '../components/home/Masthead.astro';
+import SectionOpener from '../components/home/SectionOpener.astro';
+import ContentsLedger from '../components/home/ContentsLedger.astro';
+import Plate from '../components/home/Plate.astro';
+import ChroniclesIndex from '../components/home/ChroniclesIndex.astro';
+import RollStrip from '../components/home/RollStrip.astro';
+import Colophon from '../components/home/Colophon.astro';
+import { getCollection } from 'astro:content';
+import '../styles/home.css';
+
+import plateFriarsHead from '../assets/images/home/plate-1-friars-head-corridor.jpg';
+import plateLastLight from '../assets/images/home/plate-2-caddie-last-light.jpg';
+import plateBuild from '../assets/images/home/plate-3-build-stone.jpg';
+import plateEvansBib from '../assets/images/home/plate-4-evans-bib.jpg';
+
+// ---- counts, read from the content so the ledger never goes stale ----
+const published = <T extends { data: { draft?: boolean } }>(entries: T[]) => entries.filter((e) => !e.data.draft);
+const chronicleCount = published(await getCollection('chronicles')).length;
+const courseCount = published(await getCollection('courses')).length;
+const fieldNoteCount = published(await getCollection('fieldNotes')).length;
+
+// Camera Roll: same grouping as /camera-roll/ (first 9 digits of the lab filename = one roll)
+const rollImages = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/camera-roll/*.jpg',
+  { eager: true }
+);
+const rollMap = new Map<string, Map<string, ImageMetadata>>();
+for (const [path, mod] of Object.entries(rollImages)) {
+  const filename = path.split('/').pop()!.replace('.jpg', '');
+  const rollId = filename.substring(0, 9);
+  if (!rollMap.has(rollId)) rollMap.set(rollId, new Map());
+  rollMap.get(rollId)!.set(filename.substring(9), mod.default);
+}
+const rollIds = [...rollMap.keys()].sort();
+const rollCount = rollIds.length;
+
+// The roll on the strip. Frame numbers, alt text and the season are facts
+// about this one roll (Roll 8, fall 2026), so they are written out here.
+const STRIP_ROLL = '002602370';
+const STRIP_SEASON = 'Fall 2026';
+const STRIP_FRAMES = [
+  { frame: '018', alt: 'Blue Ridge mountains in late sun above a valley of trees and a golf course.' },
+  { frame: '017', alt: 'A white clapboard church behind a stone wall at dusk under a pink sky.' },
+  { frame: '034', alt: 'A green complex at dusk, low light across native grass and a line of pines.' },
+  { frame: '032', alt: 'A flagstick against a fading evening sky above a darkening green.' },
+];
+const stripRoll = rollMap.get(STRIP_ROLL);
+if (!stripRoll) throw new Error(`[homepage] camera roll ${STRIP_ROLL} not found in src/assets/images/camera-roll/`);
+const stripNumber = rollIds.indexOf(STRIP_ROLL) + 1;
+const stripFrames = STRIP_FRAMES.map(({ frame, alt }) => {
+  const image = stripRoll.get(frame);
+  if (!image) throw new Error(`[homepage] frame ${frame} missing from roll ${STRIP_ROLL}`);
+  return { image, frame, alt };
+});
+
+const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const word = (n: number) => NUMBER_WORDS[n] ?? String(n);
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+
+const contents = [
+  {
+    title: 'Chronicles',
+    href: '/chronicles/',
+    description: 'First-person stories from inside the ropes: practice rounds on the bag for Viktor Hovland, Tyrrell Hatton and Matt Fitzpatrick, and essays on what makes a hole work.',
+    count: plural(chronicleCount, 'story', 'stories'),
+  },
+  {
+    title: 'Golden Age Golf',
+    href: '/courses/golden-age-golf/',
+    description: "Nine days, eight courses, and a search for the heart of Golden Age architecture in the Northeast, from Tillinghast to Travis, Winged Foot to Friar's Head.",
+    count: plural(courseCount, 'course', 'courses'),
+  },
+  {
+    title: 'Camera Roll',
+    href: '/camera-roll/',
+    description: 'Film rolls from abroad, tournament galleries, and the road between courses. A visual journal, one roll at a time.',
+    count: plural(rollCount, 'roll', 'rolls'),
+  },
+  {
+    title: 'Field Notes',
+    href: '/field-notes/',
+    description: 'Short notes from golf-course construction: earthwork, drainage, stone and sand.',
+    count: fieldNoteCount > 0 ? plural(fieldNoteCount, 'note', 'notes') : 'Forthcoming',
+  },
+];
+const sectionsWord = word(contents.length);
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -36,127 +112,117 @@ const jsonLd = {
   description="Stories from inside the ropes, golden age golf courses, and the world through a caddie's lens."
 >
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
-  <Nav />
-  <main id="main">
-  <Hero />
+  <div class="home">
+    <Masthead />
 
-  <section class="section-pad-lg">
-    <div class="container">
-      <div class="intro-grid" data-scroll-reveal>
-        <div class="intro-text">
-          <span class="section-label">About</span>
-          <h2>Every round tells a story. Every course has a soul.</h2>
-          <p>I'm Joe Stoehner: caddie, Evans Scholar, and storyteller. As an Evans Scholar, I've had the opportunity to caddie for PGA Tour pros like Viktor Hovland and Tyrrell Hatton at charity pro-ams, and when I'm not carrying a bag I'm chasing golden age architecture across the Northeast. This is where I document the game's most human moments.</p>
-          <p>The Caddie Chat is a home for the stories, photography, and perspectives that emerge when you spend your life inside the ropes.</p>
-          <div style="margin-top: 2rem;">
-            <a href="/chronicles/" class="btn btn-arrow">Start Reading</a>
+    <main id="main">
+      <Hero />
+
+      <section class="home-wrap home-section" aria-labelledby="contents-h">
+        <SectionOpener id="contents-h" title="Contents" aside={`${sectionsWord[0].toUpperCase()}${sectionsWord.slice(1)} sections`} />
+        <ContentsLedger rows={contents} />
+      </section>
+
+      <section class="home-wrap home-section" aria-label="Plate I, Friar's Head">
+        <Plate
+          no="I"
+          image={plateFriarsHead}
+          alt="Golfers on a tee at Friar's Head looking down a fairway corridor framed by sand dunes and trees, with Long Island Sound visible through the gap at the far end."
+          caption="The tee shot through the dunes, the Sound at the end of the corridor. Coore & Crenshaw, 2002."
+          href="/courses/friars-head/"
+          hrefLabel="Friar's Head, read the course essay"
+          verb="WALKED"
+          place="Friar's Head, Baiting Hollow NY"
+        />
+      </section>
+
+      <section class="home-wrap home-section" aria-labelledby="chron-h">
+        <SectionOpener id="chron-h" title="Chronicles" aside="The full index" />
+        <div class="split">
+          <Plate
+            no="II"
+            size="column"
+            image={plateLastLight}
+            alt="A player checks his yardage beside his bag while a caddie in a white cap stands ready, both lit by low golden light in front of a dark line of pines."
+            caption="Player and caddie at last light."
+            verb="SHOT"
+            place="Roll 8, Fr. 028"
+            date="Fall 2026"
+          />
+          <div class="split-body">
+            <ChroniclesIndex />
+            <a class="textlink" href="/chronicles/">All Chronicles <span class="arr" aria-hidden="true">&rarr;</span></a>
           </div>
         </div>
-        <div class="intro-image">
-          <Image src={introImg} alt="On the course" loading="lazy" />
+      </section>
+
+      <section class="home-wrap home-section" aria-labelledby="fn-h">
+        <SectionOpener
+          id="fn-h"
+          title="Field Notes"
+          aside={fieldNoteCount > 0 ? plural(fieldNoteCount, 'note', 'notes') : 'Forthcoming'}
+        />
+        <div class="fn-intro">
+          <h3 class="display-2">How a hole gets built, <em>before anyone tees off.</em></h3>
+          <div class="body-copy">
+            <p>Earthwork, drainage, stone and sand, written from inside golf-course construction. The part of the game most golf writing skips, told by someone who works in it.</p>
+            <p class="inprep">
+              <span class="caps muted">In preparation</span>
+              <span class="t">The Cost of Rock</span>
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
+        <Plate
+          no="III"
+          image={plateBuild}
+          alt="A construction site below a blasted rock ledge: stockpiles of sand, a half-built dry-stone wall, utility vehicles, a tracked loader and crew in high-visibility vests, autumn trees above."
+          caption="Sand stockpiled under the ledge while the stone wall goes in."
+          href="/field-notes/"
+          hrefLabel="Field Notes"
+          verb="SHOT"
+          place="Roll 8, Fr. 009"
+          date="Fall 2026"
+        />
+      </section>
 
-  <section class="section-pad-lg">
-    <div class="container">
-      <span class="section-label" data-scroll-reveal>Explore</span>
-      <h2 class="explore-heading" data-scroll-reveal>Three Worlds. One Story.</h2>
-      <CardGrid>
-        <ContentCard
-          title="Chronicles"
-          description="First-person stories from inside the ropes: pro-am rounds caddying for Viktor Hovland, Tyrrell Hatton, and Matt Fitzpatrick, and the moments that happen between the shots."
-          image={chroniclesCardImg}
-          href="/chronicles/"
-          tag="01"
-        />
-        <ContentCard
-          title="Golden Age Golf"
-          description="Nine days, eight courses, and a search for the heart of Golden Age architecture in the Northeast, from Tillinghast to Travis, Winged Foot to Friar's Head."
-          image={coursesCardImg}
-          href="/courses/golden-age-golf/"
-          tag="02"
-        />
-        <ContentCard
+      <section class="home-wrap home-section" aria-labelledby="roll-h">
+        <SectionOpener
+          id="roll-h"
           title="Camera Roll"
-          description="Film rolls from abroad, tournament galleries, and city photography: a visual journal of the places and perspectives that shape the journey."
-          image={cameraCardImg}
-          href="/camera-roll/"
-          tag="03"
+          aside={`Roll ${stripNumber} · ${stripRoll.size} frames · ${STRIP_SEASON}`}
         />
-      </CardGrid>
-    </div>
-  </section>
+        <RollStrip frames={stripFrames} />
+        <a class="textlink" href="/camera-roll/">All {word(rollCount)} rolls <span class="arr" aria-hidden="true">&rarr;</span></a>
+      </section>
 
-  <CtaBanner
-    heading='The story is still<br>being <em>written.</em>'
-    description="New chronicles, course reviews, and photography galleries are always in progress. Follow the journey on Instagram or check back for the latest."
-    buttonText="Follow on Instagram"
-    buttonHref="https://instagram.com/thecaddiechat"
-    buttonExternal={true}
-  />
-  </main>
+      <section class="home-wrap home-section" aria-labelledby="about-h">
+        <SectionOpener id="about-h" title="About" aside="Joe Stoehner" />
+        <div class="split split--rev">
+          <div class="split-body">
+            <h3 class="display-2 about-head">Every round tells a story. <em>Every course has a soul.</em></h3>
+            <div class="body-copy">
+              <p>I'm Joe Stoehner: caddie, Evans Scholar, and storyteller. As an Evans Scholar, I've had the opportunity to caddie for PGA Tour pros like Viktor Hovland and Tyrrell Hatton at charity pro-ams, and when I'm not carrying a bag I'm chasing golden age architecture across the Northeast. This is where I document the game's most human moments.</p>
+              <p>These days the work is golf-course construction: the earthwork, drainage and stone that come before anyone tees off. That is where the Builder comes from.</p>
+              <p>The Caddie Chat is a home for the stories, photography, and perspectives that emerge when you spend your life inside the ropes.</p>
+            </div>
+            <p class="signature">Joe Stoehner</p>
+            <p class="about-links"><a class="textlink" href="/chronicles/">Start reading <span class="arr" aria-hidden="true">&rarr;</span></a></p>
+          </div>
+          <Plate
+            no="IV"
+            size="column"
+            image={plateEvansBib}
+            alt="Two caddies in golden-hour light, one in a green Evans Scholar bib with a towel over his shoulder."
+            caption="Evans Scholar caddies during BMW Championship week."
+            href="/chronicles/viktor-hovland/"
+            hrefLabel="My Day as a Golf Caddie for Viktor Hovland"
+            verb="WALKED"
+            place="Olympia Fields CC, Olympia Fields IL"
+          />
+        </div>
+      </section>
+    </main>
 
-  <Footer />
+    <Colophon />
+  </div>
 </BaseLayout>
-
-<style>
-  .intro-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-xl);
-    align-items: center;
-  }
-  .intro-text h2 {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    font-weight: 500;
-    line-height: 1.15;
-    margin-bottom: var(--space-md);
-  }
-  .intro-text p {
-    color: var(--color-text-secondary);
-    font-size: 1rem;
-    line-height: 1.85;
-    margin-bottom: var(--space-sm);
-  }
-  .intro-image {
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 4/5;
-  }
-  .intro-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: var(--transition-image);
-  }
-  .intro-image:hover img {
-    transform: scale(1.03);
-  }
-  .intro-image::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border: 1px solid var(--color-border);
-    pointer-events: none;
-  }
-  .explore-heading {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    font-weight: 500;
-    line-height: 1.15;
-    margin-bottom: var(--space-lg);
-  }
-
-  @media (max-width: 900px) {
-    .intro-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-lg);
-    }
-    .intro-image {
-      max-width: 500px;
-    }
-  }
-</style>

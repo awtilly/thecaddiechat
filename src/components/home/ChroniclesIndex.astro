@@ -1,0 +1,33 @@
+---
+// ChroniclesIndex.astro - Dated index of every published chronicle, newest
+// first. Reads the collection, so a new story appears here on its own.
+import { getCollection } from 'astro:content';
+
+// Index-length titles for stories whose full title carries a lead-in phrase.
+const SHORT_TITLES: Record<string, string> = {
+  'viktor-hovland': 'My Day as a Golf Caddie for Viktor Hovland',
+  'matt-fitzpatrick': 'Caddying for Matt Fitzpatrick at the BMW Championship',
+};
+
+const stories = (await getCollection('chronicles'))
+  .filter((e) => !e.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const monthYear = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+---
+<ol class="index">
+  {stories.map((story) => (
+    <li>
+      <a href={`/chronicles/${story.id}/`}>
+        <time class="ix-date" datetime={story.data.date.toISOString().slice(0, 10)}>
+          {monthYear.format(story.data.date)}
+        </time>
+        <span>
+          <span class="ix-title">{SHORT_TITLES[story.id] ?? story.data.title}</span>
+          <span class="ix-meta">{story.data.meta}</span>
+        </span>
+        <span class="ix-arr" aria-hidden="true">&rarr;</span>
+      </a>
+    </li>
+  ))}
+</ol>

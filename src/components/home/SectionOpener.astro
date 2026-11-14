@@ -1,0 +1,14 @@
+---
+// SectionOpener.astro - Hairline rule, small-caps section name on the left,
+// a muted aside (count, status) on the right.
+interface Props {
+  id: string;
+  title: string;
+  aside?: string;
+}
+const { id, title, aside } = Astro.props;
+---
+<div class="opener">
+  <h2 id={id}>{title}</h2>
+  {aside && <span class="aside caps muted">{aside}</span>}
+</div>

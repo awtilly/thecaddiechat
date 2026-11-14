@@ -1,0 +1,42 @@
+---
+// Plate.astro - A numbered plate: photo, one ruled label (plate number + italic
+// caption) and a provenance tag. No overlay, no hover zoom.
+import { Image } from 'astro:assets';
+import ProvenanceTag from '../ProvenanceTag.astro';
+
+interface Props {
+  /** Roman numeral: "I", "II" ... */
+  no: string;
+  image: ImageMetadata;
+  alt: string;
+  caption: string;
+  /** Optional link target for the photo. */
+  href?: string;
+  /** Accessible name for that link. */
+  hrefLabel?: string;
+  /** "full" runs the measure; "column" sits beside a list (5 of 12 columns). */
+  size?: 'full' | 'column';
+  /** ProvenanceTag fields. Facts only: leave out what isn't verified. */
+  verb: 'WALKED' | 'PRICED' | 'MADE' | 'SHOT' | 'WORN';
+  place?: string;
+  date?: string;
+}
+
+const { no, image, alt, caption, href, hrefLabel, size = 'full', verb, place, date } = Astro.props;
+
+const widths = (size === 'full' ? [480, 800, 1200, 1565] : [400, 640, 960]).filter((w) => w <= image.width);
+const sizes = size === 'full'
+  ? '(max-width: 1456px) 100vw, 1360px'
+  : '(max-width: 900px) 100vw, 42vw';
+const Frame = href ? 'a' : 'div';
+---
+<figure class="plate" id={`plate-${no.toLowerCase()}`}>
+  <Frame class="plate-img" href={href} aria-label={href ? hrefLabel : undefined}>
+    <Image src={image} alt={alt} widths={widths} sizes={sizes} loading="lazy" />
+  </Frame>
+  <figcaption class="label">
+    <span class="label-no">Plate<b>{no}</b></span>
+    <span class="label-text">{caption}</span>
+    <ProvenanceTag verb={verb} place={place} date={date} />
+  </figcaption>
+</figure>

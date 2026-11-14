@@ -40,6 +40,8 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     display: flex;
     align-items: flex-end;
     overflow: hidden;
+    /* dark while the photo loads, so the white masthead is never on cream */
+    background: var(--color-dark);
   }
   .hero-bg {
     position: absolute;
@@ -84,7 +86,9 @@ import heroImg from '../assets/images/courses/friars-head/hero-clubhouse-bluff.j
     min-height: 100vh;
     min-height: 100dvh;
     padding-bottom: var(--space-xl);
-    padding-top: calc(var(--nav-height) + var(--space-lg));
+    /* --mast-h: measured height of the floating homepage masthead (it wraps to
+       two rows on phones). Falls back to the fixed nav height. */
+    padding-top: calc(var(--mast-h, var(--nav-height)) + var(--space-lg));
   }
   .hero-kicker {
     display: inline-flex;
