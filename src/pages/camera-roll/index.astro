@@ -1,70 +1,66 @@
 ---
 import PageLayout from '../../layouts/PageLayout.astro';
-import { Image } from 'astro:assets';
 import CtaBanner from '../../components/CtaBanner.astro';
-import Lightbox from '../../components/Lightbox.astro';
+import FilterBar from '../../components/camera-roll/FilterBar.astro';
+import RollSection from '../../components/camera-roll/RollSection.astro';
+import FrameViewer from '../../components/camera-roll/FrameViewer.astro';
+import { loadCameraRoll } from '../../lib/camera-roll';
+import '../../styles/camera-roll.css';
 
-// Glob import all camera roll images
-const allImages = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/images/camera-roll/*.jpg',
-  { eager: true }
-);
+// Golf up top, travel below. What is on the page and in what order is
+// src/data/camera-roll.json; the scans are in src/assets/images/camera-roll/.
+const { sections, frameCount, rollCount } = await loadCameraRoll();
 
-// Group by film roll prefix (first 9 digits of filename)
-const rollMap = new Map<string, { src: ImageMetadata; filename: string }[]>();
-for (const [path, module] of Object.entries(allImages)) {
-  const filename = path.split('/').pop()!.replace('.jpg', '');
-  const rollId = filename.substring(0, 9);
-  if (!rollMap.has(rollId)) rollMap.set(rollId, []);
-  rollMap.get(rollId)!.push({ src: module.default, filename });
-}
-
-// Sort each roll's images by filename
-for (const images of rollMap.values()) {
-  images.sort((a, b) => a.filename.localeCompare(b.filename));
-}
-
-// Convert to array and sort rolls by their ID
-const rolls = [...rollMap.entries()]
-  .sort(([a], [b]) => a.localeCompare(b))
-  .map(([id, images], index) => ({
-    id,
-    label: `Roll ${index + 1}`,
-    count: images.length,
-    images,
-  }));
+const NUMBER_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
+const rollsWord = NUMBER_WORDS[rollCount] ?? String(rollCount);
+const PART_LABELS = ['Part one', 'Part two', 'Part three'];
 ---
 <PageLayout
   title="Camera Roll | The Caddie Chat"
-  description="Photography galleries: film rolls from abroad, tournament moments, and city streets."
-  pageTitle='Camera<br><em>Roll</em>'
-  pageSubtitle="A visual journal: film rolls from abroad, tournament moments, and city streets through a caddie's lens."
-  sectionLabel="Photography"
+  description={`${rollsWord} rolls of 35mm film: golf courses, a tournament week and a course build up top, then the travel between them.`}
 >
-  <section class="section-pad-lg">
-    <div class="container">
-      {rolls.map((roll) => (
-        <div class="gallery-section" data-scroll-reveal>
-          <div class="gallery-section-header">
-            <h2>{roll.label}</h2>
-            <span>{roll.count} Frames</span>
+  <div class="cr">
+    <header class="cr-wrap cr-head">
+      <span class="section-label">Photography</span>
+      <h1>Camera <em>Roll</em></h1>
+      <p class="sub">{rollsWord} rolls of 35mm. Golf up top: courses, a tournament week, a build. Then the travel, the road between them.</p>
+      <p class="stat cr-mono">{rollCount} rolls &middot; {frameCount} frames &middot; 35mm</p>
+    </header>
+
+    <FilterBar sections={sections} total={frameCount} />
+
+    <div class="cr-wrap cr-end">
+      <section class="cr-index" id="rolls" aria-label="Rolls">
+        {sections.map((section) => (
+          <div class="grp">
+            <h2><a href={`#${section.id}`}>{section.title}</a> <span>{section.count} frames &middot; {section.rolls.length} rolls</span></h2>
+            <div class="rows">
+              {section.rolls.map((roll) => (
+                <a class="cr-row" href={`#${roll.anchor}`}>
+                  <span class="no">No. {roll.no}</span>
+                  <img src={roll.cover.thumb.src} width="84" height="56" alt="" loading="lazy" decoding="async" />
+                  <span class="what">
+                    <strong>{roll.title}</strong>
+                    {roll.chapters.length > 1 && <small>{roll.chapters.map((c) => c.title).join(' · ')}</small>}
+                  </span>
+                  <span class="n">{roll.frames.length}</span>
+                </a>
+              ))}
+            </div>
           </div>
-          <div class="roll-grid">
-            {roll.images.map((image, i) => (
-              <Image
-                src={image.src}
-                alt=""
-                widths={[400, 800, 1200]}
-                sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-                loading="lazy"
-                data-lightbox
-              />
-            ))}
-          </div>
-        </div>
+        ))}
+      </section>
+
+      <p class="cr-result" aria-live="polite"></p>
+
+      {sections.map((section, i) => (
+        <RollSection section={section} label={PART_LABELS[i] ?? `Part ${i + 1}`} />
       ))}
     </div>
-  </section>
+
+    <a class="cr-rollsbtn cr-mono" href="#rolls">Rolls <span aria-hidden="true">&uarr;</span></a>
+    <FrameViewer />
+  </div>
 
   <CtaBanner
     heading='See more on <em>Instagram.</em>'
@@ -73,34 +69,4 @@ const rolls = [...rollMap.entries()]
     buttonHref="https://instagram.com/thecaddiechat"
     buttonExternal={true}
   />
-
-  <Lightbox />
 </PageLayout>
-
-<style>
-  .roll-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.5rem;
-  }
-  .roll-grid img {
-    width: 100%;
-    aspect-ratio: 3/2;
-    object-fit: cover;
-    cursor: pointer;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-  .roll-grid img:hover {
-    opacity: 0.85;
-  }
-  @media (max-width: 1280px) {
-    .roll-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-  @media (max-width: 768px) {
-    .roll-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-</style>

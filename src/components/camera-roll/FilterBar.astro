@@ -1,0 +1,88 @@
+---
+// FilterBar.astro - Sticky chip row for the Camera Roll: All, then each section
+// with its own tags. Filtering hides frames in place, so film order is kept.
+import type { Section } from '../../lib/camera-roll';
+
+interface Props {
+  sections: Section[];
+  total: number;
+}
+const { sections, total } = Astro.props;
+const names = Object.fromEntries(sections.flatMap((s) => [[s.id, s.title], ...s.tags.map((t) => [t.id, t.title])]));
+---
+<div class="cr-filter-anchor" aria-hidden="true"></div>
+<nav class="cr-filters" aria-label="Filter frames" data-names={JSON.stringify(names)}>
+  <div class="cr-wrap">
+    <button type="button" class="on" data-tag="all" aria-pressed="true">All <i>{total}</i></button>
+    {sections.map((s) => (
+      <Fragment>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" class="main" data-tag={s.id} aria-pressed="false">{s.title} <i>{s.count}</i></button>
+        {s.tags.map((t) => (
+          <button type="button" data-tag={t.id} aria-pressed="false">{t.title} <i>{t.count}</i></button>
+        ))}
+      </Fragment>
+    ))}
+  </div>
+</nav>
+
+<script>
+  // The window scroll listener is aborted on swap so it doesn't pile up across
+  // soft navigations; element listeners die with the swapped body.
+  let pageAbort: AbortController | null = null;
+  document.addEventListener('astro:before-swap', () => {
+    pageAbort?.abort();
+    pageAbort = null;
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('.cr');
+    const bar = root?.querySelector<HTMLElement>('.cr-filters');
+    if (!root || !bar) return;
+    pageAbort = new AbortController();
+
+    const names: Record<string, string> = JSON.parse(bar.dataset.names || '{}');
+    const buttons = [...bar.querySelectorAll<HTMLButtonElement>('button')];
+    const result = root.querySelector<HTMLElement>('.cr-result');
+    const anchor = root.querySelector<HTMLElement>('.cr-filter-anchor');
+    const all = <T extends HTMLElement>(sel: string) => [...root.querySelectorAll<T>(sel)];
+
+    function apply(tag: string) {
+      root!.classList.toggle('cr-filtered', tag !== 'all');
+      buttons.forEach((b) => {
+        const on = b.dataset.tag === tag;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      let n = 0;
+      all('.cr-fr').forEach((f) => {
+        const ok = tag === 'all' || (f.dataset.tags || '').split(' ').includes(tag);
+        f.hidden = !ok;
+        if (ok) n++;
+      });
+      // A sequence, roll or section with nothing left in it drops out too
+      ['.cr-chapter', '.cr-roll', '.cr-sec'].forEach((sel) =>
+        all(sel).forEach((el) => { el.hidden = !el.querySelector('.cr-fr:not([hidden])'); })
+      );
+      const rolls = all('.cr-roll').filter((r) => !r.hidden).length;
+      if (result) result.textContent = tag === 'all' ? '' : `${names[tag] ?? tag} · ${n} frames across ${rolls} roll${rolls === 1 ? '' : 's'}`;
+    }
+
+    buttons.forEach((b) =>
+      b.addEventListener('click', () => {
+        apply(b.dataset.tag || 'all');
+        b.scrollIntoView({ inline: 'center', block: 'nearest' });
+        // The page just got shorter: come back up to the top of the results
+        if (anchor) {
+          const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 72;
+          const y = anchor.getBoundingClientRect().top + window.scrollY - navH;
+          if (window.scrollY > y) window.scrollTo({ top: y, behavior: 'instant' });
+        }
+      })
+    );
+
+    window.addEventListener('scroll', () => {
+      root.classList.toggle('cr-scrolled', window.scrollY > 900);
+    }, { passive: true, signal: pageAbort.signal });
+  });
+</script>

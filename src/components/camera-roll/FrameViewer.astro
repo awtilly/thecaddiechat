@@ -1,0 +1,153 @@
+---
+// FrameViewer.astro - Full-screen viewer for the Camera Roll contact sheets.
+// Swipe or arrow through the frames that are currently showing (the filter is
+// respected), with roll, frame number and what is in the picture underneath.
+// The address carries the frame (/camera-roll/#r8-003), so a link opens on it.
+---
+<div class="cr-viewer" role="dialog" aria-modal="true" aria-label="Frame viewer" data-lenis-prevent>
+  <button class="x" type="button" aria-label="Close">&times;</button>
+  <div class="stage"><img alt="" /></div>
+  <div class="bar">
+    <span class="id cr-mono"></span>
+    <span class="cap"></span>
+    <span class="btns">
+      <button class="prev" type="button" aria-label="Previous frame">&#8249;</button>
+      <button class="next" type="button" aria-label="Next frame">&#8250;</button>
+    </span>
+  </div>
+</div>
+
+<script>
+  // Document listeners are aborted on swap so they don't pile up across soft
+  // navigations; element listeners die with the swapped body.
+  let pageAbort: AbortController | null = null;
+  document.addEventListener('astro:before-swap', () => {
+    document.body.style.overflow = '';
+    pageAbort?.abort();
+    pageAbort = null;
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('.cr');
+    const viewer = root?.querySelector<HTMLElement>('.cr-viewer');
+    if (!root || !viewer) return;
+    pageAbort = new AbortController();
+    const { signal } = pageAbort;
+
+    const stage = viewer.querySelector<HTMLElement>('.stage')!;
+    const img = stage.querySelector('img')!;
+    const idEl = viewer.querySelector<HTMLElement>('.id')!;
+    const capEl = viewer.querySelector<HTMLElement>('.cap')!;
+    const closeBtn = viewer.querySelector<HTMLButtonElement>('.x')!;
+    const isOpen = () => viewer.classList.contains('on');
+
+    let list: HTMLElement[] = [];
+    let at = 0;
+    let last: HTMLElement | null = null;
+
+    // replaceState keeps Astro's router state; only the hash changes
+    const setHash = (hash: string) =>
+      history.replaceState(history.state, '', location.pathname + location.search + hash);
+
+    function show(i: number) {
+      at = (i + list.length) % list.length;
+      const f = list[at];
+      img.style.transform = '';
+      img.sizes = '100vw';
+      img.srcset = f.dataset.lset || '';
+      img.src = f.dataset.l || '';
+      img.alt = f.querySelector('img')?.alt || '';
+      const inRoll = list.filter((x) => x.dataset.roll === f.dataset.roll);
+      idEl.textContent = `Roll ${f.dataset.roll} · Fr. ${f.dataset.frame} · ${inRoll.indexOf(f) + 1} / ${inRoll.length}`;
+      capEl.textContent = f.dataset.desc || '';
+      setHash('#' + f.id);
+      // Warm the neighbours so a swipe lands on a loaded frame
+      [1, -1].forEach((d) => {
+        const n = list[(at + d + list.length) % list.length];
+        const pre = new Image();
+        pre.sizes = '100vw';
+        pre.srcset = n.dataset.lset || '';
+        pre.src = n.dataset.l || '';
+      });
+    }
+
+    function open(f: HTMLElement | null) {
+      list = [...root!.querySelectorAll<HTMLElement>('.cr-fr:not([hidden])')];
+      if (!f || list.length === 0) return;
+      last = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      viewer!.classList.add('on');
+      document.body.style.overflow = 'hidden';
+      show(Math.max(0, list.indexOf(f)));
+      closeBtn.focus();
+    }
+
+    function close() {
+      viewer!.classList.remove('on');
+      document.body.style.overflow = '';
+      setHash('');
+      list[at]?.scrollIntoView({ block: 'center' });
+      last?.focus({ preventScroll: true });
+      last = null;
+    }
+
+    root.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      const frame = target.closest<HTMLElement>('.cr-fr');
+      if (frame) return open(frame);
+      const cover = target.closest<HTMLElement>('.cr-cover');
+      if (cover) open(document.getElementById(cover.dataset.open || ''));
+    });
+    closeBtn.addEventListener('click', close);
+    viewer.querySelector('.prev')!.addEventListener('click', () => show(at - 1));
+    viewer.querySelector('.next')!.addEventListener('click', () => show(at + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen()) {
+        const frame = (e.target as HTMLElement).closest?.<HTMLElement>('.cr-fr');
+        if (frame && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          open(frame);
+        }
+        return;
+      }
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowLeft') show(at - 1);
+      if (e.key === 'ArrowRight') show(at + 1);
+      // Keep Tab inside the dialog's three buttons while it is open
+      if (e.key === 'Tab') {
+        const buttons = [...viewer.querySelectorAll<HTMLElement>('button')];
+        const first = buttons[0];
+        const lastBtn = buttons[buttons.length - 1];
+        const active = document.activeElement as HTMLElement | null;
+        if (e.shiftKey && active === first) { e.preventDefault(); lastBtn.focus(); }
+        else if (!e.shiftKey && active === lastBtn) { e.preventDefault(); first.focus(); }
+        else if (!active || !buttons.includes(active)) { e.preventDefault(); first.focus(); }
+      }
+    }, { signal });
+
+    // Swipe left/right to move, drag down to close
+    let x0: number | null = null;
+    let y0 = 0;
+    stage.addEventListener('touchstart', (e) => {
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+    }, { passive: true });
+    stage.addEventListener('touchmove', (e) => {
+      if (x0 === null) return;
+      img.style.transform = `translateX(${e.touches[0].clientX - x0}px)`;
+    }, { passive: true });
+    stage.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      const dy = e.changedTouches[0].clientY - y0;
+      x0 = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(at + (dx < 0 ? 1 : -1));
+      else if (dy > 90) close();
+      else img.style.transform = '';
+    });
+
+    // A shared link opens straight on its frame
+    const linked = /^#(r\d+-\d+)$/.exec(location.hash);
+    if (linked) open(document.getElementById(linked[1]));
+  });
+</script>

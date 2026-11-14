@@ -47,6 +47,18 @@ Once all of the above is done, delete this section from CLAUDE.md.
 - MDX files named to match URL slugs exactly (no number prefixes)
 - Image paths in frontmatter are relative to the MDX file
 
+## Camera Roll
+
+- `src/data/camera-roll.json` is the catalog: Golf section, then Travel; each
+  roll's title, cover frame, sequences, and every frame's description and tags
+- Scans live in `src/assets/images/camera-roll/` under the lab filename
+  (9-digit roll id + 3-digit frame number)
+- `src/lib/camera-roll.ts` joins the two and fails the build if a scan is on
+  disk but not in the catalog, or the other way round. Adding a roll means
+  adding both.
+- No frames with people in them (Joe, 2026-11-14)
+- The homepage strip counts the roll's frames from the files on disk
+
 ## Styling Rules
 
 - CSS custom properties: Do NOT rename or remove existing variables in `:root`

@@ -1,0 +1,104 @@
+---
+// RollSection.astro - One part of the Camera Roll (Golf, then Travel): a big
+// section head, then each roll as a cover frame plus contact sheets, one sheet
+// per sequence. Frames keep their own shape; nothing is cropped on the sheet.
+import ProvenanceTag from '../ProvenanceTag.astro';
+import type { Section, Frame } from '../../lib/camera-roll';
+
+interface Props {
+  section: Section;
+  /** "Part one", "Part two" */
+  label: string;
+}
+const { section, label } = Astro.props;
+
+/** A half-roll smaller than this gets no full-width cover. */
+const COVER_MIN = 8;
+const range = (frames: Frame[]) => {
+  const a = frames[0].frame;
+  const b = frames[frames.length - 1].frame;
+  return a === b ? `Fr. ${a}` : `Fr. ${a}–${b}`;
+};
+const THUMB_SIZES = '(min-width: 1100px) 300px, (min-width: 700px) 250px, 130px';
+const COVER_SIZES = '(min-width: 1344px) 1216px, (min-width: 700px) calc(100vw - 4rem), 100vw';
+---
+<section class="cr-sec" id={section.id} aria-labelledby={`${section.id}-h`}>
+  <header class="cr-sechead">
+    <p class="cr-mono cr-green">{label}</p>
+    <h2 id={`${section.id}-h`}>{section.title}</h2>
+    <p class="cr-mono cr-muted">{section.count} frames &middot; {section.rolls.length} rolls</p>
+  </header>
+
+  {section.rolls.map((roll) => {
+    const single = roll.chapters.length === 1; // one sequence would only repeat the title
+    const sequences = roll.chapters.map((c) => c.title).join(' · ');
+    return (
+      <section class="cr-roll" id={roll.anchor} aria-labelledby={`${roll.anchor}-h`}>
+        <header>
+          <p class="cr-mono cr-green">
+            Roll {roll.no} &middot; {roll.frames.length} frames{roll.date && <Fragment> &middot; {roll.date}</Fragment>}
+          </p>
+          <h3 id={`${roll.anchor}-h`}>{roll.title}</h3>
+          {!single && <p class="cr-chs">{sequences}</p>}
+          {roll.twin && (
+            <a class="cr-also cr-mono" href={`#${roll.twin.anchor}`}>
+              Same roll, {roll.twin.count} more under {roll.twin.section} <span aria-hidden="true">{roll.twin.below ? '↓' : '↑'}</span>
+            </a>
+          )}
+        </header>
+
+        {roll.frames.length >= COVER_MIN && (
+          <button class="cr-cover" type="button" data-open={roll.cover.id} aria-label={`Open frame ${roll.cover.frame}: ${roll.cover.desc}`}>
+            <img
+              src={roll.cover.large.src}
+              srcset={roll.cover.large.srcset}
+              sizes={COVER_SIZES}
+              width={roll.cover.image.width}
+              height={roll.cover.image.height}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="cr-mono">Fr. {roll.cover.frame}</span>
+          </button>
+        )}
+
+        {roll.chapters.map((chapter) => (
+          <div class="cr-chapter">
+            <h4 class="cr-mono"><span>{chapter.title}</span><span class="cr-muted">{range(chapter.frames)}</span></h4>
+            <div class="cr-sheet">
+              {chapter.frames.map((f) => (
+                <figure
+                  class="cr-fr"
+                  id={f.id}
+                  style={`--r:${f.ratio.toFixed(4)}`}
+                  data-tags={f.tags.join(' ')}
+                  data-roll={f.roll}
+                  data-frame={f.frame}
+                  data-desc={f.desc}
+                  data-l={f.large.src}
+                  data-lset={f.large.srcset}
+                >
+                  <img
+                    src={f.thumb.src}
+                    srcset={f.thumb.srcset}
+                    sizes={THUMB_SIZES}
+                    width={f.image.width}
+                    height={f.image.height}
+                    alt={f.alt}
+                    loading="lazy"
+                    decoding="async"
+                    tabindex="0"
+                    role="button"
+                  />
+                </figure>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <ProvenanceTag verb="SHOT" place={[`Roll ${roll.no}`, roll.place].filter(Boolean).join(', ')} date={roll.date ?? undefined} />
+      </section>
+    );
+  })}
+</section>
