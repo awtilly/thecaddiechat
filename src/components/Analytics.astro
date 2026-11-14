@@ -1,0 +1,162 @@
+---
+/*
+ * Analytics — BOTH options built, neither switched on.
+ *
+ * GEO-PLAN Phase 0.3 is blocked on one decision from Joe, so both candidates are
+ * implemented here behind a single constant. Flipping PROVIDER below (and pasting
+ * one id) is the entire remaining task; there is no second step.
+ *
+ *   'none'       — current state. Renders nothing at all. Site is unchanged.
+ *   'ga4'        — Google Analytics 4. Matches FFG, so one reporting script
+ *                  (ga4_report.py) covers both properties. Needs GA4_ID.
+ *   'plausible'  — Plausible. Lighter, no cookies, no consent banner needed,
+ *                  but it's a paid hosted dependency. Needs no id, just the domain.
+ *
+ * Constraint that ruled out everything else: GitHub Pages has no server and no
+ * access logs, so this has to be a plain client-side script tag. Nothing
+ * server-rendered, nothing that needs an edge function.
+ *
+ * WHY THIS EXISTS AT ALL: without it, AI referral traffic is unmeasurable — and
+ * Phase 6 can then only ever measure citations, never the visits they produce.
+ *
+ * Phase 6.2 (AI referral tracking) ships here too, for both providers: the
+ * classification is done in first-party code rather than left to a dashboard
+ * segment, because a segment cannot see utm_source-only visits and cannot keep
+ * attribution across soft navigations. See src/lib/ai-referrers.mjs for why.
+ */
+import { buildInlinePrelude } from '../lib/ai-referrers.mjs';
+
+const PROVIDER: 'none' | 'ga4' | 'plausible' = 'ga4';
+
+// Paste the real GA4 measurement id here when/if PROVIDER = 'ga4'.
+const GA4_ID = 'G-6RST62EFLX';
+const PLAUSIBLE_DOMAIN = 'thecaddiechat.com';
+
+// Guard against shipping the placeholder id to production by accident.
+const ga4Ready = PROVIDER === 'ga4' && !GA4_ID.includes('XXXXXXXXXX');
+if (PROVIDER === 'ga4' && !ga4Ready) {
+  console.warn('[Analytics] PROVIDER=ga4 but GA4_ID is still the placeholder — not emitting the tag.');
+}
+
+/*
+ * Shared Phase 6.2 runtime, emitted into whichever provider block renders.
+ *
+ * resolveAiSource() is the sticky wrapper around the pure classifier:
+ *   - a hit with a recognised referrer or utm_source is recorded for the session;
+ *   - later pageviews with no signal of their own inherit it, tagged via:'session',
+ *     so a 5-page AI visit reports 5 AI pageviews instead of 1 and 4 "direct".
+ * sessionStorage is wrapped in try/catch throughout — it throws outright when
+ * cookies are blocked, which is disproportionately likely in this audience.
+ *
+ * aiReferralIsNew() makes the headline "an AI sent someone here" event fire once
+ * per visit. It needs both guards: document.referrer survives Astro's soft
+ * navigations (so the in-memory flag catches repeats within one visit) while
+ * sessionStorage catches a hard reload of the landing page.
+ */
+const AI_RUNTIME = `
+${buildInlinePrelude()}
+var CC_AI_KEY = 'cc_ai_src';
+var CC_AI_FIRED_KEY = 'cc_ai_fired';
+var ccAiFired = false;
+function resolveAiSource() {
+  var found = classifyAiSource(document.referrer, location.search);
+  if (found) {
+    try { sessionStorage.setItem(CC_AI_KEY, JSON.stringify(found)); } catch (e) {}
+    return found;
+  }
+  try {
+    var saved = sessionStorage.getItem(CC_AI_KEY);
+    if (saved) { var p = JSON.parse(saved); p.via = 'session'; return p; }
+  } catch (e) {}
+  return null;
+}
+function aiReferralIsNew() {
+  if (ccAiFired) return false;
+  ccAiFired = true;
+  try {
+    if (sessionStorage.getItem(CC_AI_FIRED_KEY)) return false;
+    sessionStorage.setItem(CC_AI_FIRED_KEY, '1');
+  } catch (e) {}
+  return true;
+}
+`;
+---
+{ga4Ready && (
+  <Fragment>
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}></script>
+    <script is:inline set:html={`
+${AI_RUNTIME}
+window.dataLayer = window.dataLayer || [];
+function gtag(){ window.dataLayer.push(arguments); }
+gtag('js', new Date());
+// send_page_view is OFF: astro:page-load fires on the initial load as well as on
+// every soft navigation, so leaving it on double-counts the landing pageview of
+// every single session.
+gtag('config', ${JSON.stringify(GA4_ID)}, { send_page_view: false });
+document.addEventListener('astro:page-load', function () {
+  var ai = resolveAiSource();
+  gtag('event', 'page_view', {
+    page_location: window.location.href,
+    page_path: window.location.pathname,
+    page_title: document.title,
+    // '(none)' rather than undefined: GA4 drops undefined params, which would make
+    // non-AI traffic indistinguishable from traffic the classifier never saw.
+    ai_source: ai ? ai.id : '(none)',
+    ai_source_via: ai ? ai.via : '(none)',
+  });
+  if (ai && ai.via !== 'session' && aiReferralIsNew()) {
+    gtag('event', 'ai_referral', {
+      ai_source: ai.id,
+      ai_source_via: ai.via,
+      landing_page: window.location.pathname,
+    });
+  }
+});
+`} />
+  </Fragment>
+)}
+
+{PROVIDER === 'plausible' && (
+  <Fragment>
+    {/* manual mode: Astro soft-navigates, so pageviews are sent by hand below */}
+    <script is:inline defer data-domain={PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.manual.js"></script>
+    <script is:inline set:html={`
+${AI_RUNTIME}
+window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };
+document.addEventListener('astro:page-load', function () {
+  var ai = resolveAiSource();
+  window.plausible('pageview', { props: {
+    ai_source: ai ? ai.id : 'none',
+    ai_source_via: ai ? ai.via : 'none',
+  } });
+  if (ai && ai.via !== 'session' && aiReferralIsNew()) {
+    window.plausible('AI Referral', { props: {
+      ai_source: ai.id,
+      ai_source_via: ai.via,
+      landing_page: window.location.pathname,
+    } });
+  }
+});
+`} />
+  </Fragment>
+)}
+
+{/*
+  REPORTING NOTES — what to switch on in whichever tool wins.
+
+  The hostname/utm list itself lives in src/lib/ai-referrers.mjs and is applied in
+  first-party code above, so neither tool needs a referrer segment to get this
+  right. What each one still needs is somewhere to PUT the values:
+
+  GA4: Admin -> Custom definitions -> create two event-scoped custom dimensions,
+       'ai_source' and 'ai_source_via', with those exact parameter names. Until
+       they exist the params are collected but not reportable. 'ai_referral' shows
+       up as an event with no setup, and is the one to mark as a conversion.
+  Plausible: Site settings -> Custom properties -> allow 'ai_source' and
+       'ai_source_via'. 'AI Referral' appears under Custom events (Goals).
+
+  Values for ai_source_via, which is worth splitting in reports:
+    referrer — arrived with an AI hostname in the Referer header
+    utm      — Referer stripped, but the AI product tagged the link
+    session  — a later pageview in a visit that started as one of the above
+*/}

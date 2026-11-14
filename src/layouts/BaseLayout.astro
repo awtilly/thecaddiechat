@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import Analytics from '../components/Analytics.astro';
 import { getImage } from 'astro:assets';
 import defaultOgSrc from '../assets/images/courses/friars-head/hero-clubhouse-bluff.jpg';
 
@@ -68,6 +69,8 @@ const ogImageUrl = new URL(ogProcessed.src, Astro.site).href;
   <link rel="preload" as="font" type="font/woff2" href={dmSansUrl} crossorigin>
   <style set:html={fontFaceCss}></style>
   <slot name="head" />
+  {/* Renders nothing until Joe picks a provider -- see Analytics.astro */}
+  <Analytics />
   <ClientRouter />
 </head>
 <body>
