@@ -43,6 +43,7 @@ const EXPECTED_URLS = [
   '/courses/friars-head/',
   '/camera-roll/',
   '/field-notes/',
+  '/privacy/',
   '/tarmac/', // noindex + excluded from sitemap, but the page must still build
 ];
 

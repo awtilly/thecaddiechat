@@ -1,0 +1,127 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+
+// Keep this page true to what the site actually does. If analytics, embeds,
+// forms or hosting change, change this page in the same commit.
+const UPDATED = 'November 13, 2026';
+---
+<PageLayout
+  title="Privacy | The Caddie Chat"
+  description="What The Caddie Chat collects when you read the site, why, and how to opt out."
+  pageTitle="Privacy"
+  pageSubtitle="What this site collects when you read it, why, and how to opt out."
+  sectionLabel="The fine print"
+>
+  <section class="privacy">
+    <div class="container">
+      <div class="privacy-body">
+        <p class="updated">Last updated {UPDATED}</p>
+
+        <p>
+          The Caddie Chat is a personal site written and run by Joe Stoehner. The stories,
+          course pages and photo rolls have no comments, no newsletter sign-up and no ads.
+          The one thing the site does collect is ordinary visit statistics, explained below.
+        </p>
+
+        <h2>Site statistics (Google Analytics)</h2>
+        <p>
+          The site uses Google Analytics 4 to count visits. It records which pages are
+          read, roughly where readers are (country and city, worked out from the IP
+          address, which Google Analytics does not store), what kind of device and browser
+          was used, and which site or search sent the reader here. That includes whether a
+          visit came from an AI assistant such as ChatGPT, Perplexity, Claude, Gemini or
+          Copilot.
+        </p>
+        <p>
+          To tell one visit from another, Google Analytics sets first-party cookies named
+          <code>_ga</code> and <code>_ga_6RST62EFLX</code>, which last up to two years. If
+          you arrive from an AI assistant, the site also keeps a small note in your
+          browser's session storage, cleared when you close the tab, so that visit is
+          counted once.
+        </p>
+        <p>
+          The statistics are used for one thing: to see what people read. They are not used
+          for advertising, they are not sold, and the advertising features of Google
+          Analytics are switched off. Visit-level data is kept for up to 14 months.
+        </p>
+        <p>
+          Google processes this data on the site's behalf. Google's own explanation is at
+          <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">How Google uses information from sites that use its services</a>.
+        </p>
+
+        <h2>Readers in Europe and the UK</h2>
+        <p>
+          If you are reading from the European Economic Area, the United Kingdom or
+          Switzerland, the analytics cookies above are not set. Google Analytics receives a
+          cookieless page count only, which cannot be tied to you from one page to the next.
+        </p>
+
+        <h2>How to opt out</h2>
+        <ul>
+          <li>Install Google's <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Analytics opt-out add-on</a> for your browser.</li>
+          <li>Block or clear cookies for thecaddiechat.com in your browser settings.</li>
+          <li>Use a content blocker. The site works the same without analytics.</li>
+        </ul>
+
+        <h2>Hosting</h2>
+        <p>
+          The site is hosted on GitHub Pages. Like any web host, GitHub receives your IP
+          address when your browser requests a page and may keep it in server logs for
+          security. See
+          <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub's privacy statement</a>.
+          Fonts and images are served from this site, not from third parties.
+        </p>
+
+        <h2>Links to other sites</h2>
+        <p>
+          Links to Instagram and other sites take you off The Caddie Chat. What those sites
+          collect is covered by their own policies.
+        </p>
+
+        <h2>Questions</h2>
+        <p>
+          Message <a href="https://instagram.com/thecaddiechat" target="_blank" rel="noopener">@thecaddiechat</a>
+          on Instagram. If this page changes, the date at the top changes with it.
+        </p>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .privacy {
+    padding: var(--space-lg) 0 var(--space-xl);
+  }
+  .privacy-body {
+    max-width: 680px;
+  }
+  .privacy-body .updated {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+  .privacy-body h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    margin: 2.5rem 0 var(--space-sm);
+  }
+  .privacy-body p,
+  .privacy-body li {
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-sm);
+  }
+  .privacy-body ul {
+    padding-left: 1.25rem;
+  }
+  .privacy-body a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .privacy-body code {
+    font-size: 0.9em;
+  }
+</style>

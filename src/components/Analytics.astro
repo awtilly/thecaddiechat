@@ -89,6 +89,12 @@ ${AI_RUNTIME}
 window.dataLayer = window.dataLayer || [];
 function gtag(){ window.dataLayer.push(arguments); }
 gtag('js', new Date());
+// Consent defaults, set before config. Advertising storage is off for everyone (the
+// site runs no ads). Analytics cookies are off for the EEA, UK and Switzerland, where
+// they would need a consent banner; those visits are counted cookieless instead.
+// /privacy/ describes exactly this, so change the two together.
+gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'granted' });
+gtag('consent', 'default', { analytics_storage: 'denied', region: ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH'] });
 // send_page_view is OFF: astro:page-load fires on the initial load as well as on
 // every soft navigation, so leaving it on double-counts the landing pageview of
 // every single session.

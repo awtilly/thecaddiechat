@@ -81,7 +81,7 @@ Custom image layout components for course articles:
 - `FeaturedImage` -- Featured image with styled caption line
 - `Memorabilia` -- Centered memorabilia display with label
 
-## Key URLs (21 Pages)
+## Key URLs (22 Pages)
 
 Keep this list in sync with `EXPECTED_URLS` in `scripts/validate-urls.mjs` --
 the validator fails the deploy on any mismatch (missing OR unexpected pages).
@@ -107,6 +107,7 @@ the validator fails the deploy on any mismatch (missing OR unexpected pages).
 /courses/friars-head/        Course article
 /camera-roll/                Camera Roll (standalone page)
 /field-notes/                Field Notes listing (empty state until content ships)
+/privacy/                    Privacy notice (must match what Analytics.astro actually does)
 /tarmac/                     AA award tracker (noindex, not in sitemap)
 ```
 
